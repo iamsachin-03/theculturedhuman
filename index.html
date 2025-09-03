@@ -4,13 +4,94 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Cultured Human</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #ece9e6, #ffffff);
+      color: #222;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    header {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      font-weight: 600;
+    }
+    header a {
+      text-decoration: none;
+      color: #444;
+      transition: 0.3s;
+    }
+    header a:hover {
+      color: #0070f3;
+    }
+    h1 {
+      font-size: 3rem;
+      margin: 0.5rem 0;
+    }
+    h1 span {
+      font-size: 2.8rem;
+    }
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #555;
+    }
+    .btn {
+      background: #0070f3;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.8rem 1.6rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    }
+    .btn:hover {
+      background: #0051aa;
+      transform: scale(1.05);
+    }
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.9rem;
+      color: #777;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col items-center justify-center">
-  <h1 class="text-4xl font-bold mb-6">🌍 The Cultured Human</h1>
-  <p class="mb-8 text-lg">Exploring Fitness, Lifestyle, Culture & Personal Growth.</p>
-  <a href="fitness.html" class="px-6 py-3 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700">
-    Go To Fitness Page 💪
-  </a>
+<body>
+  <!-- Navigation -->
+  <header>
+    <a href="#">Home</a>
+    <a href="fitness.html">Fitness</a>
+    <a href="#">Lifestyle</a>
+    <a href="#">Culture</a>
+    <a href="#">About</a>
+  </header>
+
+  <!-- Main Section -->
+  <main>
+    <h1>🌍 <span>The Cultured Human</span></h1>
+    <p>Exploring Fitness, Lifestyle, Culture & Personal Growth.</p>
+    <a href="fitness.html" class="btn">Go To Fitness Page 💪</a>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 The Cultured Human · Designed with ❤️ for growth & balance
+  </footer>
 </body>
 </html>
