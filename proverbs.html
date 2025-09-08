@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bihari Proverbs - The Cultured Human</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header & Nav -->
+    <header class="absolute top-0 left-0 w-full z-50 p-6">
+        <nav class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="h-10 w-10">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="48" stroke="var(--primary-color)" stroke-width="4" fill="none"/>
+                        <text x="50" y="55" font-family="'Playfair Display', serif" font-size="32" font-weight="700" fill="var(--primary-color)" text-anchor="middle" dominant-baseline="middle">TCH</text>
+                    </svg>
+                </div>
+                <span class="text-2xl font-semibold tracking-wider">The Cultured Human</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-10 text-lg">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="fitness.html" class="nav-link">Fitness</a>
+                <a href="culture.html" class="nav-link font-semibold" style="color: var(--primary-color);">Culture</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Proverbs Hero Section -->
+    <section class="relative hero-bg py-48 text-center" style="background-image: linear-gradient(to top, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 0.6) 50%, rgba(10, 10, 10, 0.9) 100%), url('https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=1974&auto=format&fit=crop');">
+        <div class="relative max-w-4xl mx-auto px-6">
+            <h1 class="font-playfair text-6xl md:text-7xl font-bold">Pearls of Wisdom (Padhua)</h1>
+            <p class="text-xl md:text-2xl text-gray-300 mt-4">A comprehensive collection of timeless proverbs from Bihar, offering insights into its culture, values, and humor.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="py-24 px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="space-y-8" id="proverbs-list">
+                <div class="proverb-card"><p class="proverb">"अधजल गगरी छलकत जाय"</p><p class="meaning">An empty vessel makes much noise; people with little knowledge often boast the most.</p></div>
+                <div class="proverb-card"><p class="proverb">"जेकर लाठी, ओकर भঁইস"</p><p class="meaning">He who holds the stick, owns the buffalo; a commentary on "might is right".</p></div>
+                <div class="proverb-card"><p class="proverb">"घर के मुरगी दाल बराबर"</p><p class="meaning">Self-possessions are always undermined; familiarity breeds contempt.</p></div>
+                <div class="proverb-card"><p class="proverb">"नाच ना जाने, आँगन टेढ़"</p><p class="meaning">Doesn't know how to dance, but blames the crooked courtyard; a bad workman blames his tools.</p></div>
+                <div class="proverb-card"><p class="proverb">"सौ सोनार के, एक लोहार के"</p><p class="meaning">A single blow from a blacksmith is as effective as a hundred from a goldsmith; quality over quantity.</p></div>
+                <div class="proverb-card"><p class="proverb">"बन्दर क्या जाने अदरक का स्वाद"</p><p class="meaning">What does a monkey know of the taste of ginger; casting pearls before swine.</p></div>
+                <div class="proverb-card"><p class="proverb">"केतनो सोझ करू, कुकुर के पुछ टेढ़े रहत"</p><p class="meaning">You can't straighten a dog's tail; some people will never change.</p></div>
+                <div class="proverb-card"><p class="proverb">"आगे नाथ ना पीछे पगहा"</p><p class="meaning">With no one to control them; someone who has no responsibilities.</p></div>
+                <div class="proverb-card"><p class="proverb">"चमड़ी जाये पर दमड़ी ना जाये"</p><p class="meaning">The skin may go, but the penny shouldn't; about a very miserly person.</p></div>
+                <div class="proverb-card"><p class="proverb">"जबरा मारे रोवे ना दे"</p><p class="meaning">The powerful one hits you and doesn't even let you cry; oppression by the powerful.</p></div>
+                <div class="proverb-card"><p class="proverb">"अंधा बांटे रेवड़ी, फिर फिर अपनो को दे"</p><p class="meaning">The blind distributes sweets, and gives them only to his own; about favoritism and nepotism.</p></div>
+                <div class="proverb-card"><p class="proverb">"आम के आम गुठली के दाम"</p><p class="meaning">Getting the price of both the mango and its seed; a double benefit or a win-win situation.</p></div>
+                <div class="proverb-card"><p class="proverb">"एक अनार सौ बीमार"</p><p class="meaning">One pomegranate for a hundred sick people; a single solution for too many problems, or high demand for a scarce resource.</p></div>
+                <div class="proverb-card"><p class="proverb">"कहाँ राजा भोज, कहाँ गंगू तेली"</p><p class="meaning">Where is King Bhoj, and where is Gangu the oil-presser; a comparison between two people of vastly different statuses.</p></div>
+                <div class="proverb-card"><p class="proverb">"नौ नगद न तेरह उधार"</p><p class="meaning">Nine in cash is better than thirteen on credit; a bird in the hand is worth two in the bush.</p></div>
+                <div class="proverb-card"><p class="proverb">"अईसन कोई ना भेड़ा, जे अपने टांग تरे ना हेरा"</p><p class="meaning">No sheep looks for grass under its own feet; one often overlooks the value of what is close to them.</p></div>
+                <div class="proverb-card"><p class="proverb">"आपन सुधि ना, दोसरा के ज्ञान"</p><p class="meaning">Lacks self-awareness but gives knowledge to others; a person who doesn't practice what they preach.</p></div>
+                <div class="proverb-card"><p class="proverb">"बिना पेंदी के लोटा"</p><p class="meaning">A pot without a base; a person who is unreliable or constantly changes their opinion.</p></div>
+                <div class="proverb-card"><p class="proverb">"पेट में दाढ़ी होना"</p><p class="meaning">To have a beard in the stomach; being wise or mature beyond one's age.</p></div>
+                <div class="proverb-card"><p class="proverb">"पानी में रह कर मगर से बैर"</p><p class="meaning">Living in the water and having enmity with the crocodile; it is foolish to make enemies with those in power around you.</p></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center p-10 mt-16 border-t border-gray-800">
+        <p class="text-gray-400">&copy; 2025 The Cultured Human. All Rights Reserved.</p>
+        <p class="text-sm text-gray-600 mt-2">A brand dedicated to the art of living well, inspired by the spirit of Bihar.</p>
+    </footer>
+
+</body>
+</html>

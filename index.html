@@ -4,131 +4,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Cultured Human</title>
+    <title>The Cultured Human - A Journey to Balance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #C0A080;
+            --secondary-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --bg-color: #0a0a0a;
+        }
         body {
-            font-family: 'Montserrat', sans-serif;
-            background-image: url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=2071&auto=format&fit=crop');
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Cg fill-rule="evenodd"%3E%3Cg fill="%231a1a1a" fill-opacity="0.4"%3E%3Cpath opacity=".5" d="M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z"/%3E%3Cpath d="M6 5V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v5h-1v-5h-9v5h-1v-5h-9v5h-1v-5h-9v5h-1v-5h-9v5h-1v-5h-9v5h-1v-5h-9v5h-1v-5h-9v5H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h5v1h-5v9h5v1h-5v9h5v1h-5v9h5v1h-5v9h5v1h-5v9h5v1h-5v9h5v1h-5v9h5v1h-5v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0V6h6zm-1 5v-9h-5v9h5zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        .hero-bg {
+            background-image: linear-gradient(to top, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 0.6) 50%, rgba(10, 10, 10, 0.9) 100%), url('https://images.unsplash.com/photo-1605599042523-6a9a0e6b733c?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
         }
-
-        /* Animation for elements */
+        .card {
+            background-color: var(--secondary-color);
+            border: 1px solid #2a2a2a;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(192, 160, 128, 0.2);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #000;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(192, 160, 128, 0.3);
+        }
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(192, 160, 128, 0.5);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .fade-in-up {
+            animation: fadeInUp 1s ease-out forwards;
+            opacity: 0;
+        }
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        .fade-in-up {
-            animation: fadeInUp 0.8s ease-out forwards;
-        }
-        .fade-in-up-delay-1 {
-            animation: fadeInUp 0.8s ease-out 0.2s forwards;
-            opacity: 0;
-        }
-        .fade-in-up-delay-2 {
-            animation: fadeInUp 0.8s ease-out 0.4s forwards;
-            opacity: 0;
-        }
     </style>
 </head>
-<body class="text-white">
-    <!-- Background Overlay -->
-    <div class="absolute inset-0 bg-black bg-opacity-70"></div>
+<body class="overflow-x-hidden">
 
-    <!-- Main Content Wrapper -->
-    <div class="relative min-h-screen flex flex-col p-4 md:p-6">
-        
-        <!-- Top Navigation Bar -->
-        <nav class="sticky top-4 z-50 w-full max-w-6xl mx-auto bg-white/10 backdrop-blur-lg rounded-2xl shadow-lg">
-            <div class="mx-auto px-6">
-                <div class="flex items-center justify-between h-16">
-                    <!-- Logo & Title -->
-                    <a href="index.html" class="text-xl font-bold flex items-center gap-3 hover:opacity-80 transition-opacity">
-                        <!-- New Icon -->
-                        <!-- New Icon -->
-                        <div class="h-8 w-8">
-                           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="50" cy="50" r="50" fill="#FFC300"/>
-                                <path d="M 0 50 A 50 50 0 0 0 100 50 L 100 100 L 0 100 Z" fill="#FF5733"/>
-                                <text x="50" y="55" font-family="Montserrat, sans-serif" font-size="36" font-weight="700" fill="#005792" text-anchor="middle" dominant-baseline="middle">TCH</text>
-                            </svg>
-                        </div>
-                        <span>The Cultured Human</span>
-                    </a>
-                    <!-- Menu Items -->
-                    <div class="hidden md:flex items-center space-x-8 text-gray-200 font-semibold">
-                        <a href="index.html" class="text-white font-bold transition-colors">Home</a>
-                        <a href="fitness.html" class="hover:text-white transition-colors">Fitness</a>
-                        <a href="about.html" class="hover:text-white transition-colors">About</a>
-                        <a href="culture.html" class="hover:text-white transition-colors">Culture</a>
-                        <a href="#" class="opacity-50 cursor-not-allowed">Lifestyle</a>
-                        <a href="#" class="opacity-50 cursor-not-allowed">Growth</a>
-                    </div>
+    <!-- Header & Nav -->
+    <header class="absolute top-0 left-0 w-full z-50 p-6">
+        <nav class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                 <div class="h-10 w-10">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="48" stroke="var(--primary-color)" stroke-width="4" fill="none"/>
+                        <text x="50" y="55" font-family="'Playfair Display', serif" font-size="32" font-weight="700" fill="var(--primary-color)" text-anchor="middle" dominant-baseline="middle">TCH</text>
+                    </svg>
                 </div>
+                <span class="text-2xl font-semibold tracking-wider">The Cultured Human</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-10 text-lg">
+                <a href="index.html" class="nav-link font-semibold" style="color: var(--primary-color);">Home</a>
+                <a href="fitness.html" class="nav-link">Fitness</a>
+                <a href="culture.html" class="nav-link">Culture</a>
+                <a href="about.html" class="nav-link">About</a>
             </div>
         </nav>
+    </header>
 
-        <!-- Centered Hero Content -->
-        <div class="flex-grow flex items-center justify-center text-center py-20">
-            <div class="w-full max-w-3xl">
-                <h1 class="fade-in-up text-5xl md:text-7xl font-bold mb-4 leading-tight">Unlock a More Balanced You</h1>
-                <p class="fade-in-up-delay-1 text-lg md:text-xl text-gray-200 mb-8 max-w-xl mx-auto">Explore the pillars of a well-rounded life, from physical fitness to personal growth and cultural understanding.</p>
-                <a href="fitness.html" class="fade-in-up-delay-2 inline-block px-8 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transform hover:scale-105 transition-all duration-300">
-                    Begin Your Fitness Journey
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center justify-center text-center p-6">
+        <div class="max-w-4xl">
+            <h1 class="font-playfair text-6xl md:text-8xl font-bold leading-tight mb-6 fade-in-up" style="text-shadow: 0 5px 20px rgba(0,0,0,0.7);">Embrace the Renaissance of Self</h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-10 fade-in-up" style="animation-delay: 0.3s;">A modern sanctuary for balancing body, mind, and spirit. Discover your potential, explore ancient wisdom, and cultivate a life of purpose.</p>
+            <a href="about.html" class="btn-primary px-10 py-4 rounded-full text-lg inline-block fade-in-up" style="animation-delay: 0.6s;">
+                Discover Our Philosophy
+            </a>
+        </div>
+    </section>
+
+    <!-- Exploration Section -->
+    <section class="py-24 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-playfair text-5xl font-bold">Pillars of a Balanced Life</h2>
+                <p class="text-lg text-gray-400 mt-4">We focus on three core areas for holistic self-development.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Fitness Card -->
+                <a href="fitness.html" class="card rounded-2xl overflow-hidden group">
+                    <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=2070&auto=format&fit=crop" alt="Fitness" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="p-8">
+                        <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Body</h3>
+                        <p class="text-gray-400">Strengthen your vessel. Explore dynamic fitness routines, nutritional guidance, and practices for physical vitality.</p>
+                    </div>
+                </a>
+                <!-- Culture Card -->
+                <a href="culture.html" class="card rounded-2xl overflow-hidden group">
+                     <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1524222717473-730000095977?q=80&w=2070&auto=format&fit=crop" alt="Culture" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="p-8">
+                        <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Spirit</h3>
+                        <p class="text-gray-400">Nourish your soul. Immerse yourself in the rich tapestry of Bihari culture, art, and timeless traditions.</p>
+                    </div>
+                </a>
+                <!-- About/Mind Card -->
+                 <a href="about.html" class="card rounded-2xl overflow-hidden group">
+                     <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2070&auto=format&fit=crop" alt="Mind" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="p-8">
+                        <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Mind</h3>
+                        <p class="text-gray-400">Expand your horizons. Understand our philosophy of growth, learning, and the pursuit of a meaningful life.</p>
+                    </div>
                 </a>
             </div>
         </div>
-
-    </div>
-
-    <!-- "What We Explore" Section -->
-    <section class="relative bg-black bg-opacity-20 py-20 px-4">
-        <div class="w-full max-w-5xl mx-auto text-center">
-            <h2 class="text-4xl font-bold mb-12">What We Explore</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Fitness Card -->
-                <a href="fitness.html" class="group bg-white/10 p-8 rounded-xl hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2">
-                    <h3 class="text-2xl font-bold mb-2">Fitness 💪</h3>
-                    <p class="text-gray-300 group-hover:text-white transition-colors">Build a stronger body and mind.</p>
-                </a>
-                <!-- Lifestyle Card (Disabled) -->
-                <div class="group bg-black/20 p-8 rounded-xl cursor-not-allowed opacity-60">
-                    <h3 class="text-2xl font-bold mb-2">Lifestyle 🧘‍♀️</h3>
-                    <p class="text-gray-400">Cultivate mindful and balanced living.</p>
-                </div>
-                <!-- Culture Card (Active) -->
-                <a href="culture.html" class="group bg-white/10 p-8 rounded-xl hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2">
-                    <h3 class="text-2xl font-bold mb-2">Culture 🏛️</h3>
-                    <p class="text-gray-300 group-hover:text-white transition-colors">Explore art, history, and traditions.</p>
-                </a>
-                <!-- Growth Card (Disabled) -->
-                <div class="group bg-black/20 p-8 rounded-xl cursor-not-allowed opacity-60">
-                    <h3 class="text-2xl font-bold mb-2">Growth 🌱</h3>
-                    <p class="text-gray-400">Unlock your full potential.</p>
-                </div>
-                <!-- About Card -->
-                <a href="about.html"  class="group bg-black/20 p-8 rounded-xl hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2">
-                    <h3 class="text-2xl font-bold mb-2">About ✌️</h3>
-                    <p class="text-gray-300 group-hover:text-white transition-colors">Know Us.</p>
+    </section>
+    
+    <!-- Featured Section -->
+    <section class="bg-secondary-color py-24 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div class="rounded-2xl overflow-hidden shadow-2xl">
+                <img src="https://plus.unsplash.com/premium_photo-1661963953494-0a307d39d9f5?q=80&w=1974&auto=format&fit=crop" alt="Featured content" class="w-full h-full object-cover">
+            </div>
+            <div>
+                <h2 class="font-playfair text-5xl font-bold mb-6">Featured: The Soul of Bihar</h2>
+                <p class="text-xl text-gray-400 mb-8">Journey with us into the heart of Bihar. Explore ancient wonders, vibrant festivals, and the profound wisdom of its people. A celebration of a land rich in history and spirit.</p>
+                <a href="culture.html" class="btn-primary px-10 py-4 rounded-full text-lg inline-block">
+                    Explore Culture
                 </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="relative w-full text-center text-gray-300 text-sm p-6 bg-black bg-opacity-30">
-        © 2025 The Cultured Human · Designed with ❤️ for growth & balance
+    <footer class="text-center p-10 mt-16 border-t border-gray-800">
+        <p class="text-gray-400">&copy; 2025 The Cultured Human. All Rights Reserved.</p>
+        <p class="text-sm text-gray-600 mt-2">A brand dedicated to the art of living well, inspired by the spirit of Bihar.</p>
     </footer>
+
 </body>
 </html>

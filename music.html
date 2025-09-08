@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bihari Music - The Cultured Human</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header & Nav -->
+    <header class="absolute top-0 left-0 w-full z-50 p-6">
+        <nav class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="h-10 w-10">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="48" stroke="var(--primary-color)" stroke-width="4" fill="none"/>
+                        <text x="50" y="55" font-family="'Playfair Display', serif" font-size="32" font-weight="700" fill="var(--primary-color)" text-anchor="middle" dominant-baseline="middle">TCH</text>
+                    </svg>
+                </div>
+                <span class="text-2xl font-semibold tracking-wider">The Cultured Human</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-10 text-lg">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="fitness.html" class="nav-link">Fitness</a>
+                <a href="culture.html" class="nav-link font-semibold" style="color: var(--primary-color);">Culture</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Music Hero Section -->
+    <section class="relative hero-bg py-48 text-center" style="background-image: linear-gradient(to top, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 0.6) 50%, rgba(10, 10, 10, 0.9) 100%), url('https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=2070&auto=format&fit=crop');">
+        <div class="relative max-w-4xl mx-auto px-6">
+            <h1 class="font-playfair text-6xl md:text-7xl font-bold">The Sound of the Soil</h1>
+            <p class="text-xl md:text-2xl text-gray-300 mt-4">A curated collection of Bihari folk music, categorized by the moments they beautify.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="py-24 px-6 space-y-20">
+        <!-- Wedding Songs -->
+        <section>
+            <h2 class="font-playfair text-4xl font-bold text-center mb-12">Wedding Songs (Biyah Geet)</h2>
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                <div class="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-2xl"><iframe class="w-full h-full" src="https://www.youtube.com/embed/videoseries?list=PL32l6_t_Kyw9026n8p-5O2Mn-Rpai0gS5" title="Bihari Wedding Songs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+                <p class="text-gray-400 text-lg">The joyous and emotional melodies that form the heart of a Bihari wedding, from playful banter to heartfelt farewells.</p>
+            </div>
+        </section>
+
+        <!-- Chhath Puja Songs -->
+        <section>
+            <h2 class="font-playfair text-4xl font-bold text-center mb-12">Chhath Puja Songs</h2>
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                 <p class="text-gray-400 text-lg md:order-2">Devotional hymns dedicated to the Sun God, filling the air with reverence and gratitude during Bihar's most important festival.</p>
+                <div class="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-2xl md:order-1"><iframe class="w-full h-full" src="https://www.youtube.com/embed/videoseries?list=PL688A126335645F61" title="Chhath Puja Songs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+            </div>
+        </section>
+
+        <!-- Sohar - Childbirth Songs -->
+        <section>
+            <h2 class="font-playfair text-4xl font-bold text-center mb-12">Sohar - Childbirth Songs</h2>
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                <div class="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-2xl"><iframe class="w-full h-full" src="https://www.youtube.com/embed/videoseries?list=PLIOH-a0_AXX_7-A4sA2d3a5A6G3f4a3e_" title="Sohar Geet" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+                <p class="text-gray-400 text-lg">Tender songs celebrating the arrival of a new life, expressing the joy and hopes of the family.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center p-10 mt-16 border-t border-gray-800">
+        <p class="text-gray-400">&copy; 2025 The Cultured Human. All Rights Reserved.</p>
+        <p class="text-sm text-gray-600 mt-2">A brand dedicated to the art of living well, inspired by the spirit of Bihar.</p>
+    </footer>
+
+</body>
+</html>
