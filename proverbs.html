@@ -10,6 +10,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js" defer></script>
 </head>
 <body class="overflow-x-hidden">
 
@@ -28,8 +32,20 @@
             <div class="hidden md:flex items-center space-x-10 text-lg">
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="fitness.html" class="nav-link">Fitness</a>
-                <a href="culture.html" class="nav-link font-semibold" style="color: var(--primary-color);">Culture</a>
+                <a href="culture.html" class="nav-link">Culture</a>
+                <a href="marketplace.html" class="nav-link">Marketplace</a>
                 <a href="about.html" class="nav-link">About</a>
+                <a href="auth.html" id="login-link" class="nav-link">Login</a>
+                <div id="user-info" class="hidden items-center space-x-4">
+                    <span id="user-name" class="font-semibold"></span>
+                    <button id="logout-button" class="p-2 rounded-full focus:outline-none">
+                        <i class="fas fa-sign-out-alt text-xl"></i>
+                    </button>
+                </div>
+                <button id="theme-toggle" class="p-2 rounded-full focus:outline-none">
+                    <i id="theme-toggle-sun" class="fas fa-sun text-xl"></i>
+                    <i id="theme-toggle-moon" class="fas fa-moon text-xl hidden"></i>
+                </button>
             </div>
         </nav>
     </header>
@@ -49,7 +65,7 @@
                 <div class="proverb-card"><p class="proverb">"अधजल गगरी छलकत जाय"</p><p class="meaning">An empty vessel makes much noise; people with little knowledge often boast the most.</p></div>
                 <div class="proverb-card"><p class="proverb">"जेकर लाठी, ओकर भঁইস"</p><p class="meaning">He who holds the stick, owns the buffalo; a commentary on "might is right".</p></div>
                 <div class="proverb-card"><p class="proverb">"घर के मुरगी दाल बराबर"</p><p class="meaning">Self-possessions are always undermined; familiarity breeds contempt.</p></div>
-                <div class="proverb-card"><p class="proverb">"नाच ना जाने, आँगन टेढ़"</p><p class="meaning">Doesn't know how to dance, but blames the crooked courtyard; a bad workman blames his tools.</p></div>
+                <div class_="proverb-card"><p class="proverb">"नाच ना जाने, आँगन टेढ़"</p><p class="meaning">Doesn't know how to dance, but blames the crooked courtyard; a bad workman blames his tools.</p></div>
                 <div class="proverb-card"><p class="proverb">"सौ सोनार के, एक लोहार के"</p><p class="meaning">A single blow from a blacksmith is as effective as a hundred from a goldsmith; quality over quantity.</p></div>
                 <div class="proverb-card"><p class="proverb">"बन्दर क्या जाने अदरक का स्वाद"</p><p class="meaning">What does a monkey know of the taste of ginger; casting pearls before swine.</p></div>
                 <div class="proverb-card"><p class="proverb">"केतनो सोझ करू, कुकुर के पुछ टेढ़े रहत"</p><p class="meaning">You can't straighten a dog's tail; some people will never change.</p></div>
@@ -75,6 +91,7 @@
         <p class="text-gray-400">&copy; 2025 The Cultured Human. All Rights Reserved.</p>
         <p class="text-sm text-gray-600 mt-2">A brand dedicated to the art of living well, inspired by the spirit of Bihar.</p>
     </footer>
-
+    <script src="theme.js"></script>
+    <script type="module" src="auth.js"></script>
 </body>
 </html>

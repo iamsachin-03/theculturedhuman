@@ -10,6 +10,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js" defer></script>
 </head>
 <body class="overflow-x-hidden">
 
@@ -29,13 +33,26 @@
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="fitness.html" class="nav-link">Fitness</a>
                 <a href="culture.html" class="nav-link">Culture</a>
-                <a href="about.html" class="nav-link font-semibold" style="color: var(--primary-color);">About</a>
+                <a href="marketplace.html" class="nav-link">Marketplace</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="about.html" class="nav-link font-semibold">About</a>
+                <a href="auth.html" id="login-link" class="nav-link">Login</a>
+                <div id="user-info" class="hidden items-center space-x-4">
+                    <span id="user-name" class="font-semibold"></span>
+                    <button id="logout-button" class="p-2 rounded-full focus:outline-none">
+                        <i class="fas fa-sign-out-alt text-xl"></i>
+                    </button>
+                </div>
+                <button id="theme-toggle" class="p-2 rounded-full focus:outline-none">
+                    <i id="theme-toggle-sun" class="fas fa-sun text-xl"></i>
+                    <i id="theme-toggle-moon" class="fas fa-moon text-xl hidden"></i>
+                </button>
             </div>
         </nav>
     </header>
 
     <!-- About Hero Section -->
-    <section class="relative hero-bg py-48 text-center">
+    <section class="relative hero-bg py-48 text-center" style="background-image: linear-gradient(to top, rgba(10, 10, 10, 0.8) 0%, rgba(10, 10, 10, 0.7) 50%, rgba(10, 10, 10, 0.9) 100%), url('https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1973&auto=format&fit=crop');">
         <div class="absolute inset-0 bg-black opacity-60"></div>
         <div class="relative max-w-4xl mx-auto px-6">
             <h1 class="font-playfair text-6xl md:text-7xl font-bold">Our Philosophy</h1>
@@ -48,12 +65,12 @@
         <div class="max-w-4xl mx-auto">
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center mb-24">
-                <div class="prose prose-invert lg:prose-xl max-w-none">
+                <div class="prose lg:prose-xl max-w-none">
                     <h2 class="font-playfair text-4xl font-bold mb-4" style="color: var(--primary-color);">The Cultured Human is a movement.</h2>
-                    <p class="text-gray-300">
+                    <p>
                         We believe that a truly enriched existence is not found in the pursuit of a single goal, but in the harmonious balance of our physical, intellectual, and spiritual selves. In a world that often demands specialization, we champion the art of being a modern-day renaissance person.
                     </p>
-                    <p class="text-gray-300">
+                    <p>
                         Our philosophy is rooted in the timeless wisdom that a strong body houses a sharp mind, and a nurtured spirit gives purpose to both.
                     </p>
                 </div>
@@ -65,17 +82,17 @@
             <div class="text-center border-t border-gray-800 pt-16">
                 <h2 class="font-playfair text-5xl font-bold mb-12">The Three Pillars</h2>
                  <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                    <div class="p-8 rounded-2xl bg-secondary-color border border-gray-800">
+                    <div class="p-8 rounded-2xl bg-secondary-color border border-card-border">
                         <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">The Body</h3>
-                        <p class="text-gray-400">The sacred vessel that carries us through life. We honor it through disciplined training, nourishing food, and restorative practices that build resilience and vitality.</p>
+                        <p>The sacred vessel that carries us through life. We honor it through disciplined training, nourishing food, and restorative practices that build resilience and vitality.</p>
                     </div>
-                    <div class="p-8 rounded-2xl bg-secondary-color border border-gray-800">
+                    <div class="p-8 rounded-2xl bg-secondary-color border border-card-border">
                         <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">The Mind</h3>
-                        <p class="text-gray-400">The engine of our curiosity and growth. We cultivate it through continuous learning, critical thinking, and an insatiable appetite for knowledge and new perspectives.</p>
+                        <p>The engine of our curiosity and growth. We cultivate it through continuous learning, critical thinking, and an insatiable appetite for knowledge and new perspectives.</p>
                     </div>
-                    <div class="p-8 rounded-2xl bg-secondary-color border border-gray-800">
+                    <div class="p-8 rounded-2xl bg-secondary-color border border-card-border">
                         <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">The Spirit</h3>
-                        <p class="text-gray-400">The core of our being. We connect with it by immersing ourselves in culture, art, nature, and the timeless traditions that give our lives meaning and context.</p>
+                        <p>The core of our being. We connect with it by immersing ourselves in culture, art, nature, and the timeless traditions that give our lives meaning and context.</p>
                     </div>
                 </div>
             </div>
@@ -89,5 +106,7 @@
         <p class="text-sm text-gray-600 mt-2">A brand dedicated to the art of living well, inspired by the spirit of Bihar.</p>
     </footer>
 
+    <script src="theme.js"></script>
+    <script type="module" src="auth.js"></script>
 </body>
 </html>

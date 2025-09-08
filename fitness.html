@@ -10,13 +10,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        .tab-btn.active {
-            background-color: var(--primary-color);
-            color: #000;
-            box-shadow: 0 4px 15px rgba(192, 160, 128, 0.3);
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js" defer></script>
 </head>
 <body class="overflow-x-hidden">
 
@@ -34,15 +31,28 @@
             </a>
             <div class="hidden md:flex items-center space-x-10 text-lg">
                 <a href="index.html" class="nav-link">Home</a>
-                <a href="fitness.html" class="nav-link font-semibold" style="color: var(--primary-color);">Fitness</a>
+                <a href="fitness.html" class="nav-link font-semibold">Fitness</a>
                 <a href="culture.html" class="nav-link">Culture</a>
+                <a href="marketplace.html" class="nav-link">Marketplace</a>
+                <a href="blog.html" class="nav-link">Blog</a>
                 <a href="about.html" class="nav-link">About</a>
+                <a href="auth.html" id="login-link" class="nav-link">Login</a>
+                <div id="user-info" class="hidden items-center space-x-4">
+                    <span id="user-name" class="font-semibold"></span>
+                    <button id="logout-button" class="p-2 rounded-full focus:outline-none">
+                        <i class="fas fa-sign-out-alt text-xl"></i>
+                    </button>
+                </div>
+                <button id="theme-toggle" class="p-2 rounded-full focus:outline-none">
+                    <i id="theme-toggle-sun" class="fas fa-sun text-xl"></i>
+                    <i id="theme-toggle-moon" class="fas fa-moon text-xl hidden"></i>
+                </button>
             </div>
         </nav>
     </header>
 
     <!-- Fitness Hero Section -->
-    <section class="relative hero-bg py-48 text-center">
+    <section class="relative hero-bg py-48 text-center" style="background-image: linear-gradient(to top, rgba(10, 10, 10, 0.8) 0%, rgba(10, 10, 10, 0.7) 50%, rgba(10, 10, 10, 0.9) 100%), url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=2070&auto=format&fit=crop');">
         <div class="absolute inset-0 bg-black opacity-60"></div>
         <div class="relative max-w-4xl mx-auto px-6">
             <h1 class="font-playfair text-6xl md:text-7xl font-bold">The Body: A Living Temple</h1>
@@ -116,5 +126,7 @@
     </footer>
 
     <script src="main.js"></script>
+    <script src="theme.js"></script>
+    <script type="module" src="auth.js"></script>
 </body>
 </html>

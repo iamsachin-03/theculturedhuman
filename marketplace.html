@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace - The Cultured Human</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js" defer></script>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header & Nav -->
+    <header class="absolute top-0 left-0 w-full z-50 p-6">
+        <nav class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="h-10 w-10">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="48" stroke="var(--primary-color)" stroke-width="4" fill="none"/>
+                        <text x="50" y="55" font-family=''Playfair Display', serif' font-size="32" font-weight="700" fill="var(--primary-color)" text-anchor="middle" dominant-baseline="middle">TCH</text>
+                    </svg>
+                </div>
+                <span class="text-2xl font-semibold tracking-wider">The Cultured Human</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-10 text-lg">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="fitness.html" class="nav-link">Fitness</a>
+                <a href="culture.html" class="nav-link">Culture</a>
+                <a href="marketplace.html" class="nav-link font-semibold">Marketplace</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="auth.html" id="login-link" class="nav-link">Login</a>
+                <div id="user-info" class="hidden items-center space-x-4">
+                    <span id="user-name" class="font-semibold"></span>
+                    <button id="logout-button" class="p-2 rounded-full focus:outline-none">
+                        <i class="fas fa-sign-out-alt text-xl"></i>
+                    </button>
+                </div>
+                <button id="theme-toggle" class="p-2 rounded-full focus:outline-none">
+                    <i id="theme-toggle-sun" class="fas fa-sun text-xl"></i>
+                    <i id="theme-toggle-moon" class="fas fa-moon text-xl hidden"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative hero-bg py-56 text-center" style="background-image: linear-gradient(to top, rgba(10, 10, 10, 0.8) 0%, rgba(10, 10, 10, 0.7) 50%, rgba(10, 10, 10, 0.9) 100%), url('https://images.unsplash.com/photo-1528303209531-18534b1a4a5b?q=80&w=2070&auto=format&fit=crop');">
+        <div class="relative max-w-4xl mx-auto px-6">
+            <h1 class="font-playfair text-6xl md:text-7xl font-bold">The Cultured Human Marketplace</h1>
+            <p class="text-xl md:text-2xl text-gray-300 mt-4">Coming Soon: A curated platform connecting Bihar's finest artisans and creators directly with a global audience.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="py-24 px-6">
+        <div class="max-w-5xl mx-auto text-center mb-20">
+            <h2 class="font-playfair text-4xl font-bold mb-4">A Digital Mela for the Modern Age</h2>
+            <p class="text-lg text-gray-400">We are building a bridge between the rich artistic heritage of Bihar and discerning patrons worldwide. Our marketplace is a space for authentic connection, where every product tells a story and every purchase supports a creator.</p>
+        </div>
+
+        <!-- Waitlist Forms -->
+        <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+            
+            <!-- Buyers -->
+            <div class="p-8 rounded-2xl bg-secondary-color border border-card-border shadow-2xl">
+                <h3 class="font-playfair text-3xl font-bold mb-4 text-center" style="color: var(--primary-color);">For Buyers</h3>
+                <p class="text-center text-gray-400 mb-6">Be the first to know when the marketplace launches. Get exclusive access to unique, handcrafted products from Bihar.</p>
+                <form action="#" method="POST" class="space-y-4">
+                    <div>
+                        <label for="buyer-email" class="sr-only">Email address</label>
+                        <input type="email" name="buyer-email" id="buyer-email" class="w-full p-4 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary-color" placeholder="Enter your email">
+                    </div>
+                    <button type="submit" class="w-full cta-button">Notify Me</button>
+                </form>
+            </div>
+
+            <!-- Sellers -->
+            <div class="p-8 rounded-2xl bg-secondary-color border border-card-border shadow-2xl">
+                <h3 class="font-playfair text-3xl font-bold mb-4 text-center" style="color: var(--primary-color);">For Sellers</h3>
+                <p class="text-center text-gray-400 mb-6">Are you a Bihari artisan or creator? Apply to become a founding seller and share your craft with the world.</p>
+                <form action="#" method="POST" class="space-y-4">
+                    <div>
+                        <label for="seller-name" class="sr-only">Your Name</label>
+                        <input type="text" name="seller-name" id="seller-name" class="w-full p-4 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary-color" placeholder="Your Name">
+                    </div>
+                    <div>
+                        <label for="seller-email" class="sr-only">Email address</label>
+                        <input type="email" name="seller-email" id="seller-email" class="w-full p-4 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary-color" placeholder="Your Email">
+                    </div>
+                    <div>
+                         <label for="seller-craft" class="sr-only">Your Craft</label>
+                        <input type="text" name="seller-craft" id="seller-craft" class="w-full p-4 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary-color" placeholder="What do you create? (e.g., Madhubani painting, Sujini embroidery)">
+                    </div>
+                    <button type="submit" class="w-full cta-button">Apply Now</button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center p-10 mt-16 border-t border-gray-800">
+        <p class="text-gray-400">&copy; 2025 The Cultured Human. All Rights Reserved.</p>
+        <p class="text-sm text-gray-600 mt-2">A brand dedicated to the art of living well, inspired by the spirit of Bihar.</p>
+    </footer>
+
+    <script src="theme.js"></script>
+    <script type="module" src="auth.js"></script>
+</body>
+</html>

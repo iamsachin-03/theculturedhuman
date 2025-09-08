@@ -11,6 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js" defer></script>
 </head>
 <body class="overflow-x-hidden">
 
@@ -29,14 +32,27 @@
             <div class="hidden md:flex items-center space-x-10 text-lg">
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="fitness.html" class="nav-link">Fitness</a>
-                <a href="culture.html" class="nav-link font-semibold" style="color: var(--primary-color);">Culture</a>
+                <a href="culture.html" class="nav-link font-semibold">Culture</a>
+                <a href="marketplace.html" class="nav-link">Marketplace</a>
+                <a href="blog.html" class="nav-link">Blog</a>
                 <a href="about.html" class="nav-link">About</a>
+                <a href="auth.html" id="login-link" class="nav-link">Login</a>
+                <div id="user-info" class="hidden items-center space-x-4">
+                    <span id="user-name" class="font-semibold"></span>
+                    <button id="logout-button" class="p-2 rounded-full focus:outline-none">
+                        <i class="fas fa-sign-out-alt text-xl"></i>
+                    </button>
+                </div>
+                <button id="theme-toggle" class="p-2 rounded-full focus:outline-none">
+                    <i id="theme-toggle-sun" class="fas fa-sun text-xl"></i>
+                    <i id="theme-toggle-moon" class="fas fa-moon text-xl hidden"></i>
+                </button>
             </div>
         </nav>
     </header>
 
     <!-- Culture Hero Section -->
-    <section class="relative hero-bg py-48 text-center" style="background-image: linear-gradient(to top, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 0.6) 50%, rgba(10, 10, 10, 0.9) 100%), url('https://images.unsplash.com/photo-1621375493233-4139b4b39795?q=80&w=2070&auto=format&fit=crop');">
+    <section class="relative hero-bg py-48 text-center" style="background-image: linear-gradient(to top, rgba(10, 10, 10, 0.8) 0%, rgba(10, 10, 10, 0.7) 50%, rgba(10, 10, 10, 0.9) 100%), url('https://images.unsplash.com/photo-1621375493233-4139b4b39795?q=80&w=2070&auto=format&fit=crop');">
         <div class="relative max-w-4xl mx-auto px-6">
             <h1 class="font-playfair text-6xl md:text-7xl font-bold">The Soul of Bihar</h1>
             <p class="text-xl md:text-2xl text-gray-300 mt-4">An immersive journey into a land of ancient wisdom, vibrant traditions, and profound heritage.</p>
@@ -49,9 +65,9 @@
         <!-- About Bihar Section -->
         <section id="about-bihar">
             <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                <div class="prose prose-invert lg:prose-xl max-w-none">
+                <div class="prose lg:prose-xl max-w-none">
                     <h2 class="font-playfair text-5xl font-bold mb-6">The Ancient Land of Bihar</h2>
-                    <p class="text-gray-300">
+                    <p>
                         The name 'Bihar' originates from "Vihara," meaning monastery, a testament to its past as a great center of Buddhist and Jain learning. It's the land where Lord Buddha attained enlightenment and where the mighty Mauryan and Gupta empires flourished, shaping the course of Indian history. From the ancient university of Nalanda to its pivotal role in the freedom struggle, Bihar's legacy is a rich tapestry of knowledge, power, and revolution.
                     </p>
                 </div>
@@ -73,21 +89,21 @@
                         <div class="h-64 overflow-hidden"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Chhat_Puja_at_Patna_in_2022.jpg/640px-Chhat_Puja_at_Patna_in_2022.jpg" alt="Chhath Puja" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"></div>
                         <div class="p-8">
                             <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Chhath Puja</h3>
-                            <p class="text-gray-400">The most significant festival, an ancient Vedic tradition where devotees worship the Sun God, Surya, offering prayers for life, prosperity, and well-being.</p>
+                            <p>The most significant festival, an ancient Vedic tradition where devotees worship the Sun God, Surya, offering prayers for life, prosperity, and well-being.</p>
                         </div>
                     </div>
                     <div class="card rounded-2xl overflow-hidden group">
                         <div class="h-64 overflow-hidden"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Sama_Chakeva_festival_celebration_in_Mithila.jpg/640px-Sama_Chakeva_festival_celebration_in_Mithila.jpg" alt="Sama Chakeva" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"></div>
                         <div class="p-8">
                             <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Sama Chakeva</h3>
-                            <p class="text-gray-400">Celebrated in Mithila, this festival marks the beautiful bond between brothers and sisters, as siblings craft clay birds and perform rituals.</p>
+                            <p>Celebrated in Mithila, this festival marks the beautiful bond between brothers and sisters, as siblings craft clay birds and perform rituals.</p>
                         </div>
                     </div>
                     <div class="card rounded-2xl overflow-hidden group">
                         <div class="h-64 overflow-hidden"><img src="https://images.unsplash.com/photo-1543152292-5d4a14a0f449?q=80&w=1932&auto=format&fit=crop" alt="Makar Sankranti" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"></div>
                         <div class="p-8">
                             <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Makar Sankranti</h3>
-                            <p class="text-gray-400">Also known as 'Tila Sankranti,' this harvest festival is celebrated with feasts of 'Dahi-Chura' (curd and beaten rice) and sweets made of sesame (til).</p>
+                            <p>Also known as 'Tila Sankranti,' this harvest festival is celebrated with feasts of 'Dahi-Chura' (curd and beaten rice) and sweets made of sesame (til).</p>
                         </div>
                     </div>
                 </div>
@@ -106,21 +122,21 @@
                         <div class="h-64 overflow-hidden"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Litti_Chokha_-_A_North_Indian_Dish.jpg" alt="Litti Chokha" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"></div>
                         <div class="p-8">
                             <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Litti Chokha</h3>
-                            <p class="text-gray-400">The iconic dish of Bihar. Wheat dough balls are stuffed with a spicy mixture of roasted gram flour (sattu), then roasted over fire and served with mashed vegetables (chokha).</p>
+                            <p>The iconic dish of Bihar. Wheat dough balls are stuffed with a spicy mixture of roasted gram flour (sattu), then roasted over fire and served with mashed vegetables (chokha).</p>
                         </div>
                     </div>
                     <div class="card rounded-2xl overflow-hidden group">
                         <div class="h-64 overflow-hidden"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Dal_Pitha.jpg/640px-Dal_Pitha.jpg" alt="Dal Pitha" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"></div>
                         <div class="p-8">
                             <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Dal Pitha</h3>
-                            <p class="text-gray-400">Steamed rice flour dumplings stuffed with a savory lentil filling, a healthy and beloved snack.</p>
+                            <p>Steamed rice flour dumplings stuffed with a savory lentil filling, a healthy and beloved snack.</p>
                         </div>
                     </div>
                     <div class="card rounded-2xl overflow-hidden group">
                         <div class="h-64 overflow-hidden"><img src="https://upload.wikimedia.org/wikipedia/commons/8/85/Thekua.jpg" alt="Thekua" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"></div>
                         <div class="p-8">
                             <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Thekua</h3>
-                            <p class="text-gray-400">A crisp, sweet biscuit made from wheat flour and jaggery, traditionally prepared as a sacred offering during Chhath Puja.</p>
+                            <p>A crisp, sweet biscuit made from wheat flour and jaggery, traditionally prepared as a sacred offering during Chhath Puja.</p>
                         </div>
                     </div>
                 </div>
@@ -153,8 +169,8 @@
                 <h2 class="font-playfair text-5xl font-bold mb-6">Pearls of Wisdom (Padhua)</h2>
                 <p class="text-lg text-gray-400 mb-12">Timeless proverbs that offer a glimpse into the Bihari way of life. Here is a small selection.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-12">
-                    <div class="p-6 bg-secondary-color border-l-4 border-primary-color rounded-r-lg"><p class="text-xl italic text-gray-300">"अधजल गगरी छलकत जाय"</p><p class="text-gray-400 mt-1">An empty vessel makes much noise.</p></div>
-                    <div class="p-6 bg-secondary-color border-l-4 border-primary-color rounded-r-lg"><p class="text-xl italic text-gray-300">"घर के मुरगी दाल बराबर"</p><p class="text-gray-400 mt-1">Self-possessions are always undermined.</p></div>
+                    <div class="p-6 bg-secondary-color border-l-4 border-primary-color rounded-r-lg"><p class="text-xl italic">"अधजल गगरी छलकत जाय"</p><p class="mt-1">An empty vessel makes much noise.</p></div>
+                    <div class="p-6 bg-secondary-color border-l-4 border-primary-color rounded-r-lg"><p class="text-xl italic">"घर के मुरगी दाल बराबर"</p><p class="mt-1">Self-possessions are always undermined.</p></div>
                 </div>
                 <a href="proverbs.html" class="cta-button">Explore More Proverbs</a>
             </div>
@@ -168,9 +184,9 @@
                     <p class="text-lg text-gray-400 mt-4">A blend of comfort, tradition, and elegance woven into the fabric of daily life.</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center mb-12">
-                    <div class="prose prose-invert lg:prose-xl max-w-none">
+                    <div class="prose lg:prose-xl max-w-none">
                         <h3 class="font-playfair text-3xl font-bold mb-4" style="color: var(--primary-color);">For Women</h3>
-                        <p class="text-gray-300">The Sari is the quintessential attire, with the 'Seedha Aanchal' draping style being a distinctive feature of Bihar. The state is also the heartland of <span class="font-semibold">Tussar Silk</span>, producing exquisite sarees known for their rich texture and natural golden sheen.</p>
+                        <p>The Sari is the quintessential attire, with the 'Seedha Aanchal' draping style being a distinctive feature of Bihar. The state is also the heartland of <span class="font-semibold">Tussar Silk</span>, producing exquisite sarees known for their rich texture and natural golden sheen.</p>
                     </div>
                     <div class="rounded-2xl overflow-hidden shadow-2xl h-96">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c2/Woman_in_a_village_in_Bihar_in_Sari.jpg" alt="Bihari Woman in Sari" class="w-full h-full object-cover">
@@ -180,9 +196,9 @@
                      <div class="rounded-2xl overflow-hidden shadow-2xl h-96 md:order-2">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/A_man_in_traditional_Dhoti-Kurta_outfit_in_India.jpg" alt="Bihari Man in Dhoti-Kurta" class="w-full h-full object-cover">
                     </div>
-                    <div class="prose prose-invert lg:prose-xl max-w-none md:order-1">
+                    <div class="prose lg:prose-xl max-w-none md:order-1">
                         <h3 class="font-playfair text-3xl font-bold mb-4" style="color: var(--primary-color);">For Men</h3>
-                        <p class="text-gray-300">The traditional attire for men is the comfortable and elegant Dhoti, paired with a Kurta. This classic ensemble is a common sight in rural areas and during festivals and formal occasions.</p>
+                        <p>The traditional attire for men is the comfortable and elegant Dhoti, paired with a Kurta. This classic ensemble is a common sight in rural areas and during festivals and formal occasions.</p>
                     </div>
                 </div>
             </div>
@@ -193,10 +209,10 @@
              <div class="max-w-7xl mx-auto text-center">
                 <h2 class="font-playfair text-5xl font-bold mb-16">The Sound of the Soil</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-                    <div class="card p-8"><h3 class="font-playfair text-2xl mb-2" style="color: var(--primary-color);">Sohar</h3><p class="text-gray-400">Celebrating Childbirth</p></div>
-                    <div class="card p-8"><h3 class="font-playfair text-2xl mb-2" style="color: var(--primary-color);">Sumangali</h3><p class="text-gray-400">For a Wedding</p></div>
-                    <div class="card p-8"><h3 class="font-playfair text-2xl mb-2" style="color: var(--primary-color);">Chhath Songs</h3><p class="text-gray-400">Devotional Festival Music</p></div>
-                    <div class="card p-8"><h3 class="font-playfair text-2xl mb-2" style="color: var(--primary-color);">Bidesia</h3><p class="text-gray-400">Folk Theatre & Drama</p></div>
+                    <div class="card p-8"><h3 class="font-playfair text-2xl mb-2" style="color: var(--primary-color);">Sohar</h3><p>Celebrating Childbirth</p></div>
+                    <div class="card p-8"><h3 class="font-playfair text-2xl mb-2" style="color: var(--primary-color);">Sumangali</h3><p>For a Wedding</p></div>
+                    <div class="card p-8"><h3 class="font-playfair text-2xl mb-2" style="color: var(--primary-color);">Chhath Songs</h3><p>Devotional Festival Music</p></div>
+                    <div class="card p-8"><h3 class="font-playfair text-2xl mb-2" style="color: var(--primary-color);">Bidesia</h3><p>Folk Theatre & Drama</p></div>
                 </div>
                 <a href="music.html" class="cta-button">Listen to Bihari Music</a>
             </div>
@@ -210,5 +226,7 @@
         <p class="text-sm text-gray-600 mt-2">A brand dedicated to the art of living well, inspired by the spirit of Bihar.</p>
     </footer>
 
+    <script src="theme.js"></script>
+    <script type="module" src="auth.js"></script>
 </body>
 </html>

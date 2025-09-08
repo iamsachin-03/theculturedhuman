@@ -1,56 +1,124 @@
 
 :root {
-    --primary-color: #C0A080;
-    --secondary-color: #1a1a1a;
-    --text-color: #e0e0e0;
-    --bg-color: #0a0a0a;
+    /* New Dark Theme (Default) */
+    --primary-color-dark: #D4AF37; /* A richer, more antique gold */
+    --secondary-color-dark: #1E1E1E; /* A slightly off-black for cards */
+    --text-color-dark: #F5F5F5; /* A soft, elegant white */
+    --bg-color-dark: #121212; /* A deep, true black for contrast */
+    --card-border-dark: #333333;
+    --text-muted-dark: #a0a0a0;
+
+    /* New Light Theme */
+    --primary-color-light: #8B4513; /* A strong, earthy Saddle Brown */
+    --secondary-color-light: #FFFFFF; /* Pure white for clean cards */
+    --text-color-light: #212529; /* A high-contrast, readable dark grey */
+    --bg-color-light: #F8F9FA; /* A clean, very light grey background */
+    --card-border-light: #DEE2E6;
+    --text-muted-light: #6c757d;
+
+    /* Default to Dark Mode variables */
+    --primary-color: var(--primary-color-dark);
+    --secondary-color: var(--secondary-color-dark);
+    --text-color: var(--text-color-dark);
+    --bg-color: var(--bg-color-dark);
+    --card-border: var(--card-border-dark);
+    --text-muted: var(--text-muted-dark);
+}
+
+body.light-mode {
+    --primary-color: var(--primary-color-light);
+    --secondary-color: var(--secondary-color-light);
+    --text-color: var(--text-color-light);
+    --bg-color: var(--bg-color-light);
+    --card-border: var(--card-border-light);
+    --text-muted: var(--text-muted-light);
 }
 
 body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
-    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Cg fill-rule="evenodd"%3E%3Cg fill="%231a1a1a" fill-opacity="0.4"%3E%3Cpath opacity=".5" d="M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z"/%3E%3Cpath d="M6 5V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h9V0h1v5h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v5h-1v-5h-9v5h-1v-5h-9v5h-1v-5h-9v5h-1v-5h-9v5h-1v-5h-9v5h-1v-5h-9v5h-1v-5h-9v5H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0v-1h5v-9H0V6h6zm-1 5v-9h-5v9h5zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm-80-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+    transition: background-color 0.4s ease, color 0.4s ease;
+    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56"%3E%3Cg fill="%23D4AF37" fill-opacity="0.07"%3E%3Cpath fill-rule="evenodd" d="M28 0h28v28h28v28H56V28H28V0zM0 0h28v28h28v28H28V28H0V0z"/%3E%3C/g%3E%3C/svg%3E');
 }
 
 .font-playfair {
     font-family: 'Playfair Display', serif;
 }
 
+/* Ensure nav links are visible in light mode */
+header .nav-link, header .text-2xl {
+    color: var(--text-color-dark);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+body.light-mode header .nav-link, body.light-mode header .text-2xl {
+    color: var(--text-color-light);
+    text-shadow: none;
+}
+
+.text-gray-400 { color: var(--text-muted); }
+.text-gray-300 { color: var(--text-muted); }
+.text-gray-600 { color: var(--text-muted); }
+body.light-mode .text-gray-400, body.light-mode .text-gray-300, body.light-mode .text-gray-600 {
+    color: var(--text-muted-light);
+}
+
 .hero-bg {
-    background-image: linear-gradient(to top, rgba(10, 10, 10, 1) 0%, rgba(10, 10, 10, 0.6) 50%, rgba(10, 10, 10, 0.9) 100%), url('https://images.unsplash.com/photo-1605599042523-6a9a0e6b733c?q=80&w=2070&auto=format&fit=crop');
     background-size: cover;
     background-position: center;
 }
 
 .card {
     background-color: var(--secondary-color);
-    border: 1px solid #2a2a2a;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid var(--card-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease, border-color 0.4s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+body.light-mode .card {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(192, 160, 128, 0.2);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-.btn-primary {
+body.light-mode .card:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.cta-button {
+    display: inline-block;
     background-color: var(--primary-color);
     color: #000;
     font-weight: 600;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 15px rgba(192, 160, 128, 0.3);
+    padding: 1rem 2.5rem;
+    border-radius: 9999px;
+    font-size: 1.125rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-.btn-primary:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 25px rgba(192, 160, 128, 0.5);
+.cta-button:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+}
+
+body.light-mode .cta-button {
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(139, 69, 19, 0.2);
+}
+
+body.light-mode .cta-button:hover {
+    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
 }
 
 .nav-link {
     position: relative;
     transition: color 0.3s;
+    padding-bottom: 8px;
 }
 
 .nav-link:hover {
@@ -62,7 +130,7 @@ body {
     position: absolute;
     width: 0;
     height: 2px;
-    bottom: -5px;
+    bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--primary-color);
@@ -70,7 +138,7 @@ body {
 }
 
 .nav-link:hover::after {
-    width: 100%;
+    width: 70%;
 }
 
 .fade-in-up {
@@ -81,7 +149,7 @@ body {
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -89,142 +157,51 @@ body {
     }
 }
 
-.cta-button {
-    display: inline-block;
+.tab-btn.active {
     background-color: var(--primary-color);
     color: #000;
-    font-weight: 600;
-    padding: 1rem 2rem;
-    border-radius: 9999px;
-    font-size: 1.125rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 15px rgba(192, 160, 128, 0.3);
 }
 
-.cta-button:hover {
-    transform: scale(1.05) translateY(-2px);
-    box-shadow: 0 8px 25px rgba(192, 160, 128, 0.5);
-}
-
-/* Custom Select Dropdown */
-.custom-select-container {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.select-selected {
+.proverb-card {
     background-color: var(--secondary-color);
-    color: var(--text-color);
-    padding: 1rem 1.5rem;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.125rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-
-.select-selected:hover {
-    border-color: var(--primary-color);
-}
-
-.select-selected::after {
-    content: "\25BC"; /* Down arrow */
-    font-size: 1rem;
-    transition: transform 0.3s ease;
-}
-
-.select-selected.select-arrow-active::after {
-    transform: rotate(180deg);
-}
-
-.select-items {
-    position: absolute;
-    background-color: var(--secondary-color);
-    top: 110%;
-    left: 0;
-    right: 0;
-    z-index: 99;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-}
-
-.select-items div {
-    color: var(--text-color);
-    padding: 1rem 1.5rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.select-items div:hover, .same-as-selected {
-    background-color: var(--primary-color);
-    color: #000;
-}
-
-.select-hide {
-    display: none;
-}
-
-/* Music Grid */
-.music-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
-}
-
-.music-card {
-    background-color: var(--secondary-color);
-    border: 1px solid #2a2a2a;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    cursor: pointer;
-}
-
-.music-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(192, 160, 128, 0.2);
-}
-
-.music-card-thumbnail {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-}
-
-.music-card-content {
+    border-left: 5px solid var(--primary-color);
     padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
 }
 
-.music-card-title {
+.proverb-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+}
+
+.proverb {
     font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
+    color: var(--primary-color);
     margin-bottom: 0.5rem;
 }
 
-.music-card-category {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-    letter-spacing: 1px;
+.meaning {
+    font-size: 1.1rem;
+    color: var(--text-muted);
 }
 
-#playlist-view {
-    display: none; /* Initially hidden */
+.auth-tab {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background-color: transparent;
+    border-radius: 9999px;
+    transition: all 0.3s ease;
 }
 
-#back-to-grid {
-    display: none; /* Initially hidden */
-    margin-bottom: 2rem;
+.auth-tab.active {
+    color: #000;
+    background-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
 }
