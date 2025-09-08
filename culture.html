@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culture of Bihar - A Rich Heritage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #111827;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%231f2937' fill-opacity='0.4'%3E%3Crect x='0' y='0' width='100' height='100'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        .card {
+            background-color: #1f2937;
+            border-radius: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            border: 1px solid #374151;
+        }
+        .card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .card-img {
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .card:hover .card-img {
+            transform: scale(1.1);
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            font-size: 2.5rem; /* 4xl */
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2.5rem;
+        }
+        .section-title i {
+            font-size: 2.2rem;
+            color: #3b82f6;
+        }
+        .padhua-card {
+            background-color: #1f2937;
+            border-left: 5px solid #3b82f6;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+        .padhua-card:hover {
+            background-color: #374151;
+        }
+        .padhua-card p.italic {
+            color: #d1d5db; /* gray-300 */
+        }
+        .padhua-card p.meaning {
+            color: #9ca3af; /* gray-400 */
+        }
+        #to-top-button {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-gray-300">
+
+    <button id="to-top-button" onclick="goToTop()" title="Go to top"
+        class="hidden fixed z-50 bottom-10 right-10 p-4 border-0 w-16 h-16 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 text-white text-xl font-semibold transition-all duration-300 transform hover:scale-110">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <div class="container mx-auto px-4 lg:px-8 py-12">
+        <header class="text-center mb-16 fade-in">
+            <h1 class="font-playfair text-5xl md:text-6xl font-bold text-white">The Soul of Bihar</h1>
+            <p class="text-gray-400 mt-4 text-xl">An immersive journey into a land of ancient wisdom and vibrant culture.</p>
+        </header>
+
+        <nav class="flex justify-center flex-wrap gap-x-6 gap-y-2 mb-16 fade-in">
+            <a href="index.html" class="text-gray-300 hover:text-blue-500 transition-colors text-lg">Home</a>
+            <a href="about.html" class="text-gray-300 hover:text-blue-500 transition-colors text-lg">About</a>
+            <a href="fitness.html" class="text-gray-300 hover:text-blue-500 transition-colors text-lg">Fitness</a>
+            <a href="culture.html" class="text-blue-500 font-bold text-lg">Culture</a>
+        </nav>
+
+        <main class="space-y-24">
+            
+            <!-- Cuisine Section -->
+            <section id="cuisine">
+                <h2 class="section-title"><i class="fas fa-utensils"></i>Delectable Cuisine</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <div class="card">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Litti_Chokha_-_A_North_Indian_Dish.jpg" alt="Litti Chokha" class="card-img">
+                        <div class="p-6">
+                            <h3 class="font-semibold text-2xl text-white">Litti Chokha</h3>
+                            <p class="text-gray-400 mt-2">The heart of Bihari cuisine, these roasted wheat balls filled with spiced sattu are a culinary icon.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Sattu_Paratha.jpg" alt="Sattu Paratha" class="card-img">
+                        <div class="p-6">
+                            <h3 class="font-semibold text-2xl text-white">Sattu Paratha</h3>
+                            <p class="text-gray-400 mt-2">A wholesome and protein-rich flatbread, perfect for a power-packed breakfast.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/85/Thekua.jpg" alt="Thekua" class="card-img">
+                        <div class="p-6">
+                            <h3 class="font-semibold text-2xl text-white">Thekua</h3>
+                            <p class="text-gray-400 mt-2">A crisp, sweet biscuit, traditionally made as a prasad during the Chhath Puja festival.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Places to Visit Section -->
+            <section id="places">
+                <h2 class="section-title"><i class="fas fa-landmark"></i>Iconic Places to Visit</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <div class="card">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Bodh_Gaya_Mahabodhi_Temple_2006.jpg" alt="Mahabodhi Temple" class="card-img">
+                        <div class="p-6">
+                            <h3 class="font-semibold text-2xl text-white">Mahabodhi Temple</h3>
+                            <p class="text-gray-400 mt-2">The sacred site in Bodh Gaya where Lord Buddha attained enlightenment. A UNESCO World Heritage site.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f6/Nalanda_University_ruins.jpg" alt="Nalanda University" class="card-img">
+                        <div class="p-6">
+                            <h3 class="font-semibold text-2xl text-white">Nalanda University</h3>
+                            <p class="text-gray-400 mt-2">Stroll through the ruins of one of the world's oldest and greatest universities.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Glass_Bridge_Rajgir.jpg" alt="Glass Bridge, Rajgir" class="card-img">
+                        <div class="p-6">
+                            <h3 class="font-semibold text-2xl text-white">Glass Bridge, Rajgir</h3>
+                            <p class="text-gray-400 mt-2">Experience a thrilling walk on India's first glass skywalk amidst scenic hills.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Padhua Section -->
+            <section id="padhua">
+                <h2 class="section-title"><i class="fas fa-quote-left"></i>Pearls of Wisdom (Padhua)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="padhua-card">
+                        <p class="text-xl italic">"अधजल गगरी छलकत जाय"</p>
+                        <p class="meaning mt-2">An empty vessel makes much noise; people with little knowledge boast the most.</p>
+                    </div>
+                    <div class="padhua-card">
+                        <p class="text-xl italic">"जेकर लाठी, ओकर भঁইস"</p>
+                        <p class="meaning mt-2">He who holds the stick, owns the buffalo; might is right.</p>
+                    </div>
+                    <div class="padhua-card">
+                        <p class="text-xl italic">"घर के मुरगी दाल बराबर"</p>
+                        <p class="meaning mt-2">Self-possessions are always undermined; familiarity breeds contempt.</p>
+                    </div>
+                    <div class="padhua-card">
+                        <p class="text-xl italic">"नाच ना जाने, आँगन टेढ़"</p>
+                        <p class="meaning mt-2">Doesn't know how to dance, but blames the crooked courtyard; a bad workman blames his tools.</p>
+                    </div>
+                    <div class="padhua-card">
+                        <p class="text-xl italic">"सौ सोनार के, एक लोहार के"</p>
+                        <p class="meaning mt-2">A single blow from a blacksmith is as effective as a hundred from a goldsmith.</p>
+                    </div>
+                     <div class="padhua-card">
+                        <p class="text-xl italic">"बन्दर क्या जाने अदरक का स्वाद"</p>
+                        <p class="meaning mt-2">What does a monkey know of the taste of ginger; casting pearls before swine.</p>
+                    </div>
+                    <div class="padhua-card">
+                        <p class="text-xl italic">"केतनो सोझ करू, कुकुर के पुछ टेढ़े रहत"</p>
+                        <p class="meaning mt-2">You can't straighten a dog's tail; some people will never change.</p>
+                    </div>
+                    <div class="padhua-card">
+                        <p class="text-xl italic">"आगे नाथ ना पीछे पगहा"</p>
+                        <p class="meaning mt-2">With no one to control them; someone who has no responsibilities.</p>
+                    </div>
+                    <div class="padhua-card">
+                        <p class="text-xl italic">"चमड़ी जाये पर दमड़ी ना जाये"</p>
+                        <p class="meaning mt-2">The skin may go, but the penny shouldn't; about a very miserly person.</p>
+                    </div>
+                     <div class="padhua-card">
+                        <p class="text-xl italic">"जबरा मारे रोवे ना दे"</p>
+                        <p class="meaning mt-2">The powerful one hits you and doesn't even let you cry; oppression by the powerful.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Music and Arts Section -->
+            <section id="music-arts">
+                <h2 class="section-title"><i class="fas fa-music"></i>Music, Dance & Art</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-10">
+                    <div class="lg:col-span-3 card p-8">
+                        <h3 class="text-2xl font-bold text-white mb-4">Melodies and Rhythms</h3>
+                        <p class="text-gray-400 mb-6">Folk songs like <span class="font-semibold text-blue-400">Sohar</span> (celebrating birth) and <span class="font-semibold text-blue-400">Sumangali</span> (for weddings) are integral to life. The poignant <span class="font-semibold text-blue-400">Bidesia</span> dance-drama and the energetic <span class="font-semibold text-blue-400">Jat-Jatin</span> of Mithila tell stories of love, separation, and daily life.</p>
+                        <div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden">
+                            <iframe src="https://www.youtube.com/embed/zl_d5dwgsyU" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full"></iframe>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 card">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/43/Madhubani_painting_of_fish_and_peacock.jpg" alt="Madhubani Painting" class="card-img">
+                        <div class="p-6">
+                            <h3 class="font-semibold text-2xl text-white">Madhubani Painting</h3>
+                            <p class="text-gray-400 mt-2">Originating from the Mithila region, this world-renowned art form is characterized by its intricate geometric patterns and vibrant natural colors.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center text-gray-500 mt-24 py-6 border-t border-gray-800">
+            © 2025 The Cultured Human · Designed with ❤️ for growth & balance
+        </footer>
+    </div>
+
+    <script>
+        const toTopButton = document.getElementById('to-top-button');
+        window.onscroll = function () {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                toTopButton.classList.remove("hidden");
+                toTopButton.classList.add("opacity-100");
+            } else {
+                toTopButton.classList.add("hidden");
+                toTopButton.classList.remove("opacity-100");
+            }
+        };
+        function goToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
