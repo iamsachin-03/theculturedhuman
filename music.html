@@ -43,39 +43,40 @@
     </section>
 
     <!-- Main Content -->
-    <main class="py-24 px-6 space-y-20">
-        <!-- Wedding Songs -->
-        <section>
-            <h2 class="font-playfair text-4xl font-bold text-center mb-12">Wedding Songs (Biyah Geet)</h2>
-            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                <div class="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-2xl">
-                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/videoseries?list=PL8425C8164320F731" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    <main class="py-24 px-6">
+        <!-- Controls -->
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 mb-16">
+            <div class="custom-select-container">
+                <div class="select-selected">Select a Category</div>
+                <div class="select-items select-hide">
+                    <div data-value="all">All Categories (Grid View)</div>
+                    <div data-value="wedding">Wedding Songs (Biyah Geet)</div>
+                    <div data-value="chhath">Chhath Puja Songs</div>
+                    <div data-value="sohar">Sohar (Childbirth Songs)</div>
+                    <div data-value="bhajan">Bihari Bhajans</div>
+                    <div data-value="folk">Classic Folk Songs</div>
                 </div>
-                <p class="text-gray-400 text-lg">A large collection of joyous and emotional melodies that form the heart of a Bihari wedding, from playful banter to heartfelt farewells.</p>
             </div>
-        </section>
+            <button id="back-to-grid" class="btn-primary" style="display: none;">← Back to All Categories</button>
+        </div>
 
-        <!-- Chhath Puja Songs -->
-        <section>
-            <h2 class="font-playfair text-4xl font-bold text-center mb-12">Chhath Puja Songs</h2>
-            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                 <p class="text-gray-400 text-lg md:order-2">An extensive playlist of devotional hymns dedicated to the Sun God, filling the air with reverence and gratitude during Bihar's most important festival.</p>
-                <div class="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-2xl md:order-1">
-                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/videoseries?list=PLIOH-a0_AXX9aE3z3n0sZ22b6t1v7iS_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                </div>
+        <!-- Music Grid View -->
+        <div id="music-grid-view" class="max-w-6xl mx-auto">
+            <div class="music-grid">
+                <!-- Grid items will be injected by JS -->
             </div>
-        </section>
+        </div>
 
-        <!-- Sohar - Childbirth Songs -->
-        <section>
-            <h2 class="font-playfair text-4xl font-bold text-center mb-12">Sohar - Childbirth Songs</h2>
-            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                <div class="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-2xl">
-                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/videoseries?list=PL3fJTbH2Lzqa0x4Yp3-VdGqQ8c-3z4Jp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                </div>
-                <p class="text-gray-400 text-lg">A beautiful playlist of tender songs celebrating the arrival of a new life, expressing the joy and hopes of the family.</p>
+        <!-- Playlist View -->
+        <div id="playlist-view" class="max-w-4xl mx-auto" style="display: none;">
+            <div class="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-2xl">
+                <iframe id="playlist-iframe" class="w-full h-full" src="" title="YouTube Music Playlist" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>
-        </section>
+            <div class="mt-6 text-center">
+                <h2 id="playlist-title" class="font-playfair text-4xl font-bold"></h2>
+                <p id="playlist-description" class="text-gray-400 text-lg mt-2"></p>
+            </div>
+        </div>
 
     </main>
 
@@ -84,6 +85,114 @@
         <p class="text-gray-400">&copy; 2025 The Cultured Human. All Rights Reserved.</p>
         <p class="text-sm text-gray-600 mt-2">A brand dedicated to the art of living well, inspired by the spirit of Bihar.</p>
     </footer>
+
+    <script>
+        const data = {
+            greatestHits: [
+                { videoId: 'zF41-Hl_pGk', category: 'wedding', title: 'Lagan Mein Thumka', description: 'A quintessential wedding celebration song.' },
+                { videoId: 'gh6cssL0dr8', category: 'chhath', title: 'Kaanch Hi Baans Ke Bahangiya', description: 'The most iconic Chhath puja anthem.' },
+                { videoId: 'T1aWbpVf_T4', category: 'sohar', title: 'Janam Lihle Krishan Kanhaiya', description: 'A joyous sohar celebrating childbirth.' },
+                { videoId: 'B5lJqS-8f4E', category: 'bhajan', title: 'Ram Bhajo Re', description: 'A soulful bhajan for peace and devotion.' },
+                { videoId: 'a_234dsas3', category: 'folk', title: 'Nadiya Ke Teere Teere', description: 'A classic folk melody about life by the river.' },
+            ],
+            playlists: {
+                "wedding": { id: "PL2D5392E75586542D", title: "Wedding Songs (Biyah Geet)", description: "Joyous melodies for the heart of a Bihari wedding." },
+                "chhath": { id: "PL34C320F714B92416", title: "Chhath Puja Songs", description: "Devotional hymns for Bihar's most important festival." },
+                "sohar": { id: "PL3fJTbH2Lzqa0x4Yp3-VdGqQ8c-3z4Jp", title: "Sohar (Childbirth Songs)", description: "Tender songs celebrating the arrival of a new life." },
+                "bhajan": { id: "PL54B3E0A521A5405A", title: "Bihari Bhajans", description: "A serene collection of devotional bhajans from Bihar." },
+                "folk": { id: "PLIz0XA3HXa0qeji32h2b80aZsox0aF7C5", title: "Classic Bihari Folk", description: "Timeless folk music telling the stories of the land." },
+            }
+        };
+
+        const gridView = document.getElementById('music-grid-view');
+        const playlistView = document.getElementById('playlist-view');
+        const musicGrid = gridView.querySelector('.music-grid');
+        const backButton = document.getElementById('back-to-grid');
+        
+        const playlistIframe = document.getElementById('playlist-iframe');
+        const playlistTitle = document.getElementById('playlist-title');
+        const playlistDescription = document.getElementById('playlist-description');
+
+        // --- Custom Select Dropdown Logic ---
+        const selected = document.querySelector(".select-selected");
+        const itemsContainer = document.querySelector(".select-items");
+        const items = itemsContainer.querySelectorAll("div");
+
+        selected.addEventListener("click", () => {
+            itemsContainer.classList.toggle("select-hide");
+            selected.classList.toggle("select-arrow-active");
+        });
+
+        items.forEach(item => {
+            item.addEventListener("click", function() {
+                selected.innerHTML = this.innerHTML;
+                itemsContainer.classList.add("select-hide");
+                selected.classList.remove("select-arrow-active");
+                handleSelection(this.dataset.value);
+            });
+        });
+
+        document.addEventListener("click", function(e) {
+            if (!e.target.closest(".custom-select-container")) {
+                itemsContainer.classList.add("select-hide");
+                selected.classList.remove("select-arrow-active");
+            }
+        });
+
+        // --- View Switching Logic ---
+        function showGridView() {
+            gridView.style.display = 'block';
+            playlistView.style.display = 'none';
+            backButton.style.display = 'none';
+        }
+
+        function showPlaylistView(category) {
+            const playlist = data.playlists[category];
+            if (playlist) {
+                playlistIframe.src = `https://www.youtube.com/embed/videoseries?list=${playlist.id}`;
+                playlistTitle.textContent = playlist.title;
+                playlistDescription.textContent = playlist.description;
+                
+                gridView.style.display = 'none';
+                playlistView.style.display = 'block';
+                backButton.style.display = 'inline-block';
+            }
+        }
+
+        function handleSelection(value) {
+            if (value === 'all') {
+                showGridView();
+            } else {
+                showPlaylistView(value);
+            }
+        }
+        
+        backButton.addEventListener('click', showGridView);
+
+        // --- Populate Grid View ---
+        function populateGrid() {
+            musicGrid.innerHTML = '';
+            data.greatestHits.forEach(song => {
+                const card = document.createElement('div');
+                card.className = 'music-card';
+                card.dataset.category = song.category;
+                card.innerHTML = `
+                    <img src="https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg" alt="${song.title}" class="music-card-thumbnail">
+                    <div class="music-card-content">
+                        <p class="music-card-category">${song.category.replace(/\b\w/g, l => l.toUpperCase())}</p>
+                        <h3 class="music-card-title">${song.title}</h3>
+                        <p class="text-gray-400 text-sm">${song.description}</p>
+                    </div>
+                `;
+                card.addEventListener('click', () => showPlaylistView(song.category));
+                musicGrid.appendChild(card);
+            });
+        }
+
+        // Initial Load
+        populateGrid();
+
+    </script>
 
 </body>
 </html>
