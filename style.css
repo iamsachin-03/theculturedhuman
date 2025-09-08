@@ -88,3 +88,20 @@ body {
         transform: translateY(0);
     }
 }
+
+.cta-button {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: #000;
+    font-weight: 600;
+    padding: 1rem 2rem;
+    border-radius: 9999px;
+    font-size: 1.125rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(192, 160, 128, 0.3);
+}
+
+.cta-button:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 8px 25px rgba(192, 160, 128, 0.5);
+}
