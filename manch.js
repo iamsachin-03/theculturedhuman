@@ -6,27 +6,41 @@ import {
     authReady,
     collection,
     addDoc,
-    getDocs,
+    doc,
+    updateDoc,
+    deleteDoc,
     query,
     orderBy,
-    serverTimestamp
+    serverTimestamp,
+    onSnapshot
 } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM Elements ---
     const adminPostForm = document.getElementById('admin-post-form');
     const newPostForm = document.getElementById('new-post-form');
     const postsContainer = document.getElementById('posts-container');
     const selectContainer = document.querySelector(".custom-select-container");
 
-    let allPosts = []; // Cache for all blog posts
+    // Edit Modal Elements
+    const editPostModal = document.getElementById('edit-post-modal');
+    const editPostForm = document.getElementById('edit-post-form');
+    const cancelEditButton = document.getElementById('cancel-edit-post-button');
 
-    const renderPosts = (filter = 'all') => {
+    // --- State ---
+    let allPosts = []; // Cache for all blog posts
+    let isAdmin = false;
+    let currentFilter = 'all';
+
+    // --- Functions ---
+
+    const renderPosts = () => {
         if (!postsContainer) return;
         postsContainer.innerHTML = '';
 
-        const filteredPosts = filter === 'all' 
+        const filteredPosts = currentFilter === 'all' 
             ? allPosts 
-            : allPosts.filter(post => post.label === filter);
+            : allPosts.filter(post => post.label === currentFilter);
 
         if (filteredPosts.length === 0) {
             postsContainer.innerHTML = `<p class="text-center text-gray-400 col-span-full">No posts found in this category.</p>`;
@@ -37,8 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const postEl = document.createElement('div');
             postEl.className = 'card rounded-2xl overflow-hidden group';
             postEl.innerHTML = `
-                <div class="h-64 overflow-hidden">
+                <div class="h-64 overflow-hidden relative">
                     <img src="${post.imageUrl || 'https://via.placeholder.com/400x250'}" alt="${post.title || 'Untitled Post'}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                     ${isAdmin ? `
+                    <div class="card-actions absolute top-2 right-2">
+                        <button data-id="${post.id}" class="edit-post-btn"><i class="fas fa-pencil-alt"></i></button>
+                        <button data-id="${post.id}" class="delete-post-btn"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    ` : ''}
                 </div>
                 <div class="p-8">
                     <span class="label">${post.label || 'General'}</span>
@@ -60,8 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selected = selectContainer.querySelector(".select-selected");
         const itemsContainer = selectContainer.querySelector(".select-items");
         
-        itemsContainer.innerHTML = ''; // Clear existing options
-        
+        itemsContainer.innerHTML = '';
         const allOption = document.createElement('div');
         allOption.dataset.value = 'all';
         allOption.textContent = 'All Labels';
@@ -85,75 +104,112 @@ document.addEventListener('DOMContentLoaded', () => {
                 selected.textContent = this.textContent;
                 itemsContainer.classList.add("select-hide");
                 selected.classList.remove("select-arrow-active");
-                renderPosts(this.dataset.value);
+                currentFilter = this.dataset.value;
+                renderPosts();
             });
         });
+    }
 
-        document.addEventListener("click", () => {
-            if (!itemsContainer.classList.contains('select-hide')) {
-                itemsContainer.classList.add("select-hide");
-                selected.classList.remove("select-arrow-active");
+    
+    // --- Event Listeners ---
+
+    if (newPostForm) {
+        newPostForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await addDoc(collection(db, 'posts'), {
+                    title: document.getElementById('post-title').value,
+                    imageUrl: document.getElementById('post-image-url').value,
+                    content: document.getElementById('post-content').value,
+                    author: document.getElementById('post-author').value,
+                    label: document.getElementById('post-label').value,
+                    createdAt: serverTimestamp()
+                });
+                newPostForm.reset();
+            } catch (error) {
+                console.error("Error adding post: ", error);
+                alert('Error adding post.');
             }
         });
     }
 
-    const fetchPostsAndSetup = async () => {
-        try {
-            const postsCol = collection(db, 'posts');
-            const q = query(postsCol, orderBy("createdAt", "desc"));
-            const querySnapshot = await getDocs(q);
-            allPosts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
-            const uniqueLabels = [...new Set(allPosts.map(post => post.label).filter(Boolean))];
-            
-            setupDropdown(uniqueLabels);
-            renderPosts(); // Initial render of all posts
+    postsContainer.addEventListener('click', (e) => {
+        const target = e.target.closest('button');
+        if (!target) return;
+        const postId = target.dataset.id;
 
-        } catch (error) {
-            console.error("Error fetching posts: ", error);
-            if (postsContainer) {
-                postsContainer.innerHTML = `<p class="text-red-500 col-span-full">Error loading posts.</p>`;
+        if (target.classList.contains('edit-post-btn')) {
+            const postToEdit = allPosts.find(post => post.id === postId);
+            if (postToEdit) {
+                document.getElementById('edit-post-id').value = postId;
+                document.getElementById('edit-post-title').value = postToEdit.title;
+                document.getElementById('edit-post-image-url').value = postToEdit.imageUrl;
+                document.getElementById('edit-post-content').value = postToEdit.content;
+                document.getElementById('edit-post-author').value = postToEdit.author;
+                document.getElementById('edit-post-label').value = postToEdit.label;
+                editPostModal.classList.remove('hidden');
             }
         }
-    };
 
+        if (target.classList.contains('delete-post-btn')) {
+            if (confirm('Are you sure you want to delete this post?')) {
+                deleteDoc(doc(db, "posts", postId)).catch(error => console.error("Error deleting post: ", error));
+            }
+        }
+    });
+
+    editPostForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const postId = document.getElementById('edit-post-id').value;
+        const updatedData = {
+            title: document.getElementById('edit-post-title').value,
+            imageUrl: document.getElementById('edit-post-image-url').value,
+            content: document.getElementById('edit-post-content').value,
+            author: document.getElementById('edit-post-author').value,
+            label: document.getElementById('edit-post-label').value,
+        };
+
+        try {
+            await updateDoc(doc(db, "posts", postId), updatedData);
+            editPostModal.classList.add('hidden');
+        } catch (error) {
+            console.error("Error updating post: ", error);
+            alert('Error updating post.');
+        }
+    });
+
+    cancelEditButton.addEventListener('click', () => {
+        editPostModal.classList.add('hidden');
+    });
+    
+    document.addEventListener("click", (e) => {
+        const itemsContainer = selectContainer ? selectContainer.querySelector(".select-items") : null;
+        if (itemsContainer && !itemsContainer.classList.contains('select-hide') && !selectContainer.contains(e.target)) {
+            itemsContainer.classList.add("select-hide");
+            selectContainer.querySelector(".select-selected").classList.remove("select-arrow-active");
+        }
+    });
+
+    // --- Initialization ---
     authReady.then(authData => {
         console.log('Firebase is ready on Manch page.');
+        isAdmin = authData && authData.isAdmin;
+        
+        const postsCol = collection(db, 'posts');
+        const q = query(postsCol, orderBy("createdAt", "desc"));
 
-        fetchPostsAndSetup();
+        onSnapshot(q, (querySnapshot) => {
+            allPosts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const uniqueLabels = [...new Set(allPosts.map(post => post.label).filter(Boolean))];
+            setupDropdown(uniqueLabels);
+            renderPosts(); 
+        });
 
-        if (newPostForm) {
-            newPostForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                try {
-                    const postsCol = collection(db, 'posts');
-                    await addDoc(postsCol, {
-                        title: document.getElementById('post-title').value,
-                        imageUrl: document.getElementById('post-image-url').value,
-                        content: document.getElementById('post-content').value,
-                        author: document.getElementById('post-author').value,
-                        label: document.getElementById('post-label').value,
-                        createdAt: serverTimestamp()
-                    });
-                    newPostForm.reset();
-                    fetchPostsAndSetup(); // Re-fetch and setup everything again
-                } catch (error) {
-                    console.error("Error adding post: ", error);
-                    alert('There was an error adding the post.');
-                }
-            });
-        }
-
-        if (authData && authData.isAdmin) {
-            if (adminPostForm) {
-                adminPostForm.classList.remove('hidden');
-            }
+        if (isAdmin && adminPostForm) {
+            adminPostForm.classList.remove('hidden');
         }
 
     }).catch(error => {
         console.error("Fatal Error: Firebase initialization failed on Manch page.", error);
-        if(postsContainer) {
-            postsContainer.innerHTML = `<p class="text-red-500 col-span-full">Error: Could not connect to the database.</p>`;
-        }
     });
 });

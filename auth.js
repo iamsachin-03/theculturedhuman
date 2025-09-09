@@ -20,7 +20,9 @@ import {
     serverTimestamp,
     doc,
     getDoc,
-    getDocs
+    getDocs,
+    updateDoc, // Added
+    deleteDoc  // Added
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { firebaseConfig } from './firebase-config.js';
 
@@ -81,7 +83,9 @@ export {
     serverTimestamp,
     doc,
     getDoc,
-    getDocs
+    getDocs,
+    updateDoc, // Added
+    deleteDoc  // Added
 };
 
 

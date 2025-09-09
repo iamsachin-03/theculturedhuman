@@ -76,6 +76,29 @@
         </div>
     </main>
 
+    <!-- Edit Proverb Modal -->
+    <div id="edit-proverb-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4">
+        <div class="bg-secondary-color rounded-2xl shadow-2xl p-8 max-w-lg w-full border border-card-border">
+            <h2 class="font-playfair text-3xl font-bold mb-6">Edit Proverb</h2>
+            <form id="edit-proverb-form" class="space-y-6">
+                <input type="hidden" id="edit-proverb-id">
+                <div>
+                    <label for="edit-proverb-text" class="block text-lg font-medium mb-2">Proverb</label>
+                    <input type="text" id="edit-proverb-text" class="w-full p-3 rounded-lg bg-input-bg border-2 border-input-border focus:border-primary-color focus:outline-none">
+                </div>
+                <div>
+                    <label for="edit-proverb-meaning" class="block text-lg font-medium mb-2">Meaning</label>
+                    <textarea id="edit-proverb-meaning" rows="4" class="w-full p-3 rounded-lg bg-input-bg border-2 border-input-border focus:border-primary-color focus:outline-none"></textarea>
+                </div>
+                <div class="flex justify-end gap-4">
+                    <button type="button" id="cancel-edit-button" class="px-6 py-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors">Cancel</button>
+                    <button type="submit" class="px-6 py-2 bg-primary-color text-white font-bold rounded-lg hover:bg-opacity-90">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     <!-- Footer -->
     <footer class="text-center p-10 mt-16 border-t border-gray-800">
         <p class="text-gray-400">&copy; 2025 Bihar Angan. All Rights Reserved.</p>

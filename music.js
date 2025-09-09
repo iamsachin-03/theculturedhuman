@@ -1,14 +1,33 @@
 
-import { db, authReady } from './auth.js';
-import { collection, getDocs, addDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import {
+    db,
+    authReady,
+    collection,
+    addDoc,
+    doc,
+    updateDoc,
+    deleteDoc,
+    query,
+    orderBy,
+    serverTimestamp,
+    onSnapshot
+} from './auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM Elements ---
     const musicGrid = document.querySelector('.music-grid');
     const selectContainer = document.querySelector(".custom-select-container");
     const adminMusicForm = document.getElementById('admin-music-form');
     const newMusicForm = document.getElementById('new-music-form');
-    const categorySelect = document.getElementById('music-category');
+    const addCategorySelect = document.getElementById('music-category');
+    
+    // Edit Modal Elements
+    const editMusicModal = document.getElementById('edit-music-modal');
+    const editMusicForm = document.getElementById('edit-music-form');
+    const cancelEditButton = document.getElementById('cancel-edit-music-button');
+    const editCategorySelect = document.getElementById('edit-music-category');
 
+    // --- State ---
     const categories = {
         "all": "All Categories",
         "wedding": "Wedding Songs (Biyah Geet)",
@@ -17,14 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
         "bhajan": "Bihari Bhajans",
         "folk": "Classic Bihari Folk",
     };
-
     let allMusic = []; // Cache for all music tracks
+    let isAdmin = false;
+    let currentFilter = 'all';
 
-    function renderMusic(filter = 'all') {
+    // --- Functions ---
+
+    function renderMusic() {
         if (!musicGrid) return;
-        const filteredMusic = filter === 'all' 
+        const filteredMusic = currentFilter === 'all' 
             ? allMusic 
-            : allMusic.filter(song => song.category === filter);
+            : allMusic.filter(song => song.category === currentFilter);
 
         musicGrid.innerHTML = '';
         if (filteredMusic.length === 0) {
@@ -33,34 +55,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         filteredMusic.forEach(song => {
-            const videoUrl = `https://www.youtube.com/watch?v=${song.videoId}`;
-            const card = document.createElement('a');
-            card.href = videoUrl;
-            card.target = '_blank';
-            card.rel = 'noopener noreferrer';
+            const card = document.createElement('div');
             card.className = 'music-card';
             card.innerHTML = `
-                <img src="https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg" alt="${song.title}" class="music-card-thumbnail">
+                <div class="music-card-thumbnail-wrapper">
+                    <img src="https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg" alt="${song.title}" class="music-card-thumbnail">
+                    <div class="play-overlay"><i class="fas fa-play"></i></div>
+                </div>
                 <div class="music-card-content">
                     <p class="music-card-category">${categories[song.category] || 'General'}</p>
                     <h3 class="music-card-title">${song.title}</h3>
-                    <p class="text-gray-400 text-sm">${song.description || ''}</p>
+                    <p class="text-gray-400 text-sm">${(song.description || '').substring(0, 80)}...</p>
                 </div>
+                ${isAdmin ? `
+                <div class="card-actions">
+                    <button data-id="${song.id}" class="edit-music-btn"><i class="fas fa-pencil-alt"></i></button>
+                    <button data-id="${song.id}" class="delete-music-btn"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                ` : ''}
             `;
+            
+            const thumbnailWrapper = card.querySelector('.music-card-thumbnail-wrapper');
+            thumbnailWrapper.addEventListener('click', () => {
+                window.open(`https://www.youtube.com/watch?v=${song.videoId}`, '_blank');
+            });
+            
             musicGrid.appendChild(card);
         });
     }
 
-    async function fetchMusic() {
-        try {
-            const q = query(collection(db, "music"), orderBy("createdAt", "desc"));
-            const querySnapshot = await getDocs(q);
-            allMusic = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderMusic(); // Render all music initially
-        } catch (error) {
-            console.error("Error loading music: ", error);
-            if (musicGrid) musicGrid.innerHTML = `<p class="text-red-500">Failed to load music.</p>`;
-        }
+    function populateSelect(selectElement) {
+        if (!selectElement) return;
+        selectElement.innerHTML = '';
+        Object.keys(categories).forEach(key => {
+            if (key !== 'all') {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = categories[key];
+                selectElement.appendChild(option);
+            }
+        });
     }
 
     function setupDropdown() {
@@ -68,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selected = selectContainer.querySelector(".select-selected");
         const itemsContainer = selectContainer.querySelector(".select-items");
         
-        itemsContainer.innerHTML = '';
+        itemsContainer.innerHTML = ''; 
         Object.keys(categories).forEach(key => {
             const option = document.createElement('div');
             option.dataset.value = key;
@@ -83,29 +117,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         itemsContainer.querySelectorAll("div").forEach(item => {
-            item.addEventListener("click", function() {
+            item.addEventListener('click', function() {
                 selected.textContent = this.textContent;
-                renderMusic(this.dataset.value);
+                itemsContainer.classList.add("select-hide");
+                selected.classList.remove("select-arrow-active");
+                currentFilter = this.dataset.value;
+                renderMusic();
             });
         });
-
-        document.addEventListener("click", () => {
-            itemsContainer.classList.add("select-hide");
-            selected.classList.remove("select-arrow-active");
-        });
-
-        if (categorySelect) {
-            categorySelect.innerHTML = '';
-            Object.keys(categories).forEach(key => {
-                if (key !== 'all') {
-                    const option = document.createElement('option');
-                    option.value = key;
-                    option.textContent = categories[key];
-                    categorySelect.appendChild(option);
-                }
-            });
-        }
     }
+
+    // --- Event Listeners ---
 
     if (newMusicForm) {
         newMusicForm.addEventListener('submit', async (e) => {
@@ -114,28 +136,99 @@ document.addEventListener('DOMContentLoaded', () => {
                 await addDoc(collection(db, "music"), {
                     title: document.getElementById('music-title').value,
                     videoId: document.getElementById('music-video-id').value,
-                    category: document.getElementById('music-category').value,
+                    category: addCategorySelect.value,
                     description: document.getElementById('music-description').value,
                     createdAt: serverTimestamp()
                 });
                 newMusicForm.reset();
-                fetchMusic(); // Refresh the list after adding
             } catch (error) {
                 console.error("Error adding music: ", error);
-                alert("Error adding music. Please check the console.");
+                alert("Error adding music.");
             }
         });
     }
 
+    musicGrid.addEventListener('click', async (e) => {
+        const target = e.target.closest('button');
+        if (!target) return;
+
+        const musicId = target.dataset.id;
+
+        if (target.classList.contains('edit-music-btn')) {
+            const songToEdit = allMusic.find(song => song.id === musicId);
+            if (songToEdit) {
+                document.getElementById('edit-music-id').value = musicId;
+                document.getElementById('edit-music-title').value = songToEdit.title;
+                document.getElementById('edit-music-video-id').value = songToEdit.videoId;
+                editCategorySelect.value = songToEdit.category;
+                document.getElementById('edit-music-description').value = songToEdit.description;
+                editMusicModal.classList.remove('hidden');
+            }
+        }
+
+        if (target.classList.contains('delete-music-btn')) {
+            if (confirm('Are you sure you want to delete this music track?')) {
+                try {
+                    await deleteDoc(doc(db, "music", musicId));
+                } catch (error) {
+                    console.error("Error deleting music: ", error);
+                    alert('Error deleting music.');
+                }
+            }
+        }
+    });
+
+    editMusicForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const musicId = document.getElementById('edit-music-id').value;
+        const updatedData = {
+            title: document.getElementById('edit-music-title').value,
+            videoId: document.getElementById('edit-music-video-id').value,
+            category: editCategorySelect.value,
+            description: document.getElementById('edit-music-description').value,
+        };
+
+        try {
+            const musicRef = doc(db, "music", musicId);
+            await updateDoc(musicRef, updatedData);
+            editMusicModal.classList.add('hidden');
+        } catch (error) {
+            console.error("Error updating music: ", error);
+            alert('Error updating music track.');
+        }
+    });
+
+    cancelEditButton.addEventListener('click', () => {
+        editMusicModal.classList.add('hidden');
+    });
+
+    document.addEventListener("click", (e) => {
+        const selectItems = document.querySelector(".select-items");
+        if (selectItems && !selectItems.classList.contains('select-hide') && !selectContainer.contains(e.target)) {
+            selectItems.classList.add("select-hide");
+            document.querySelector(".select-selected").classList.remove("select-arrow-active");
+        }
+    });
+
+    // --- Initialization ---
     authReady.then(authData => {
-        console.log('Firebase is ready on Music page. Auth data:', authData);
+        console.log('Firebase is ready on Music page.');
+        isAdmin = authData && authData.isAdmin;
+        
         setupDropdown();
-        fetchMusic();
-        if (authData && authData.isAdmin) {
-            if (adminMusicForm) adminMusicForm.style.display = 'block';
+        populateSelect(addCategorySelect);
+        populateSelect(editCategorySelect);
+        
+        const q = query(collection(db, "music"), orderBy("createdAt", "desc"));
+        onSnapshot(q, (querySnapshot) => {
+            allMusic = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderMusic();
+        });
+        
+        if (isAdmin && adminMusicForm) {
+            adminMusicForm.classList.remove('hidden');
         }
     }).catch(error => {
         console.error("Fatal Error: Firebase initialization failed on Music page.", error);
-        if (musicGrid) musicGrid.innerHTML = `<p class="text-red-500">Fatal Error: Could not connect to the database.</p>`;
     });
 });
