@@ -12,10 +12,11 @@
 *   **Logo:** A stylized SVG logo that is dynamically themed with the current primary color.
 *   **Layout:** Responsive and mobile-first, using Tailwind CSS and modern CSS features like container queries and logical properties.
 *   **Visual Flair:** Subtle background patterns, glowing button effects, and layered drop shadows create a premium, interactive feel.
+*   **Animation:** A simple, elegant, and culturally relevant animation on the home page that showcases Bihar's rich culture.
 
 ### Features
 
-*   **Home Page (`index.html`):** A landing page introducing the three pillars of Bihar Angan: Culture, Commerce, and Community.
+*   **Home Page (`index.html`):** A landing page introducing the three pillars of Bihar Angan: Culture, Commerce, and Community. The page also features an animation that showcases Bihar's rich culture.
 *   **Culture Page (`culture.html`):** A deep dive into Bihari culture, with a new dropdown menu in the navigation bar that links to the Music, Bazaar, and Proverbs pages.
 *   **Music Page (`music.html`):** A curated collection of Bihari folk music, categorized by genre. The page features a dropdown menu to select a category and a grid view of individual songs. To work around YouTube's embedding restrictions, clicking a song card now opens the video in a new browser tab.
 *   **Bazaar Page (`bazaar.html`):** A visually rich gallery of traditional Bihari crafts. The page features a hero section and a responsive grid of product cards, each with a high-quality image and description.

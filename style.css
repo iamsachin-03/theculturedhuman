@@ -247,6 +247,39 @@ body {
     color: var(--font-color);
 }
 
+/* --- Animation Styles --- */
+#animation-container {
+    position: relative;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.animation-scene {
+    position: absolute;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s, transform 1s;
+}
+
+.animation-scene.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.animation-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.animation-text {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
 
 /* --- Buttons --- */
 .btn-primary {
