@@ -192,58 +192,59 @@ body {
     margin-bottom: 0.5rem;
 }
 
-/* --- Video Modal --- */
-.video-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
+/* --- Bazaar Page Specific Styles --- */
+
+.bazaar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2.5rem;
+}
+
+.bazaar-card {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bazaar-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+}
+
+.bazaar-card-image-container {
+    height: 250px;
+    overflow: hidden;
+}
+
+.bazaar-card-image {
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
+    object-fit: cover;
+    transition: transform 0.4s ease;
 }
 
-.video-modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
+.bazaar-card:hover .bazaar-card-image {
+    transform: scale(1.1);
 }
 
-.video-modal-content {
-    position: relative;
-    width: 90%;
-    max-width: 960px;
-    background-color: var(--background-color);
-    border-radius: 16px;
-    padding: 1.5rem;
-    transform: scale(0.9);
-    transition: transform 0.3s;
+.bazaar-card-content {
+    padding: 2rem;
 }
 
-.video-modal-overlay.active .video-modal-content {
-    transform: scale(1);
+.bazaar-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
 }
 
-.video-modal-close {
-    position: absolute;
-    top: -1rem;
-    right: -1rem;
-    background: white;
-    color: black;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.bazaar-card-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--font-color);
 }
 
 
@@ -278,4 +279,3 @@ body {
     top: 0;
     left: 0;
 }
-

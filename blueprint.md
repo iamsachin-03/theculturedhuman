@@ -18,6 +18,7 @@
 *   **Home Page (`index.html`):** A landing page introducing the three pillars of Bihar Angan: Culture, Commerce, and Community.
 *   **Culture Page (`culture.html`):** A deep dive into Bihari culture, with a new dropdown menu in the navigation bar that links to the Music, Bazaar, and Proverbs pages.
 *   **Music Page (`music.html`):** A curated collection of Bihari folk music, categorized by genre. The page features a dropdown menu to select a category and a grid view of individual songs. To work around YouTube's embedding restrictions, clicking a song card now opens the video in a new browser tab.
+*   **Bazaar Page (`bazaar.html`):** A visually rich gallery of traditional Bihari crafts. The page features a hero section and a responsive grid of product cards, each with a high-quality image and description.
 *   **Fitness Page (`fitness.html`):** A page dedicated to traditional Bihari wellness practices and a weekly workout planner.
 *   **Marketplace Page (`marketplace.html`):** A "coming soon" page for a marketplace.
 *   **Manch Page (`manch.html`):** A blog/forum for the community.
@@ -27,10 +28,11 @@
 *   **Authentication (`auth.js`):** A robust authentication system using Firebase Email Link (passwordless) sign-in. It correctly handles user sessions and custom claims (like admin status) via an `authReady` promise, which acts as a single source of truth for the user's authentication state. The flow involves sending a secure link to the user's email, which they click to sign in.
 *   **Proverbs Page (`proverbs.js`):** A feature displaying Bihari proverbs, with an admin-only form to add new ones. This feature now works correctly by waiting for the `authReady` signal.
 
-## Current Plan: Build the Bazaar Page
+## Current Plan: Build the Proverbs Page
 
-*   **Goal:** Create the `bazaar.html` page, a visually rich gallery of traditional Bihari crafts.
+*   **Goal:** Create the `proverbs.html` page, which will display a collection of Bihari proverbs. It will also include a form that is only visible to admins, allowing them to add new proverbs to the collection.
 *   **Features:**
     *   A hero section with a relevant background image and an inspiring title.
-    *   A responsive grid of "product cards," each featuring a high-quality image, a title, and a brief description of a specific Bihari craft (e.g., Madhubani paintings, Sujini embroidery).
+    *   A responsive grid or list to display the proverbs.
+    *   An admin-only form to add new proverbs, which will be stored in Firestore.
     *   The page will be styled to match the rest of the site, using the existing `style.css` and the project's design language.
