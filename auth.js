@@ -1,5 +1,7 @@
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+// --- Centralized Firebase Service Module: auth.js --- //
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { 
     getAuth, 
     onAuthStateChanged,
@@ -7,46 +9,83 @@ import {
     isSignInWithEmailLink,
     signInWithEmailLink,
     signOut 
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { 
+    getFirestore,
+    collection,
+    addDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp,
+    doc,
+    getDoc,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { firebaseConfig } from './firebase-config.js';
 
-// Initialize Firebase
+// --- Initialize Firebase and Services ---
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// --- NEW ARCHITECTURE: A promise that resolves with the ID TOKEN RESULT --- //
+// --- Central Auth Promise ---
 const authReady = new Promise((resolve) => {
     onAuthStateChanged(auth, async (user) => {
         const loginLink = document.getElementById('login-link');
         const userInfo = document.getElementById('user-info');
         const userName = document.getElementById('user-name');
         
+        let authData;
+
         if (user) {
-            // User is signed in
             if(loginLink) loginLink.classList.add('hidden');
             if(userInfo) userInfo.classList.remove('hidden');
             if(userName) userName.textContent = user.displayName || user.email;
             
-            // Get the fresh token with claims HERE and ONLY HERE.
             const idTokenResult = await user.getIdTokenResult(true);
-            resolve(idTokenResult); // Resolve with the full token result
+            
+            authData = {
+                user: user,
+                isAdmin: idTokenResult.claims.admin === true,
+                idTokenResult: idTokenResult
+            };
 
         } else {
-            // User is signed out
             if(loginLink) loginLink.classList.remove('hidden');
             if(userInfo) userInfo.classList.add('hidden');
-            resolve(null); // Resolve with null if no user
+            
+            authData = {
+                user: null,
+                isAdmin: false,
+                idTokenResult: null
+            };
         }
+        resolve(authData);
     });
 });
 
-// Export the promise and the services
-export { db, auth, authReady };
+// --- EXPORT ALL SERVICES AND FUNCTIONS ---
+export { 
+    // Services
+    db, 
+    auth, 
+    authReady, 
 
-// --- Event Listeners & Auth Flow --- //
+    // Firestore Functions
+    collection,
+    addDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp,
+    doc,
+    getDoc,
+    getDocs
+};
 
+
+// --- Auth Flow Logic ---
 const handleEmailAuth = () => {
     const emailForm = document.getElementById('email-form');
     const authFeedback = document.getElementById('auth-feedback');
@@ -58,7 +97,7 @@ const handleEmailAuth = () => {
             const email = emailInput.value;
 
             const actionCodeSettings = {
-                url: window.location.href.split('?')[0], // URL to redirect back to
+                url: window.location.href.split('?')[0], 
                 handleCodeInApp: true,
             };
 
@@ -75,7 +114,7 @@ const handleEmailAuth = () => {
                     console.error("Error sending sign-in link: ", error);
                      if (authFeedback) {
                         authFeedback.textContent = `Error: ${error.message}`;
-                        authFeedback.style.color = '#ef4444'; // Red color for errors
+                        authFeedback.style.color = '#ef4444';
                     }
                 });
         });
@@ -84,17 +123,13 @@ const handleEmailAuth = () => {
     if (isSignInWithEmailLink(auth, window.location.href)) {
         let email = window.localStorage.getItem('emailForSignIn');
         if (!email) {
-            // This can happen if the user opens the link on a different device.
-            // Prompt the user for their email.
             email = window.prompt('Please provide your email for confirmation');
         }
         
         signInWithEmailLink(auth, email, window.location.href)
-            .then((result) => {
+            .then(() => {
                 window.localStorage.removeItem('emailForSignIn');
-                // You can access the new user via result.user
-                // Additional user info profile can be updated here.
-                window.location.href = '/'; // Redirect to home after successful login
+                window.location.href = '/';
             })
             .catch((error) => {
                 console.error("Error signing in with email link: ", error);
@@ -117,8 +152,6 @@ const handleSignOut = () => {
     }
 };
 
-
-// Run the appropriate auth flow based on the current page
 document.addEventListener('DOMContentLoaded', () => {
     handleEmailAuth();
     handleSignOut();

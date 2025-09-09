@@ -60,6 +60,33 @@
 
     <!-- Main Content -->
     <main class="py-24 px-6">
+        
+        <!-- Admin Music Form -->
+        <div id="admin-music-form" class="hidden max-w-4xl mx-auto mb-16 p-8 rounded-2xl bg-secondary-color border border-card-border">
+            <h2 class="font-playfair text-3xl font-bold mb-6">Add New Music</h2>
+            <form id="new-music-form" class="space-y-6">
+                <div>
+                    <label for="music-title" class="block text-lg font-medium mb-2">Song Title</label>
+                    <input type="text" id="music-title" class="w-full p-3 rounded-lg bg-input-bg border-2 border-input-border focus:border-primary-color focus:outline-none" required>
+                </div>
+                <div>
+                    <label for="music-video-id" class="block text-lg font-medium mb-2">YouTube Video ID</label>
+                    <input type="text" id="music-video-id" class="w-full p-3 rounded-lg bg-input-bg border-2 border-input-border focus:border-primary-color focus:outline-none" required>
+                </div>
+                 <div>
+                    <label for="music-category" class="block text-lg font-medium mb-2">Category</label>
+                    <select id="music-category" class="w-full p-3 rounded-lg bg-input-bg border-2 border-input-border focus:border-primary-color focus:outline-none" required>
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+                <div>
+                    <label for="music-description" class="block text-lg font-medium mb-2">Description</label>
+                    <textarea id="music-description" rows="3" class="w-full p-3 rounded-lg bg-input-bg border-2 border-input-border focus:border-primary-color focus:outline-none" required></textarea>
+                </div>
+                <button type="submit" class="px-8 py-3 bg-primary-color text-white font-bold rounded-lg hover:bg-opacity-90 transition-colors duration-300">Add Music</button>
+            </form>
+        </div>
+        
         <!-- Controls -->
         <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-center items-center gap-8 mb-16">
             <div class="custom-select-container">
@@ -86,96 +113,7 @@
     
     <script src="logo.js"></script>
     <script src="theme.js"></script>
-    <script>
-        const songData = {
-            songs: [
-                { videoId: 'zF41-Hl_pGk', category: 'wedding', title: 'Lagan Mein Thumka', description: 'A quintessential wedding celebration song.' },
-                { videoId: 'b-7AgxSPBOI', category: 'wedding', title: 'Banna Banni Geet', description: 'A playful and traditional wedding song.' },
-                { videoId: 'gh6cssL0dr8', category: 'chhath', title: 'Kaanch Hi Baans Ke Bahangiya', description: 'The most iconic Chhath puja anthem.' },
-                { videoId: 'T1aWbpVf_T4', category: 'sohar', title: 'Janam Lihle Krishan Kanhaiya', description: 'A joyous sohar celebrating childbirth.' },
-                { videoId: 'uRMKSWftUnE', category: 'sohar', title: 'Sohar - A New Beginning', description: 'A beautiful sohar welcoming a new member to the family.' },
-                { videoId: 'B5lJqS-8f4E', category: 'bhajan', title: 'Ram Bhajo Re', description: 'A soulful bhajan for peace and devotion.' },
-                { videoId: 'a_234dsas3', category: 'folk', title: 'Nadiya Ke Teere Teere', description: 'A classic folk melody about life by the river.' },
-            ],
-            categories: {
-                "all": "All Categories",
-                "wedding": "Wedding Songs (Biyah Geet)",
-                "chhath": "Chhath Puja Songs",
-                "sohar": "Sohar (Childbirth Songs)",
-                "bhajan": "Bihari Bhajans",
-                "folk": "Classic Bihari Folk",
-            }
-        };
-
-        const musicGrid = document.querySelector('.music-grid');
-        const selectContainer = document.querySelector(".custom-select-container");
-        const selected = selectContainer.querySelector(".select-selected");
-        const itemsContainer = selectContainer.querySelector(".select-items");
-
-        // --- Populate Grid View ---
-        function populateGrid(filter = 'all') {
-            musicGrid.innerHTML = '';
-            const filteredSongs = filter === 'all' 
-                ? songData.songs 
-                : songData.songs.filter(song => song.category === filter);
-
-            filteredSongs.forEach(song => {
-                const videoUrl = `https://www.youtube.com/watch?v=${song.videoId}`;
-                const card = document.createElement('div');
-                card.className = 'music-card';
-                card.innerHTML = `
-                    <a href="${videoUrl}" target="_blank" rel="noopener noreferrer">
-                        <img src="https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg" alt="${song.title}" class="music-card-thumbnail">
-                        <div class="music-card-content">
-                            <p class="music-card-category">${songData.categories[song.category]}</p>
-                            <h3 class="music-card-title">${song.title}</h3>
-                            <p class="text-gray-400 text-sm">${song.description}</p>
-                        </div>
-                    </a>
-                `;
-                musicGrid.appendChild(card);
-            });
-        }
-
-        // --- Custom Select Dropdown Logic ---
-        function populateDropdown() {
-            itemsContainer.innerHTML = '';
-            for (const categoryKey in songData.categories) {
-                const option = document.createElement('div');
-                option.dataset.value = categoryKey;
-                option.textContent = songData.categories[categoryKey];
-                itemsContainer.appendChild(option);
-            }
-            
-            const items = itemsContainer.querySelectorAll("div");
-            items.forEach(item => {
-                item.addEventListener("click", function() {
-                    const category = this.dataset.value;
-                    selected.innerHTML = this.innerHTML;
-                    itemsContainer.classList.add("select-hide");
-                    selected.classList.remove("select-arrow-active");
-                    populateGrid(category);
-                });
-            });
-        }
-
-        selected.addEventListener("click", () => {
-            itemsContainer.classList.toggle("select-hide");
-            selected.classList.toggle("select-arrow-active");
-        });
-
-        document.addEventListener("click", function(e) {
-            if (!selectContainer.contains(e.target)) {
-                itemsContainer.classList.add('select-hide');
-                selected.classList.remove("select-arrow-active");
-            }
-        });
-
-        // --- Initial Load ---
-        populateGrid();
-        populateDropdown();
-
-    </script>
+    <script type="module" src="music.js"></script>
     <script type="module" src="auth.js"></script>
 </body>
 </html>
