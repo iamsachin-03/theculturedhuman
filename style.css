@@ -4,22 +4,38 @@
     --background-color: #121212;
     --secondary-color: #1e1e1e;
     --font-color: #e0e0e0;
+    --font-color-muted: #a0a0a0;
     --primary-color: #c5a684; 
+    --primary-color-rgb: 197, 166, 132;
     --card-bg: #2a2a2a;
     --card-border: #444;
-    --input-bg: #333;
+    --input-bg: #2b2b2b;
     --input-border: #555;
+    --input-focus-border: var(--primary-color);
+    --btn-primary-bg: var(--primary-color);
+    --btn-primary-hover-bg: #a88d6c;
+    --btn-secondary-bg: transparent;
+    --btn-secondary-border: var(--card-border);
+    --btn-secondary-hover-bg: #333;
 }
 
 [data-theme="light"] {
     --background-color: #f5f3ef;
     --secondary-color: #ffffff;
     --font-color: #2c2c2c;
-    --primary-color: #8c6b4e; 
+    --font-color-muted: #6c6c6c;
+    --primary-color: #8c6b4e;
+    --primary-color-rgb: 140, 107, 78;
     --card-bg: #ffffff;
     --card-border: #e0e0e0;
-    --input-bg: #f0f0f0;
+    --input-bg: #ffffff;
     --input-border: #ccc;
+    --input-focus-border: var(--primary-color);
+    --btn-primary-bg: var(--primary-color);
+    --btn-primary-hover-bg: #755a42;
+    --btn-secondary-bg: transparent;
+    --btn-secondary-border: #ccc;
+    --btn-secondary-hover-bg: #f0f0f0;
 }
 
 body {
@@ -29,14 +45,106 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-.hero-bg {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+/* --- General Components --- */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    transition: all 0.3s ease;
 }
 
-.font-playfair {
-    font-family: 'Playfair Display', serif;
+/* --- Form Styles --- */
+.form-container {
+    background-color: var(--secondary-color);
+    padding: 3rem;
+    border-radius: 1.5rem;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    color: var(--font-color-muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-input {
+    width: 100%;
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--font-color);
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 1.1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb), 0.15);
+}
+
+.form-input::placeholder {
+    color: #666;
+}
+
+[data-theme="light"] .form-input::placeholder {
+    color: #aaa;
+}
+
+
+/* --- Button Styles --- */
+.btn-primary {
+    display: inline-block;
+    background-color: var(--btn-primary-bg);
+    color: #fff;
+    font-weight: 600;
+    padding: 1.1rem 2.5rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(var(--primary-color-rgb), 0.25);
+}
+
+.btn-primary:hover {
+    background-color: var(--btn-primary-hover-bg);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(var(--primary-color-rgb), 0.3);
+}
+
+.btn-secondary {
+    display: inline-block;
+    background-color: var(--btn-secondary-bg);
+    color: var(--font-color);
+    font-weight: 600;
+    padding: 1.1rem 2.5rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    border: 1px solid var(--btn-secondary-border);
+    cursor: pointer;
+    width: auto;
+    text-align: center;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: var(--btn-secondary-hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 /* --- Header & Navigation --- */
@@ -45,7 +153,7 @@ body {
     transition: color 0.3s;
     padding-bottom: 4px;
     text-decoration: none;
-    color: var(--font-color)
+    color: var(--font-color);
 }
 
 .nav-link::after {
@@ -78,22 +186,20 @@ body {
     color: var(--background-color);
 }
 
-
-/* --- Custom Select Dropdown (for music.html) --- */
+/* --- Custom Select Dropdown --- */
 .custom-select-container {
     position: relative;
     width: 100%;
-    max-width: 350px;
     cursor: pointer;
 }
 
 .select-selected {
     position: relative;
-    background-color: var(--secondary-color);
+    background-color: var(--input-bg);
     color: var(--font-color);
-    padding: 15px 20px;
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--input-border);
+    border-radius: 0.75rem;
     font-size: 1.1rem;
     transition: all 0.3s;
 }
@@ -115,6 +221,7 @@ body {
     right: 20px;
     transform: translateY(-50%);
     transition: transform 0.3s;
+    color: var(--font-color-muted);
 }
 
 .select-items {
@@ -126,10 +233,11 @@ body {
     z-index: 99;
     border: 1px solid var(--card-border);
     border-top: none;
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 .75rem .75rem;
     overflow: hidden;
     max-height: 250px;
     overflow-y: auto;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
 
 .select-hide {
@@ -137,178 +245,261 @@ body {
 }
 
 .select-items div {
-    padding: 15px 20px;
+    padding: 1rem 1.25rem;
     transition: background-color 0.2s;
+    font-size: 1.1rem;
 }
 
 .select-items div:hover, .same-as-selected {
-    background-color: rgba(0, 0, 0, 0.1);
-}
-
-/* --- Music Page Specific Styles --- */
-.music-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-}
-
-.music-card {
-    background-color: var(--card-bg);
-    border-radius: 12px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
-    border: 1px solid var(--card-border);
-}
-
-.music-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
-
-.music-card-thumbnail {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-}
-
-.music-card-content {
-    padding: 1.5rem;
-}
-
-.music-card-category {
+    background-color: var(--input-bg);
     color: var(--primary-color);
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    letter-spacing: 1px;
 }
 
-.music-card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
+/* --- Manch Post Preview Modal --- */
+#post-preview-modal {
+    backdrop-filter: blur(10px);
+    overflow-y: auto;
+    align-items: flex-start;
 }
 
-/* --- Bazaar Page Specific Styles --- */
-
-.bazaar-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 2.5rem;
+#post-preview-content {
+    margin-top: 5rem;
 }
 
-.bazaar-card {
-    background-color: var(--card-bg);
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid var(--card-border);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+#post-preview-content .prose {
+    color: var(--font-color-muted);
 }
 
-.bazaar-card:hover {
-    transform: translateY(-12px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+[data-theme="light"] #post-preview-content .prose {
+    color: #4b5563;
 }
 
-.bazaar-card-image-container {
-    height: 250px;
-    overflow: hidden;
-}
-
-.bazaar-card-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-}
-
-.bazaar-card:hover .bazaar-card-image {
-    transform: scale(1.1);
-}
-
-.bazaar-card-content {
-    padding: 2rem;
-}
-
-.bazaar-card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-.bazaar-card-description {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: var(--font-color);
-}
-
-/* --- Animation Styles --- */
-#animation-container {
-    position: relative;
-    height: 200px;
+#close-preview-button {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
+    transition: all 0.3s;
+    z-index: 60;
 }
 
-.animation-scene {
-    position: absolute;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1s, transform 1s;
+#close-preview-button:hover {
+    background-color: rgba(0,0,0,0.6);
+    transform: rotate(90deg);
 }
 
-.animation-scene.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.animation-icon {
-    font-size: 3rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-
-.animation-text {
-    font-size: 1.5rem;
-    font-weight: 500;
-}
-
-
-/* --- Buttons --- */
-.btn-primary {
-    padding: 12px 28px;
-    background-color: var(--primary-color);
-    color: #fff;
-    font-weight: bold;
-    border-radius: 8px;
-    transition: background-color 0.3s, transform 0.2s;
-    border: none;
-    cursor: pointer;
-}
-
-.btn-primary:hover {
-    background-color: #a88d6c; /* A slightly darker shade for hover */
-    transform: scale(1.05);
-}
 
 /* --- Utility Classes --- */
 .hidden {
     display: none;
 }
 
-.aspect-w-16 { width: 100%; padding-bottom: 56.25%; position: relative; }
-.aspect-h-9 { height: 0; }
-.aspect-w-16 > iframe {
+
+/* --- Proverb Card Styles --- */
+.proverb-card {
+    background-color: var(--secondary-color);
+    border: 1px solid var(--card-border);
+    border-radius: 1rem;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.proverb-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+}
+
+.proverb-card-content {
+    position: relative;
+    padding-left: 3.5rem;
+}
+
+.proverb-quote-icon {
     position: absolute;
+    left: 0;
+    top: -0.5rem;
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    opacity: 0.5;
+}
+
+.proverb-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--font-color);
+    margin-bottom: 1rem;
+}
+
+.proverb-meaning {
+    font-size: 1.1rem;
+    color: var(--font-color-muted);
+    line-height: 1.6;
+}
+
+.proverb-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--card-border);
+    padding-top: 1.5rem;
+}
+
+.proverb-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--font-color-muted);
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+
+.proverb-actions button:hover {
+    color: var(--primary-color);
+}
+
+.proverb-timestamps {
+    font-size: 0.8rem;
+    color: var(--font-color-muted);
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 2.5rem 0;
+    border-top: 1px solid var(--card-border);
+    margin-top: 1.5rem;
+}
+
+/* --- Music Grid Styles --- */
+.music-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2.5rem;
+}
+
+.music-card {
+    background-color: var(--card-bg);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.music-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(var(--primary-color-rgb), 0.2);
+}
+
+.music-card-thumbnail-wrapper {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+}
+
+.music-card-thumbnail {
     width: 100%;
     height: 100%;
-    top: 0;
-    left: 0;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.music-card.group:hover .music-card-thumbnail {
+    transform: scale(1.1);
+}
+
+.play-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.music-card.group:hover .play-overlay {
+    opacity: 1;
+}
+
+.music-card-content {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+.music-card-category {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.music-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--font-color);
+}
+
+/* Position admin buttons on music card */
+.music-card .card-actions {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 10;
+}
+
+.music-card.group:hover .card-actions {
+    opacity: 1;
+}
+
+.music-card .card-actions button {
+    background-color: rgba(0,0,0,0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.music-card .card-actions button:hover {
+    background-color: var(--primary-color);
+}
+
+.music-card-timestamps {
+    font-size: 0.8rem;
+    color: var(--font-color-muted);
+    display: flex;
+    justify-content: space-between;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    border-top: 1px solid var(--card-border);
 }

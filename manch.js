@@ -26,6 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const editPostModal = document.getElementById('edit-post-modal');
     const editPostForm = document.getElementById('edit-post-form');
     const cancelEditButton = document.getElementById('cancel-edit-post-button');
+    
+    // Preview Modal Elements
+    const previewModal = document.getElementById('post-preview-modal');
+    const previewContent = document.getElementById('post-preview-content');
+    const closePreviewButton = document.getElementById('close-preview-button');
 
     // --- State ---
     let allPosts = []; // Cache for all blog posts
@@ -49,7 +54,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         filteredPosts.forEach(post => {
             const postEl = document.createElement('div');
-            postEl.className = 'card rounded-2xl overflow-hidden group';
+            postEl.className = 'card rounded-2xl overflow-hidden group cursor-pointer';
+            postEl.dataset.id = post.id;
+            const createdAt = post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
+            const updatedAt = post.updatedAt ? new Date(post.updatedAt.seconds * 1000).toLocaleDateString() : createdAt;
+
             postEl.innerHTML = `
                 <div class="h-64 overflow-hidden relative">
                     <img src="${post.imageUrl || 'https://via.placeholder.com/400x250'}" alt="${post.title || 'Untitled Post'}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
@@ -67,13 +76,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="flex items-center text-sm text-gray-500">
                         <span>By ${post.author || 'Unknown'}</span>
                         <span class="mx-2">•</span>
-                        <span>${post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}</span>
+                        <span>${createdAt}</span>
                     </div>
                 </div>
             `;
             postsContainer.appendChild(postEl);
         });
     };
+
+    const openPreviewModal = (post) => {
+        if (!previewModal || !previewContent) return;
+        const createdAt = post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
+        const updatedAt = post.updatedAt ? new Date(post.updatedAt.seconds * 1000).toLocaleDateString() : createdAt;
+
+        previewContent.innerHTML = `
+            <img src="${post.imageUrl || 'https://via.placeholder.com/800x400'}" alt="${post.title}" class="w-full h-96 object-cover rounded-t-lg mb-6">
+            <div class="px-8 pb-8">
+                <span class="label mb-4">${post.label}</span>
+                <h2 class="font-playfair text-5xl font-bold mb-4">${post.title}</h2>
+                <div class="flex items-center text-sm text-gray-500 mb-6">
+                    <span>By ${post.author}</span>
+                    <span class="mx-2">•</span>
+                    <span>Posted: ${createdAt}</span>
+                    <span class="mx-2">•</span>
+                    <span>Updated: ${updatedAt}</span>
+                </div>
+                <div class="prose prose-lg max-w-none text-gray-300">${post.content.replace(/\n/g, '<br>')}</div>
+            </div>
+        `;
+        previewModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        previewModal.scrollTop = 0;
+    };
+    
+    const closePreviewModal = () => {
+        if (!previewModal) return;
+        previewModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
 
     function setupDropdown(labels) {
         if (!selectContainer) return;
@@ -123,7 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     content: document.getElementById('post-content').value,
                     author: document.getElementById('post-author').value,
                     label: document.getElementById('post-label').value,
-                    createdAt: serverTimestamp()
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
                 });
                 newPostForm.reset();
             } catch (error) {
@@ -134,26 +175,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     postsContainer.addEventListener('click', (e) => {
-        const target = e.target.closest('button');
-        if (!target) return;
-        const postId = target.dataset.id;
-
-        if (target.classList.contains('edit-post-btn')) {
-            const postToEdit = allPosts.find(post => post.id === postId);
-            if (postToEdit) {
-                document.getElementById('edit-post-id').value = postId;
-                document.getElementById('edit-post-title').value = postToEdit.title;
-                document.getElementById('edit-post-image-url').value = postToEdit.imageUrl;
-                document.getElementById('edit-post-content').value = postToEdit.content;
-                document.getElementById('edit-post-author').value = postToEdit.author;
-                document.getElementById('edit-post-label').value = postToEdit.label;
-                editPostModal.classList.remove('hidden');
+        const button = e.target.closest('button');
+        if (button) { // Admin buttons
+            const postId = button.dataset.id;
+            if (button.classList.contains('edit-post-btn')) {
+                const postToEdit = allPosts.find(post => post.id === postId);
+                if (postToEdit) {
+                    document.getElementById('edit-post-id').value = postId;
+                    document.getElementById('edit-post-title').value = postToEdit.title;
+                    document.getElementById('edit-post-image-url').value = postToEdit.imageUrl;
+                    document.getElementById('edit-post-content').value = postToEdit.content;
+                    document.getElementById('edit-post-author').value = postToEdit.author;
+                    document.getElementById('edit-post-label').value = postToEdit.label;
+                    editPostModal.classList.remove('hidden');
+                }
             }
-        }
 
-        if (target.classList.contains('delete-post-btn')) {
-            if (confirm('Are you sure you want to delete this post?')) {
-                deleteDoc(doc(db, "posts", postId)).catch(error => console.error("Error deleting post: ", error));
+            if (button.classList.contains('delete-post-btn')) {
+                if (confirm('Are you sure you want to delete this post?')) {
+                    deleteDoc(doc(db, "posts", postId)).catch(error => console.error("Error deleting post: ", error));
+                }
+            }
+        } else { // Click on the card itself to preview
+            const card = e.target.closest('.card');
+            if (card) {
+                const postId = card.dataset.id;
+                const postToPreview = allPosts.find(post => post.id === postId);
+                if (postToPreview) {
+                    openPreviewModal(postToPreview);
+                }
             }
         }
     });
@@ -167,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             content: document.getElementById('edit-post-content').value,
             author: document.getElementById('edit-post-author').value,
             label: document.getElementById('edit-post-label').value,
+            updatedAt: serverTimestamp()
         };
 
         try {
@@ -180,6 +231,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     cancelEditButton.addEventListener('click', () => {
         editPostModal.classList.add('hidden');
+    });
+    
+    closePreviewButton.addEventListener('click', closePreviewModal);
+    previewModal.addEventListener('click', (e) => {
+        if (e.target === previewModal) {
+            closePreviewModal();
+        }
     });
     
     document.addEventListener("click", (e) => {

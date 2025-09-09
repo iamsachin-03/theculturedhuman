@@ -52,21 +52,25 @@
 
     <!-- Main Content -->
     <main class="py-24 px-6">
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-3xl mx-auto">
             <!-- Admin-only Form -->
-            <div id="admin-proverb-form" class="hidden mb-16 p-8 rounded-2xl bg-secondary-color border border-card-border">
-                <h2 class="font-playfair text-3xl font-bold mb-6">Add a New Proverb</h2>
-                <form id="new-proverb-form" class="space-y-6">
-                    <div>
-                        <label for="proverb-text" class="block text-lg font-medium mb-2">Proverb (in Hindi/Bhojpuri)</label>
-                        <input type="text" id="proverb-text" class="w-full p-3 rounded-lg bg-input-bg border-2 border-input-border focus:border-primary-color focus:outline-none">
-                    </div>
-                    <div>
-                        <label for="proverb-meaning" class="block text-lg font-medium mb-2">Meaning (in English)</label>
-                        <textarea id="proverb-meaning" rows="3" class="w-full p-3 rounded-lg bg-input-bg border-2 border-input-border focus:border-primary-color focus:outline-none"></textarea>
-                    </div>
-                    <button type="submit" class="px-8 py-3 bg-primary-color text-white font-bold rounded-lg hover:bg-opacity-90 transition-colors duration-300">Add Proverb</button>
-                </form>
+            <div id="admin-proverb-form" class="hidden mb-16">
+                 <div class="form-container">
+                    <h2 class="font-playfair text-4xl font-bold mb-8 text-center">Add a New Proverb</h2>
+                    <form id="new-proverb-form">
+                        <div class="form-group">
+                            <label for="proverb-text" class="form-label">Proverb (in Hindi/Bhojpuri)</label>
+                            <input type="text" id="proverb-text" placeholder="e.g., घर के मुर्गी दाल बराबर" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="proverb-meaning" class="form-label">Meaning (in English)</label>
+                            <textarea id="proverb-meaning" rows="3" placeholder="e.g., Self-possessions are always undermined" class="form-input" required></textarea>
+                        </div>
+                        <div class="mt-8">
+                            <button type="submit" class="btn-primary">Add Proverb</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <!-- Proverbs List -->
@@ -77,22 +81,22 @@
     </main>
 
     <!-- Edit Proverb Modal -->
-    <div id="edit-proverb-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4">
-        <div class="bg-secondary-color rounded-2xl shadow-2xl p-8 max-w-lg w-full border border-card-border">
-            <h2 class="font-playfair text-3xl font-bold mb-6">Edit Proverb</h2>
-            <form id="edit-proverb-form" class="space-y-6">
+    <div id="edit-proverb-modal" class="hidden fixed inset-0 z-50 bg-black bg-opacity-70 flex items-center justify-center p-4">
+        <div class="form-container max-w-lg w-full">
+            <h2 class="font-playfair text-3xl font-bold mb-8 text-center">Edit Proverb</h2>
+            <form id="edit-proverb-form">
                 <input type="hidden" id="edit-proverb-id">
-                <div>
-                    <label for="edit-proverb-text" class="block text-lg font-medium mb-2">Proverb</label>
-                    <input type="text" id="edit-proverb-text" class="w-full p-3 rounded-lg bg-input-bg border-2 border-input-border focus:border-primary-color focus:outline-none">
+                 <div class="form-group">
+                    <label for="edit-proverb-text" class="form-label">Proverb</label>
+                    <input type="text" id="edit-proverb-text" class="form-input" required>
                 </div>
-                <div>
-                    <label for="edit-proverb-meaning" class="block text-lg font-medium mb-2">Meaning</label>
-                    <textarea id="edit-proverb-meaning" rows="4" class="w-full p-3 rounded-lg bg-input-bg border-2 border-input-border focus:border-primary-color focus:outline-none"></textarea>
+                 <div class="form-group">
+                    <label for="edit-proverb-meaning" class="form-label">Meaning</label>
+                    <textarea id="edit-proverb-meaning" rows="4" class="form-input" required></textarea>
                 </div>
-                <div class="flex justify-end gap-4">
-                    <button type="button" id="cancel-edit-button" class="px-6 py-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors">Cancel</button>
-                    <button type="submit" class="px-6 py-2 bg-primary-color text-white font-bold rounded-lg hover:bg-opacity-90">Save Changes</button>
+                <div class="flex justify-end gap-4 mt-8">
+                    <button type="button" id="cancel-edit-button" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary" style="width: auto;">Save Changes</button>
                 </div>
             </form>
         </div>

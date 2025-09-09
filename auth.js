@@ -8,7 +8,9 @@ import {
     sendSignInLinkToEmail,
     isSignInWithEmailLink,
     signInWithEmailLink,
-    signOut 
+    signOut,
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { 
     getFirestore,
@@ -21,8 +23,8 @@ import {
     doc,
     getDoc,
     getDocs,
-    updateDoc, // Added
-    deleteDoc  // Added
+    updateDoc,
+    deleteDoc
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { firebaseConfig } from './firebase-config.js';
 
@@ -74,6 +76,10 @@ export {
     auth, 
     authReady, 
 
+    // Auth Functions
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+
     // Firestore Functions
     collection,
     addDoc,
@@ -84,8 +90,8 @@ export {
     doc,
     getDoc,
     getDocs,
-    updateDoc, // Added
-    deleteDoc  // Added
+    updateDoc,
+    deleteDoc
 };
 
 

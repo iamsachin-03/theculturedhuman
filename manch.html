@@ -50,24 +50,43 @@
         </section>
 
         <!-- Admin Post Form (hidden by default) -->
-        <section id="admin-post-form" class="hidden max-w-4xl mx-auto mb-16 p-8 card">
-            <h2 class="font-playfair text-3xl font-bold mb-6">Create a New Post</h2>
-            <form id="new-post-form" class="space-y-6">
-                <input id="post-title" type="text" placeholder="Post Title" required class="w-full input-field">
-                <input id="post-image-url" type="url" placeholder="Image URL" required class="w-full input-field">
-                <textarea id="post-content" placeholder="What do you want to share?" rows="8" required class="w-full input-field"></textarea>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <input id="post-author" type="text" placeholder="Authored By" required class="w-full input-field">
-                    <select id="post-label" required class="w-full input-field">
-                        <option value="" disabled selected>Select a Label</option>
-                        <option value="Blog">Blog</option>
-                        <option value="Info">Info</option>
-                        <option value="News">News</option>
-                        <option value="Advertisement">Advertisement</option>
-                    </select>
-                </div>
-                <button type="submit" class="cta-button w-full">Publish Post</button>
-            </form>
+        <section id="admin-post-form" class="hidden max-w-3xl mx-auto mb-16">
+            <div class="form-container">
+                 <h2 class="font-playfair text-4xl font-bold mb-8 text-center">Create a New Post</h2>
+                <form id="new-post-form">
+                    <div class="form-group">
+                        <label for="post-title" class="form-label">Title</label>
+                        <input id="post-title" type="text" placeholder="Enter an engaging title" required class="form-input">
+                    </div>
+                     <div class="form-group">
+                        <label for="post-image-url" class="form-label">Image URL</label>
+                        <input id="post-image-url" type="url" placeholder="https://example.com/image.jpg" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="post-content" class="form-label">Content</label>
+                        <textarea id="post-content" placeholder="Share your story..." rows="8" required class="form-input"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                        <div class="form-group">
+                            <label for="post-author" class="form-label">Author</label>
+                            <input id="post-author" type="text" placeholder="Your name" required class="form-input">
+                        </div>
+                        <div class="form-group">
+                             <label for="post-label" class="form-label">Label</label>
+                            <select id="post-label" required class="form-input">
+                                <option value="" disabled selected>Select a Label</option>
+                                <option value="Blog">Blog</option>
+                                <option value="Info">Info</option>
+                                <option value="News">News</option>
+                                <option value="Advertisement">Advertisement</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-8">
+                        <button type="submit" class="btn-primary">Publish Post</button>
+                    </div>
+                </form>
+            </div>
         </section>
 
         <!-- Post Filter Dropdown -->
@@ -86,28 +105,51 @@
 
     <!-- Edit Post Modal -->
     <div id="edit-post-modal" class="hidden fixed inset-0 z-[60] bg-black bg-opacity-70 flex items-center justify-center p-4">
-        <div class="card max-w-2xl w-full p-8 space-y-6">
-            <h2 class="font-playfair text-3xl font-bold">Edit Post</h2>
-            <form id="edit-post-form" class="space-y-6">
-                <input type="hidden" id="edit-post-id">
-                <input id="edit-post-title" type="text" placeholder="Post Title" required class="w-full input-field">
-                <input id="edit-post-image-url" type="url" placeholder="Image URL" required class="w-full input-field">
-                <textarea id="edit-post-content" placeholder="What do you want to share?" rows="8" required class="w-full input-field"></textarea>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <input id="edit-post-author" type="text" placeholder="Authored By" required class="w-full input-field">
-                    <select id="edit-post-label" required class="w-full input-field">
-                        <option value="" disabled>Select a Label</option>
-                        <option value="Blog">Blog</option>
-                        <option value="Info">Info</option>
-                        <option value="News">News</option>
-                        <option value="Advertisement">Advertisement</option>
-                    </select>
+        <div class="form-container max-w-2xl w-full">
+            <h2 class="font-playfair text-3xl font-bold text-center mb-8">Edit Post</h2>
+            <form id="edit-post-form">
+                 <input type="hidden" id="edit-post-id">
+                 <div class="form-group">
+                    <label for="edit-post-title" class="form-label">Title</label>
+                    <input id="edit-post-title" type="text" placeholder="Enter an engaging title" required class="form-input">
                 </div>
-                <div class="flex justify-end gap-4">
-                    <button type="button" id="cancel-edit-post-button" class="px-6 py-2 rounded-lg border border-gray-600 hover:bg-gray-700 transition-colors">Cancel</button>
-                    <button type="submit" class="cta-button">Save Changes</button>
+                 <div class="form-group">
+                    <label for="edit-post-image-url" class="form-label">Image URL</label>
+                    <input id="edit-post-image-url" type="url" placeholder="https://example.com/image.jpg" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="edit-post-content" class="form-label">Content</label>
+                    <textarea id="edit-post-content" placeholder="Share your story..." rows="8" required class="form-input"></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                    <div class="form-group">
+                        <label for="edit-post-author" class="form-label">Author</label>
+                        <input id="edit-post-author" type="text" placeholder="Your name" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                         <label for="edit-post-label" class="form-label">Label</label>
+                        <select id="edit-post-label" required class="form-input">
+                            <option value="" disabled>Select a Label</option>
+                            <option value="Blog">Blog</option>
+                            <option value="Info">Info</option>
+                            <option value="News">News</option>
+                            <option value="Advertisement">Advertisement</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-4 mt-8">
+                    <button type="button" id="cancel-edit-post-button" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary" style="width: auto;">Save Changes</button>
                 </div>
             </form>
+        </div>
+    </div>
+    
+    <!-- Post Preview Modal -->
+    <div id="post-preview-modal" class="hidden fixed inset-0 z-[70] bg-black bg-opacity-80 flex items-center justify-center">
+        <div class="relative max-w-4xl w-full h-full md:h-auto bg-secondary-color rounded-lg shadow-2xl overflow-hidden">
+             <button id="close-preview-button" class="absolute top-6 right-6 text-white text-3xl z-10">&times;</button>
+            <div id="post-preview-content" class="overflow-y-auto h-full"></div>
         </div>
     </div>
 

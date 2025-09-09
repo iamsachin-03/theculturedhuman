@@ -36,10 +36,18 @@ document.addEventListener('DOMContentLoaded', () => {
         allProverbs.forEach(proverb => {
             const proverbEl = document.createElement('div');
             proverbEl.className = 'proverb-card';
+            const createdAt = proverb.createdAt ? new Date(proverb.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
+            const updatedAt = proverb.updatedAt ? new Date(proverb.updatedAt.seconds * 1000).toLocaleDateString() : createdAt;
+            
             proverbEl.innerHTML = `
-                <div class="flex-grow">
-                    <p class="proverb">${proverb.text || 'Proverb not available'}</p>
-                    <p class="meaning">${proverb.meaning || 'Meaning not available'}</p>
+                <div class="proverb-card-content">
+                    <span class="proverb-quote-icon"><i class="fas fa-quote-left"></i></span>
+                    <p class="proverb-text">${proverb.text || 'Proverb not available'}</p>
+                    <p class="proverb-meaning">${proverb.meaning || 'Meaning not available'}</p>
+                </div>
+                <div class="proverb-timestamps">
+                    <p><strong>Posted:</strong> ${createdAt}</p>
+                    <p><strong>Updated:</strong> ${updatedAt}</p>
                 </div>
                 ${isAdmin ? `
                 <div class="proverb-actions">
@@ -79,7 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     await addDoc(proverbsCol, {
                         text: proverbText,
                         meaning: proverbMeaning,
-                        createdAt: serverTimestamp()
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
                     });
                     newProverbForm.reset();
                 } catch (error) {
@@ -138,7 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const proverbRef = doc(db, "proverbs", proverbId);
             await updateDoc(proverbRef, {
                 text: newText,
-                meaning: newMeaning
+                meaning: newMeaning,
+                updatedAt: serverTimestamp()
             });
             editProverbModal.classList.add('hidden');
         } catch (error) {

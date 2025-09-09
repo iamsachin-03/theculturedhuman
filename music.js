@@ -56,27 +56,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
         filteredMusic.forEach(song => {
             const card = document.createElement('div');
-            card.className = 'music-card';
+            card.className = 'music-card group';
+            const createdAt = song.createdAt ? new Date(song.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
+            const updatedAt = song.updatedAt ? new Date(song.updatedAt.seconds * 1000).toLocaleDateString() : createdAt;
+            
             card.innerHTML = `
                 <div class="music-card-thumbnail-wrapper">
                     <img src="https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg" alt="${song.title}" class="music-card-thumbnail">
-                    <div class="play-overlay"><i class="fas fa-play"></i></div>
+                    <div class="play-overlay">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                     ${isAdmin ? `
+                    <div class="card-actions">
+                        <button data-id="${song.id}" class="edit-music-btn"><i class="fas fa-pencil-alt"></i></button>
+                        <button data-id="${song.id}" class="delete-music-btn"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    ` : ''}
                 </div>
                 <div class="music-card-content">
                     <p class="music-card-category">${categories[song.category] || 'General'}</p>
                     <h3 class="music-card-title">${song.title}</h3>
-                    <p class="text-gray-400 text-sm">${(song.description || '').substring(0, 80)}...</p>
+                    <div class="music-card-timestamps">
+                        <p><strong>Posted:</strong> ${createdAt}</p>
+                        <p><strong>Updated:</strong> ${updatedAt}</p>
+                    </div>
                 </div>
-                ${isAdmin ? `
-                <div class="card-actions">
-                    <button data-id="${song.id}" class="edit-music-btn"><i class="fas fa-pencil-alt"></i></button>
-                    <button data-id="${song.id}" class="delete-music-btn"><i class="fas fa-trash-alt"></i></button>
-                </div>
-                ` : ''}
             `;
             
             const thumbnailWrapper = card.querySelector('.music-card-thumbnail-wrapper');
-            thumbnailWrapper.addEventListener('click', () => {
+            thumbnailWrapper.addEventListener('click', (e) => {
+                if (e.target.closest('button')) return; // Ignore clicks on admin buttons
                 window.open(`https://www.youtube.com/watch?v=${song.videoId}`, '_blank');
             });
             
@@ -138,7 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     videoId: document.getElementById('music-video-id').value,
                     category: addCategorySelect.value,
                     description: document.getElementById('music-description').value,
-                    createdAt: serverTimestamp()
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
                 });
                 newMusicForm.reset();
             } catch (error) {
@@ -186,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
             videoId: document.getElementById('edit-music-video-id').value,
             category: editCategorySelect.value,
             description: document.getElementById('edit-music-description').value,
+            updatedAt: serverTimestamp()
         };
 
         try {
