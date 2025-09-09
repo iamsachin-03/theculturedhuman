@@ -1,6 +1,6 @@
 
 import { db, authReady } from './auth.js';
-import { collection, getDocs, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { collection, getDocs, addDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const musicGrid = document.querySelector('.music-grid');
@@ -18,90 +18,108 @@ document.addEventListener('DOMContentLoaded', () => {
         "folk": "Classic Bihari Folk",
     };
 
-    // This function now depends on the db object being ready.
-    async function loadMusic(filter = 'all') {
+    let allMusic = []; // Cache for all music tracks
+
+    function renderMusic(filter = 'all') {
+        if (!musicGrid) return;
+        const filteredMusic = filter === 'all' 
+            ? allMusic 
+            : allMusic.filter(song => song.category === filter);
+
+        musicGrid.innerHTML = '';
+        if (filteredMusic.length === 0) {
+            musicGrid.innerHTML = `<p class="text-center text-gray-400 col-span-full">No music found in this category.</p>`;
+            return;
+        }
+
+        filteredMusic.forEach(song => {
+            const videoUrl = `https://www.youtube.com/watch?v=${song.videoId}`;
+            const card = document.createElement('a');
+            card.href = videoUrl;
+            card.target = '_blank';
+            card.rel = 'noopener noreferrer';
+            card.className = 'music-card';
+            card.innerHTML = `
+                <img src="https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg" alt="${song.title}" class="music-card-thumbnail">
+                <div class="music-card-content">
+                    <p class="music-card-category">${categories[song.category] || 'General'}</p>
+                    <h3 class="music-card-title">${song.title}</h3>
+                    <p class="text-gray-400 text-sm">${song.description || ''}</p>
+                </div>
+            `;
+            musicGrid.appendChild(card);
+        });
+    }
+
+    async function fetchMusic() {
         try {
             const q = query(collection(db, "music"), orderBy("createdAt", "desc"));
             const querySnapshot = await getDocs(q);
-            let musicHTML = '';
-            const filteredSongs = querySnapshot.docs.filter(doc => {
-                const song = doc.data();
-                return filter === 'all' || song.category === filter;
-            });
-
-            filteredSongs.forEach(doc => {
-                const song = doc.data();
-                const videoUrl = `https://www.youtube.com/watch?v=${song.videoId}`;
-                musicHTML += `
-                    <a href="${videoUrl}" target="_blank" rel="noopener noreferrer" class="music-card">
-                        <img src="https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg" alt="${song.title}" class="music-card-thumbnail">
-                        <div class="music-card-content">
-                            <p class="music-card-category">${categories[song.category]}</p>
-                            <h3 class="music-card-title">${song.title}</h3>
-                            <p class="text-gray-400 text-sm">${song.description}</p>
-                        </div>
-                    </a>
-                `;
-            });
-            musicGrid.innerHTML = musicHTML;
+            allMusic = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderMusic(); // Render all music initially
         } catch (error) {
             console.error("Error loading music: ", error);
-            musicGrid.innerHTML = `<p class="text-red-500">Failed to load music. Please check the console for details.</p>`;
+            if (musicGrid) musicGrid.innerHTML = `<p class="text-red-500">Failed to load music.</p>`;
         }
     }
 
-    function setupDropdowns() {
+    function setupDropdown() {
         if (!selectContainer) return;
         const selected = selectContainer.querySelector(".select-selected");
         const itemsContainer = selectContainer.querySelector(".select-items");
+        
         itemsContainer.innerHTML = '';
-
-        for (const categoryKey in categories) {
+        Object.keys(categories).forEach(key => {
             const option = document.createElement('div');
-            option.dataset.value = categoryKey;
-            option.textContent = categories[categoryKey];
+            option.dataset.value = key;
+            option.textContent = categories[key];
             itemsContainer.appendChild(option);
-        }
+        });
+
+        selected.addEventListener("click", (e) => {
+            e.stopPropagation();
+            itemsContainer.classList.toggle("select-hide");
+            selected.classList.toggle("select-arrow-active");
+        });
 
         itemsContainer.querySelectorAll("div").forEach(item => {
             item.addEventListener("click", function() {
-                const category = this.dataset.value;
-                selected.innerHTML = this.innerHTML;
-                itemsContainer.classList.add("select-hide");
-                selected.classList.remove("select-arrow-active");
-                loadMusic(category);
+                selected.textContent = this.textContent;
+                renderMusic(this.dataset.value);
             });
         });
 
-        // Also populate the admin form dropdown
+        document.addEventListener("click", () => {
+            itemsContainer.classList.add("select-hide");
+            selected.classList.remove("select-arrow-active");
+        });
+
         if (categorySelect) {
             categorySelect.innerHTML = '';
-            for (const categoryKey in categories) {
-                if (categoryKey !== 'all') {
-                    const selectOption = document.createElement('option');
-                    selectOption.value = categoryKey;
-                    selectOption.textContent = categories[categoryKey];
-                    categorySelect.appendChild(selectOption);
+            Object.keys(categories).forEach(key => {
+                if (key !== 'all') {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = categories[key];
+                    categorySelect.appendChild(option);
                 }
-            }
+            });
         }
     }
 
     if (newMusicForm) {
         newMusicForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const newSong = {
-                title: document.getElementById('music-title').value,
-                videoId: document.getElementById('music-video-id').value,
-                category: document.getElementById('music-category').value,
-                description: document.getElementById('music-description').value,
-                createdAt: new Date()
-            };
-
             try {
-                await addDoc(collection(db, "music"), newSong);
+                await addDoc(collection(db, "music"), {
+                    title: document.getElementById('music-title').value,
+                    videoId: document.getElementById('music-video-id').value,
+                    category: document.getElementById('music-category').value,
+                    description: document.getElementById('music-description').value,
+                    createdAt: serverTimestamp()
+                });
                 newMusicForm.reset();
-                loadMusic(); // Refresh the list
+                fetchMusic(); // Refresh the list after adding
             } catch (error) {
                 console.error("Error adding music: ", error);
                 alert("Error adding music. Please check the console.");
@@ -109,27 +127,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- The Fix: Wait for Firebase to be ready --- //
     authReady.then(authData => {
-        // Now we are sure `db` is initialized.
-        console.log('Firebase is ready. Auth data:', authData);
-
-        // 1. Setup UI elements that depend on data
-        setupDropdowns();
-
-        // 2. Load initial data
-        loadMusic();
-
-        // 3. Show admin controls if applicable
+        console.log('Firebase is ready on Music page. Auth data:', authData);
+        setupDropdown();
+        fetchMusic();
         if (authData && authData.isAdmin) {
-            if (adminMusicForm) {
-                adminMusicForm.style.display = 'block';
-            }
+            if (adminMusicForm) adminMusicForm.style.display = 'block';
         }
     }).catch(error => {
-        console.error("Fatal Error: Firebase initialization failed.", error);
-        if (musicGrid) {
-            musicGrid.innerHTML = `<p class="text-red-500">Fatal Error: Could not connect to the database.</p>`;
-        }
+        console.error("Fatal Error: Firebase initialization failed on Music page.", error);
+        if (musicGrid) musicGrid.innerHTML = `<p class="text-red-500">Fatal Error: Could not connect to the database.</p>`;
     });
 });
