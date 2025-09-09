@@ -17,12 +17,12 @@
     --text-muted-light: #6c757d;
 
     /* Default to Dark Mode variables */
-    --primary-color: var(--primary-color-dark);
-    --secondary-color: var(--secondary-color-dark);
-    --text-color: var(--text-color-dark);
-    --bg-color: var(--bg-color-dark);
-    --card-border: var(--card-border-dark);
-    --text-muted: var(--text-muted-dark);
+        --primary-color: var(--primary-color-dark);
+        --secondary-color: var(--secondary-color-dark);
+        --text-color: var(--text-color-dark);
+        --bg-color: var(--bg-color-dark);
+        --card-border: var(--card-border-dark);
+        --text-muted: var(--text-muted-dark);
 }
 
 body.light-mode {
@@ -35,173 +35,72 @@ body.light-mode {
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
-    transition: background-color 0.4s ease, color 0.4s ease;
-    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56"%3E%3Cg fill="%23D4AF37" fill-opacity="0.07"%3E%3Cpath fill-rule="evenodd" d="M28 0h28v28h28v28H56V28H28V0zM0 0h28v28h28v28H28V28H0V0z"/%3E%3C/g%3E%3C/svg%3E');
+    font-family: 'Poppins', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .font-playfair {
     font-family: 'Playfair Display', serif;
 }
 
-/* Ensure nav links are visible in light mode */
-header .nav-link, header .text-2xl {
-    color: var(--text-color-dark);
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-}
-
-body.light-mode header .nav-link, body.light-mode header .text-2xl {
-    color: var(--text-color-light);
-    text-shadow: none;
-}
-
-.text-gray-400 { color: var(--text-muted); }
-.text-gray-300 { color: var(--text-muted); }
-.text-gray-600 { color: var(--text-muted); }
-body.light-mode .text-gray-400, body.light-mode .text-gray-300, body.light-mode .text-gray-600 {
-    color: var(--text-muted-light);
-}
-
-.hero-bg {
-    background-size: cover;
-    background-position: center;
-}
-
 .card {
     background-color: var(--secondary-color);
     border: 1px solid var(--card-border);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.4s ease, border-color 0.4s ease;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
-
-body.light-mode .card {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-}
-
-body.light-mode .card:hover {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.cta-button {
-    display: inline-block;
-    background-color: var(--primary-color);
-    color: #000;
-    font-weight: 600;
-    padding: 1rem 2.5rem;
-    border-radius: 9999px;
-    font-size: 1.125rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-.cta-button:hover {
-    transform: scale(1.05) translateY(-2px);
-    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
-}
-
-body.light-mode .cta-button {
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(139, 69, 19, 0.2);
-}
-
-body.light-mode .cta-button:hover {
-    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
-}
-
-.nav-link {
-    position: relative;
-    transition: color 0.3s;
-    padding-bottom: 8px;
-}
-
-.nav-link:hover {
-    color: var(--primary-color);
-}
-
-.nav-link::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--primary-color);
-    transition: width 0.3s ease;
-}
-
-.nav-link:hover::after {
-    width: 70%;
-}
-
-.fade-in-up {
-    animation: fadeInUp 1s ease-out forwards;
-    opacity: 0;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.tab-btn.active {
-    background-color: var(--primary-color);
-    color: #000;
-    box-shadow: 0 4px 15px rgba(192, 160, 128, 0.3);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.15);
 }
 
 .proverb-card {
     background-color: var(--secondary-color);
     border-left: 5px solid var(--primary-color);
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
 }
 
-.proverb-card:hover {
-    transform: translateX(5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
-}
-
-.proverb {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--primary-color);
+.proverb-card .proverb {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color);
     margin-bottom: 0.5rem;
 }
 
-.meaning {
+.proverb-card .meaning {
     font-size: 1.1rem;
     color: var(--text-muted);
 }
 
-.auth-tab {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+/* --- Manch Page Label & Form Styling --- */
+
+.label {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px; /* pill shape */
+    font-size: 0.8rem;
     font-weight: 600;
-    color: var(--text-muted);
-    background-color: transparent;
-    border-radius: 9999px;
-    transition: all 0.3s ease;
+    background-color: var(--primary-color);
+    color: var(--bg-color); /* High contrast against primary color */
+    margin-bottom: 1rem;
 }
 
-.auth-tab.active {
-    color: #000;
-    background-color: var(--primary-color);
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+#admin-post-form input[type="text"],
+#admin-post-form input[type="url"],
+#admin-post-form textarea,
+#admin-post-form select {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    transition: border-color 0.2s;
+}
+
+#admin-post-form input[type="text"]:focus,
+#admin-post-form input[type="url"]:focus,
+#admin-post-form textarea:focus,
+#admin-post-form select:focus {
+    outline: none;
+    border-color: var(--primary-color);
 }

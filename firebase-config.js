@@ -1,0 +1,8 @@
+export const firebaseConfig = {
+    projectId: "the-cultured-human-blog",
+    appId: "1:1048541348767:web:ad036ea45cf8dc2ca033aa",
+    storageBucket: "the-cultured-human-blog.firebasestorage.app",
+    apiKey: "AIzaSyCkgwmL4nC7UAtMRX5RsFtiT6zujMswa_8",
+    authDomain: "the-cultured-human-blog.firebaseapp.com",
+    messagingSenderId: "1048541348767"
+};
