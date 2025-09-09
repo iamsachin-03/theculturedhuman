@@ -23,13 +23,18 @@
     *   **Admin Controls:** Admins have exclusive access to a form to create, edit, and delete posts.
     *   **Post Display:** All posts are displayed in a visually appealing grid, fetched from Firestore.
 *   **About Page (`about.html`):** Information about the vision and mission of Bihar Angan.
-*   **Authentication (`auth.js`):** A robust authentication system using Firebase. It correctly handles user sessions and custom claims (like admin status) via an `authReady` promise, which acts as a single source of truth for the user's authentication state.
+*   **Authentication (`auth.js`):** A robust authentication system using Firebase Email Link (passwordless) sign-in. It correctly handles user sessions and custom claims (like admin status) via an `authReady` promise, which acts as a single source of truth for the user's authentication state. The flow involves sending a secure link to the user's email, which they click to sign in.
 *   **Proverbs Page (`proverbs.js`):** A feature displaying Bihari proverbs, with an admin-only form to add new ones. This feature now works correctly by waiting for the `authReady` signal.
 
-## Current Plan: Implement Navigation
+## Current Plan: Fix Authentication Flow
 
-I have implemented the navigation bar across all pages of the website. This was a multi-step process that involved:
-
-1.  **Identifying the correct files:** I located all the HTML files that make up the website.
-2.  **Updating the navigation bar:** I added the "Fitness" and "Marketplace" links to the navigation bar in each HTML file.
-3.  **Ensuring consistency:** I renamed the "Bazaar" link to "Marketplace" to ensure consistency across the website.
+*   **Problem:** The login page was not working because the JavaScript code was configured for Google Sign-In, while the HTML form was set up for passwordless email link authentication.
+*   **Solution:**
+    1.  **Modified `auth.js`:** Re-implemented the email link authentication logic.
+        *   Imported `sendSignInLinkToEmail`, `isSignInWithEmailLink`, and `signInWithEmailLink` from the Firebase SDK.
+        *   Added an event listener to the email form to call `sendSignInLinkToEmail` on submission.
+        *   Added logic to check the URL on page load using `isSignInWithEmailLink`.
+        *   If the URL is a sign-in link, complete the process using `signInWithEmailLink`, retrieving the user's email from `localStorage`.
+        *   Implemented user feedback messages for both success and error scenarios.
+    2.  **Verified `auth.html`:** Ensured the HTML form, input, and feedback elements have the correct IDs for the JavaScript to target.
+*   **Result:** The login page is now fully functional, providing a passwordless sign-in experience as originally designed.
