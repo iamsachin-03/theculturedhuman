@@ -11,9 +11,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js" defer></script>
 </head>
 <body class="overflow-x-hidden">
 
@@ -26,8 +23,15 @@
             </a>
             <div class="hidden md:flex items-center space-x-10 text-lg">
                 <a href="index.html" class="nav-link">Home</a>
+                 <div class="relative dropdown">
+                    <a href="culture.html" class="nav-link active">Culture</a>
+                    <div class="dropdown-menu absolute hidden bg-secondary-color rounded-lg shadow-lg mt-2 py-2 w-48">
+                        <a href="music.html" class="block px-4 py-2 text-white hover:bg-primary-color">Music</a>
+                        <a href="bazaar.html" class="block px-4 py-2 text-white hover:bg-primary-color">Bazaar</a>
+                        <a href="proverbs.html" class="block px-4 py-2 text-white hover:bg-primary-color">Proverbs</a>
+                    </div>
+                </div>
                 <a href="fitness.html" class="nav-link">Fitness</a>
-                <a href="culture.html" class="nav-link">Culture</a>
                 <a href="marketplace.html" class="nav-link">Marketplace</a>
                 <a href="manch.html" class="nav-link">Manch</a>
                 <a href="about.html" class="nav-link">About</a>
@@ -57,19 +61,13 @@
     <!-- Main Content -->
     <main class="py-24 px-6">
         <!-- Controls -->
-        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 mb-16">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-center items-center gap-8 mb-16">
             <div class="custom-select-container">
-                <div class="select-selected">Select a Category</div>
+                <div class="select-selected">All Categories</div>
                 <div class="select-items select-hide">
-                    <div data-value="all">All Categories (Grid View)</div>
-                    <div data-value="wedding">Wedding Songs (Biyah Geet)</div>
-                    <div data-value="chhath">Chhath Puja Songs</div>
-                    <div data-value="sohar">Sohar (Childbirth Songs)</div>
-                    <div data-value="bhajan">Bihari Bhajans</div>
-                    <div data-value="folk">Classic Folk Songs</div>
+                    <!-- Options will be injected by JS -->
                 </div>
             </div>
-            <button id="back-to-grid" class="btn-primary" style="display: none;">← Back to All Categories</button>
         </div>
 
         <!-- Music Grid View -->
@@ -78,18 +76,6 @@
                 <!-- Grid items will be injected by JS -->
             </div>
         </div>
-
-        <!-- Playlist View -->
-        <div id="playlist-view" class="max-w-4xl mx-auto" style="display: none;">
-            <div class="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-2xl">
-                <iframe id="playlist-iframe" class="w-full h-full" src="" title="YouTube Music Playlist" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-            </div>
-            <div class="mt-6 text-center">
-                <h2 id="playlist-title" class="font-playfair text-4xl font-bold"></h2>
-                <p id="playlist-description" class="text-gray-400 text-lg mt-2"></p>
-            </div>
-        </div>
-
     </main>
 
     <!-- Footer -->
@@ -101,110 +87,93 @@
     <script src="logo.js"></script>
     <script src="theme.js"></script>
     <script>
-        const data = {
-            greatestHits: [
+        const songData = {
+            songs: [
                 { videoId: 'zF41-Hl_pGk', category: 'wedding', title: 'Lagan Mein Thumka', description: 'A quintessential wedding celebration song.' },
+                { videoId: 'b-7AgxSPBOI', category: 'wedding', title: 'Banna Banni Geet', description: 'A playful and traditional wedding song.' },
                 { videoId: 'gh6cssL0dr8', category: 'chhath', title: 'Kaanch Hi Baans Ke Bahangiya', description: 'The most iconic Chhath puja anthem.' },
                 { videoId: 'T1aWbpVf_T4', category: 'sohar', title: 'Janam Lihle Krishan Kanhaiya', description: 'A joyous sohar celebrating childbirth.' },
+                { videoId: 'uRMKSWftUnE', category: 'sohar', title: 'Sohar - A New Beginning', description: 'A beautiful sohar welcoming a new member to the family.' },
                 { videoId: 'B5lJqS-8f4E', category: 'bhajan', title: 'Ram Bhajo Re', description: 'A soulful bhajan for peace and devotion.' },
                 { videoId: 'a_234dsas3', category: 'folk', title: 'Nadiya Ke Teere Teere', description: 'A classic folk melody about life by the river.' },
             ],
-            playlists: {
-                "wedding": { id: "PL2D5392E75586542D", title: "Wedding Songs (Biyah Geet)", description: "Joyous melodies for the heart of a Bihari wedding." },
-                "chhath": { id: "PL34C320F714B92416", title: "Chhath Puja Songs", description: "Devotional hymns for Bihar's most important festival." },
-                "sohar": { id: "PL3fJTbH2Lzqa0x4Yp3-VdGqQ8c-3z4Jp", title: "Sohar (Childbirth Songs)", description: "Tender songs celebrating the arrival of a new life." },
-                "bhajan": { id: "PL54B3E0A521A5405A", title: "Bihari Bhajans", description: "A serene collection of devotional bhajans from Bihar." },
-                "folk": { id: "PLIz0XA3HXa0qeji32h2b80aZsox0aF7C5", title: "Classic Bihari Folk", description: "Timeless folk music telling the stories of the land." },
+            categories: {
+                "all": "All Categories",
+                "wedding": "Wedding Songs (Biyah Geet)",
+                "chhath": "Chhath Puja Songs",
+                "sohar": "Sohar (Childbirth Songs)",
+                "bhajan": "Bihari Bhajans",
+                "folk": "Classic Bihari Folk",
             }
         };
 
-        const gridView = document.getElementById('music-grid-view');
-        const playlistView = document.getElementById('playlist-view');
-        const musicGrid = gridView.querySelector('.music-grid');
-        const backButton = document.getElementById('back-to-grid');
-        
-        const playlistIframe = document.getElementById('playlist-iframe');
-        const playlistTitle = document.getElementById('playlist-title');
-        const playlistDescription = document.getElementById('playlist-description');
+        const musicGrid = document.querySelector('.music-grid');
+        const selectContainer = document.querySelector(".custom-select-container");
+        const selected = selectContainer.querySelector(".select-selected");
+        const itemsContainer = selectContainer.querySelector(".select-items");
+
+        // --- Populate Grid View ---
+        function populateGrid(filter = 'all') {
+            musicGrid.innerHTML = '';
+            const filteredSongs = filter === 'all' 
+                ? songData.songs 
+                : songData.songs.filter(song => song.category === filter);
+
+            filteredSongs.forEach(song => {
+                const videoUrl = `https://www.youtube.com/watch?v=${song.videoId}`;
+                const card = document.createElement('div');
+                card.className = 'music-card';
+                card.innerHTML = `
+                    <a href="${videoUrl}" target="_blank" rel="noopener noreferrer">
+                        <img src="https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg" alt="${song.title}" class="music-card-thumbnail">
+                        <div class="music-card-content">
+                            <p class="music-card-category">${songData.categories[song.category]}</p>
+                            <h3 class="music-card-title">${song.title}</h3>
+                            <p class="text-gray-400 text-sm">${song.description}</p>
+                        </div>
+                    </a>
+                `;
+                musicGrid.appendChild(card);
+            });
+        }
 
         // --- Custom Select Dropdown Logic ---
-        const selected = document.querySelector(".select-selected");
-        const itemsContainer = document.querySelector(".select-items");
-        const items = itemsContainer.querySelectorAll("div");
+        function populateDropdown() {
+            itemsContainer.innerHTML = '';
+            for (const categoryKey in songData.categories) {
+                const option = document.createElement('div');
+                option.dataset.value = categoryKey;
+                option.textContent = songData.categories[categoryKey];
+                itemsContainer.appendChild(option);
+            }
+            
+            const items = itemsContainer.querySelectorAll("div");
+            items.forEach(item => {
+                item.addEventListener("click", function() {
+                    const category = this.dataset.value;
+                    selected.innerHTML = this.innerHTML;
+                    itemsContainer.classList.add("select-hide");
+                    selected.classList.remove("select-arrow-active");
+                    populateGrid(category);
+                });
+            });
+        }
 
         selected.addEventListener("click", () => {
             itemsContainer.classList.toggle("select-hide");
             selected.classList.toggle("select-arrow-active");
         });
 
-        items.forEach(item => {
-            item.addEventListener("click", function() {
-                selected.innerHTML = this.innerHTML;
-                itemsContainer.classList.add("select-hide");
-                selected.classList.remove("select-arrow-active");
-                handleSelection(this.dataset.value);
-            });
-        });
-
         document.addEventListener("click", function(e) {
-            if (!e.target.closest(".custom-select-container")) {
+            if (!selectContainer.contains(e.target)) {
                 itemsContainer.classList.add('select-hide');
                 selected.classList.remove("select-arrow-active");
             }
         });
 
-        // --- View Switching Logic ---
-        function showGridView() {
-            gridView.style.display = 'block';
-            playlistView.style.display = 'none';
-            backButton.style.display = 'none';
-        }
-
-        function showPlaylistView(category) {
-            const playlist = data.playlists[category];
-            if (playlist) {
-                playlistIframe.src = `https://www.youtube.com/embed/videoseries?list=${playlist.id}`;
-                playlistTitle.textContent = playlist.title;
-                playlistDescription.textContent = playlist.description;
-                
-                gridView.style.display = 'none';
-                playlistView.style.display = 'block';
-                backButton.style.display = 'inline-block';
-            }
-        }
-
-        function handleSelection(value) {
-            if (value === 'all') {
-                showGridView();
-            } else {
-                showPlaylistView(value);
-            }
-        }
-        
-        backButton.addEventListener('click', showGridView);
-
-        // --- Populate Grid View ---
-        function populateGrid() {
-            musicGrid.innerHTML = '';
-            data.greatestHits.forEach(song => {
-                const card = document.createElement('div');
-                card.className = 'music-card';
-                card.dataset.category = song.category;
-                card.innerHTML = `
-                    <img src="https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg" alt="${song.title}" class="music-card-thumbnail">
-                    <div class="music-card-content">
-                        <p class="music-card-category">${song.category.replace(/\b\w/g, l => l.toUpperCase())}</p>
-                        <h3 class="music-card-title">${song.title}</h3>
-                        <p class="text-gray-400 text-sm">${song.description}</p>
-                    </div>
-                `;
-                card.addEventListener('click', () => showPlaylistView(song.category));
-                musicGrid.appendChild(card);
-            });
-        }
-
-        // Initial Load
+        // --- Initial Load ---
         populateGrid();
+        populateDropdown();
 
     </script>
     <script type="module" src="auth.js"></script>

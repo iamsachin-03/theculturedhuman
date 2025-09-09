@@ -16,7 +16,8 @@
 ### Features
 
 *   **Home Page (`index.html`):** A landing page introducing the three pillars of Bihar Angan: Culture, Commerce, and Community.
-*   **Culture Page (`culture.html`):** A deep dive into Bihari culture.
+*   **Culture Page (`culture.html`):** A deep dive into Bihari culture, with a new dropdown menu in the navigation bar that links to the Music, Bazaar, and Proverbs pages.
+*   **Music Page (`music.html`):** A curated collection of Bihari folk music, categorized by genre. The page features a dropdown menu to select a category and a grid view of individual songs. To work around YouTube's embedding restrictions, clicking a song card now opens the video in a new browser tab.
 *   **Fitness Page (`fitness.html`):** A page dedicated to traditional Bihari wellness practices and a weekly workout planner.
 *   **Marketplace Page (`marketplace.html`):** A "coming soon" page for a marketplace.
 *   **Manch Page (`manch.html`):** A blog/forum for the community.
@@ -26,15 +27,10 @@
 *   **Authentication (`auth.js`):** A robust authentication system using Firebase Email Link (passwordless) sign-in. It correctly handles user sessions and custom claims (like admin status) via an `authReady` promise, which acts as a single source of truth for the user's authentication state. The flow involves sending a secure link to the user's email, which they click to sign in.
 *   **Proverbs Page (`proverbs.js`):** A feature displaying Bihari proverbs, with an admin-only form to add new ones. This feature now works correctly by waiting for the `authReady` signal.
 
-## Current Plan: Fix Authentication Flow
+## Current Plan: Build the Bazaar Page
 
-*   **Problem:** The login page was not working because the JavaScript code was configured for Google Sign-In, while the HTML form was set up for passwordless email link authentication.
-*   **Solution:**
-    1.  **Modified `auth.js`:** Re-implemented the email link authentication logic.
-        *   Imported `sendSignInLinkToEmail`, `isSignInWithEmailLink`, and `signInWithEmailLink` from the Firebase SDK.
-        *   Added an event listener to the email form to call `sendSignInLinkToEmail` on submission.
-        *   Added logic to check the URL on page load using `isSignInWithEmailLink`.
-        *   If the URL is a sign-in link, complete the process using `signInWithEmailLink`, retrieving the user's email from `localStorage`.
-        *   Implemented user feedback messages for both success and error scenarios.
-    2.  **Verified `auth.html`:** Ensured the HTML form, input, and feedback elements have the correct IDs for the JavaScript to target.
-*   **Result:** The login page is now fully functional, providing a passwordless sign-in experience as originally designed.
+*   **Goal:** Create the `bazaar.html` page, a visually rich gallery of traditional Bihari crafts.
+*   **Features:**
+    *   A hero section with a relevant background image and an inspiring title.
+    *   A responsive grid of "product cards," each featuring a high-quality image, a title, and a brief description of a specific Bihari craft (e.g., Madhubani paintings, Sujini embroidery).
+    *   The page will be styled to match the rest of the site, using the existing `style.css` and the project's design language.

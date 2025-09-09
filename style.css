@@ -1,106 +1,281 @@
 
+/* --- Base Styles & Theme Variables --- */
 :root {
-    /* New Dark Theme (Default) */
-    --primary-color-dark: #D4AF37; /* A richer, more antique gold */
-    --secondary-color-dark: #1E1E1E; /* A slightly off-black for cards */
-    --text-color-dark: #F5F5F5; /* A soft, elegant white */
-    --bg-color-dark: #121212; /* A deep, true black for contrast */
-    --card-border-dark: #333333;
-    --text-muted-dark: #a0a0a0;
-
-    /* New Light Theme */
-    --primary-color-light: #8B4513; /* A strong, earthy Saddle Brown */
-    --secondary-color-light: #FFFFFF; /* Pure white for clean cards */
-    --text-color-light: #212529; /* A high-contrast, readable dark grey */
-    --bg-color-light: #F8F9FA; /* A clean, very light grey background */
-    --card-border-light: #DEE2E6;
-    --text-muted-light: #6c757d;
-
-    /* Default to Dark Mode variables */
-        --primary-color: var(--primary-color-dark);
-        --secondary-color: var(--secondary-color-dark);
-        --text-color: var(--text-color-dark);
-        --bg-color: var(--bg-color-dark);
-        --card-border: var(--card-border-dark);
-        --text-muted: var(--text-muted-dark);
+    --background-color: #121212;
+    --secondary-color: #1e1e1e;
+    --font-color: #e0e0e0;
+    --primary-color: #c5a684; 
+    --card-bg: #2a2a2a;
+    --card-border: #444;
+    --input-bg: #333;
+    --input-border: #555;
 }
 
-body.light-mode {
-    --primary-color: var(--primary-color-light);
-    --secondary-color: var(--secondary-color-light);
-    --text-color: var(--text-color-light);
-    --bg-color: var(--bg-color-light);
-    --card-border: var(--card-border-light);
-    --text-muted: var(--text-muted-light);
+[data-theme="light"] {
+    --background-color: #f5f3ef;
+    --secondary-color: #ffffff;
+    --font-color: #2c2c2c;
+    --primary-color: #8c6b4e; 
+    --card-bg: #ffffff;
+    --card-border: #e0e0e0;
+    --input-bg: #f0f0f0;
+    --input-border: #ccc;
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    background-color: var(--background-color);
+    color: var(--font-color);
     font-family: 'Poppins', sans-serif;
     transition: background-color 0.3s, color 0.3s;
+}
+
+.hero-bg {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .font-playfair {
     font-family: 'Playfair Display', serif;
 }
 
-.card {
+/* --- Header & Navigation --- */
+.nav-link {
+    position: relative;
+    transition: color 0.3s;
+    padding-bottom: 4px;
+    text-decoration: none;
+    color: var(--font-color)
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: var(--primary-color);
+    transition: all 0.3s ease-in-out;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--primary-color);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 100%;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu a:hover {
+    color: var(--background-color);
+}
+
+
+/* --- Custom Select Dropdown (for music.html) --- */
+.custom-select-container {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    cursor: pointer;
+}
+
+.select-selected {
+    position: relative;
     background-color: var(--secondary-color);
+    color: var(--font-color);
+    padding: 15px 20px;
     border: 1px solid var(--card-border);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.15);
-}
-
-.proverb-card {
-    background-color: var(--secondary-color);
-    border-left: 5px solid var(--primary-color);
-    padding: 2rem;
-    margin-bottom: 1.5rem;
     border-radius: 8px;
+    font-size: 1.1rem;
+    transition: all 0.3s;
 }
 
-.proverb-card .proverb {
-    font-size: 1.5rem;
+.select-selected:hover {
+    border-color: var(--primary-color);
+}
+
+.select-selected.select-arrow-active:after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.select-selected:after {
+    position: absolute;
+    content: "\f078"; /* Font Awesome down arrow */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    transition: transform 0.3s;
+}
+
+.select-items {
+    position: absolute;
+    background-color: var(--secondary-color);
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    border: 1px solid var(--card-border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.select-hide {
+    display: none;
+}
+
+.select-items div {
+    padding: 15px 20px;
+    transition: background-color 0.2s;
+}
+
+.select-items div:hover, .same-as-selected {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* --- Music Page Specific Styles --- */
+.music-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.music-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid var(--card-border);
+}
+
+.music-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.music-card-thumbnail {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.music-card-content {
+    padding: 1.5rem;
+}
+
+.music-card-category {
+    color: var(--primary-color);
     font-weight: 600;
-    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.music-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
     margin-bottom: 0.5rem;
 }
 
-.proverb-card .meaning {
-    font-size: 1.1rem;
-    color: var(--text-muted);
-}
-
-/* --- Manch Page Label & Form Styling --- */
-
-.label {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px; /* pill shape */
-    font-size: 0.8rem;
-    font-weight: 600;
-    background-color: var(--primary-color);
-    color: var(--bg-color); /* High contrast against primary color */
-    margin-bottom: 1rem;
-}
-
-#admin-post-form input[type="text"],
-#admin-post-form input[type="url"],
-#admin-post-form textarea,
-#admin-post-form select {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
+/* --- Video Modal --- */
+.video-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    transition: border-color 0.2s;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
 }
 
-#admin-post-form input[type="text"]:focus,
-#admin-post-form input[type="url"]:focus,
-#admin-post-form textarea:focus,
-#admin-post-form select:focus {
-    outline: none;
-    border-color: var(--primary-color);
+.video-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
 }
+
+.video-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 960px;
+    background-color: var(--background-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transform: scale(0.9);
+    transition: transform 0.3s;
+}
+
+.video-modal-overlay.active .video-modal-content {
+    transform: scale(1);
+}
+
+.video-modal-close {
+    position: absolute;
+    top: -1rem;
+    right: -1rem;
+    background: white;
+    color: black;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* --- Buttons --- */
+.btn-primary {
+    padding: 12px 28px;
+    background-color: var(--primary-color);
+    color: #fff;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: background-color 0.3s, transform 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #a88d6c; /* A slightly darker shade for hover */
+    transform: scale(1.05);
+}
+
+/* --- Utility Classes --- */
+.hidden {
+    display: none;
+}
+
+.aspect-w-16 { width: 100%; padding-bottom: 56.25%; position: relative; }
+.aspect-h-9 { height: 0; }
+.aspect-w-16 > iframe {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
