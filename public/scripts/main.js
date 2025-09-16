@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     const workoutData = {
         monday: {
@@ -17,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
             exercises: [
                 { name: "Pull-Ups", sets: "4x8-10", gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Pull-up.gif" },
                 { name: "Barbell Bent Over Row", sets: "4x6-8", gif: "https://media1.tenor.com/m/AYJ_bNXDvoUAAAAd/workout-muscles.gif" },
-                { name: "Seated Cable Row", sets: "3x10-12", gif: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Cable-Row.gif" },
+                { name: "Seated Cable Row", sets: "3x10-12", gif: "https://fitnessprogramer.com/wp-content/uploads/2.gif" },
                 { name: "Barbell Curl", sets: "3x10", gif: "https://media1.tenor.com/m/nLodhTy5DjwAAAAd/bodybuilding-biceps.gif" },
                 { name: "Incline Dumbbell Curl", sets: "3x12", gif: "https://media1.tenor.com/m/j6wkDQurcm8AAAAd/incline-biceps-curl.gif" },
                 { name: "Hammer Curl", sets: "3x12", gif: "https://media1.tenor.com/m/XWnWViXkK1MAAAAC/greeg-sulkin-work-out.gif" },

@@ -1,0 +1,498 @@
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-09T16:22:34.352Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.352Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.353Z] > refreshing access token with scopes: []
+[debug] [2025-09-09T16:22:34.356Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-09T16:22:34.356Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.406Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.407Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.407Z] > refreshing access token with scopes: []
+[debug] [2025-09-09T16:22:34.408Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-09T16:22:34.408Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.411Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.411Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.412Z] > refreshing access token with scopes: []
+[debug] [2025-09-09T16:22:34.413Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-09T16:22:34.413Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.415Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.415Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.416Z] > refreshing access token with scopes: []
+[debug] [2025-09-09T16:22:34.416Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-09T16:22:34.416Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.419Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.419Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.420Z] > refreshing access token with scopes: []
+[debug] [2025-09-09T16:22:34.420Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-09T16:22:34.420Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-09T16:22:34.527Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.527Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.528Z] > refreshing access token with scopes: []
+[debug] [2025-09-09T16:22:34.528Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-09T16:22:34.528Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.531Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.531Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.531Z] > refreshing access token with scopes: []
+[debug] [2025-09-09T16:22:34.532Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-09T16:22:34.532Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.534Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.534Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.534Z] > refreshing access token with scopes: []
+[debug] [2025-09-09T16:22:34.535Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-09T16:22:34.535Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.537Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.537Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.537Z] > refreshing access token with scopes: []
+[debug] [2025-09-09T16:22:34.537Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-09T16:22:34.537Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.539Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.540Z] Checked if tokens are valid: false, expires at: 1757432408085
+[debug] [2025-09-09T16:22:34.540Z] > refreshing access token with scopes: []
+[debug] [2025-09-09T16:22:34.540Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-09T16:22:34.540Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.584Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-09T16:22:34.584Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.602Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [none]
+[debug] [2025-09-09T16:22:34.602Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-09T16:22:34.605Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-09T16:22:34.605Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.613Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-09-09T16:22:34.613Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-09T16:22:34.643Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-09T16:22:34.643Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.658Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [none]
+[debug] [2025-09-09T16:22:34.658Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-09T16:22:34.660Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-09T16:22:34.661Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.669Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [none]
+[debug] [2025-09-09T16:22:34.669Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-09T16:22:34.673Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-09T16:22:34.674Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.687Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-09-09T16:22:34.687Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-09T16:22:34.698Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-09T16:22:34.698Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.711Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-09-09T16:22:34.711Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-09T16:22:34.718Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-09T16:22:34.718Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.726Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-09-09T16:22:34.727Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-09T16:22:34.752Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-09T16:22:34.752Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.763Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [none]
+[debug] [2025-09-09T16:22:34.764Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-09T16:22:34.767Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-09T16:22:34.767Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.778Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-09-09T16:22:34.778Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-09T16:22:34.780Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-09T16:22:34.781Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-09T16:22:34.789Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-09-09T16:22:34.789Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-09T16:22:35.700Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com 403
+[debug] [2025-09-09T16:22:35.703Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [omitted]
+[debug] [2025-09-09T16:22:35.719Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-09-09T16:22:35.719Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-09-09T16:22:35.761Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-09-09T16:22:35.762Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-09-09T16:22:35.773Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-09-09T16:22:35.773Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-09-09T16:22:35.789Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com 403
+[debug] [2025-09-09T16:22:35.789Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [omitted]
+[debug] [2025-09-09T16:22:35.791Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-09-09T16:22:35.791Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-09-09T16:22:35.813Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-09-09T16:22:35.813Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-09-09T16:22:35.829Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-09-09T16:22:35.829Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-09-09T16:22:36.006Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ 200
+[debug] [2025-09-09T16:22:36.006Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [omitted]
+[debug] [2025-09-09T16:22:36.017Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ 200
+[debug] [2025-09-09T16:22:36.017Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-09T16:22:36.027Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-09-09T16:22:36.028Z] > authorizing via signed-in user (sachinpriyadarshi03@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-10T11:22:35.203Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.204Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.204Z] > refreshing access token with scopes: []
+[debug] [2025-09-10T11:22:35.207Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-10T11:22:35.208Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.258Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.258Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.258Z] > refreshing access token with scopes: []
+[debug] [2025-09-10T11:22:35.259Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-10T11:22:35.260Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.264Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.264Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.264Z] > refreshing access token with scopes: []
+[debug] [2025-09-10T11:22:35.265Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-10T11:22:35.266Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.268Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.269Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.269Z] > refreshing access token with scopes: []
+[debug] [2025-09-10T11:22:35.269Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-10T11:22:35.270Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.272Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.273Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.273Z] > refreshing access token with scopes: []
+[debug] [2025-09-10T11:22:35.273Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-10T11:22:35.273Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-10T11:22:35.355Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.356Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.356Z] > refreshing access token with scopes: []
+[debug] [2025-09-10T11:22:35.356Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-10T11:22:35.356Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.359Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.359Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.359Z] > refreshing access token with scopes: []
+[debug] [2025-09-10T11:22:35.359Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-10T11:22:35.360Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.362Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.362Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.362Z] > refreshing access token with scopes: []
+[debug] [2025-09-10T11:22:35.363Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-10T11:22:35.363Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.365Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.365Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.365Z] > refreshing access token with scopes: []
+[debug] [2025-09-10T11:22:35.365Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-10T11:22:35.366Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.368Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.368Z] Checked if tokens are valid: false, expires at: 1757438553781
+[debug] [2025-09-10T11:22:35.368Z] > refreshing access token with scopes: []
+[debug] [2025-09-10T11:22:35.368Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-10T11:22:35.368Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.419Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-10T11:22:35.419Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.432Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [none]
+[debug] [2025-09-10T11:22:35.433Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:22:35.450Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-10T11:22:35.451Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.460Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-09-10T11:22:35.460Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:22:35.471Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-10T11:22:35.471Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.483Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-09-10T11:22:35.483Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:22:35.491Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-10T11:22:35.491Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.500Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [none]
+[debug] [2025-09-10T11:22:35.501Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:22:35.504Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-10T11:22:35.504Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.513Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-09-10T11:22:35.513Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:22:35.523Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-10T11:22:35.523Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.534Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-09-10T11:22:35.534Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:22:35.549Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-10T11:22:35.549Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.559Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [none]
+[debug] [2025-09-10T11:22:35.559Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:22:35.562Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-10T11:22:35.562Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.571Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [none]
+[debug] [2025-09-10T11:22:35.571Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:22:35.579Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-10T11:22:35.580Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.588Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-09-10T11:22:35.588Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:22:35.593Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-10T11:22:35.593Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-10T11:22:35.601Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-09-10T11:22:35.601Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:22:36.502Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com 403
+[debug] [2025-09-10T11:22:36.503Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [omitted]
+[debug] [2025-09-10T11:22:36.509Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-09-10T11:22:36.509Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-09-10T11:22:36.565Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-09-10T11:22:36.565Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-09-10T11:22:36.585Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com 403
+[debug] [2025-09-10T11:22:36.585Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [omitted]
+[debug] [2025-09-10T11:22:36.595Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-09-10T11:22:36.596Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-09-10T11:22:36.599Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-09-10T11:22:36.599Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-09-10T11:22:36.638Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-09-10T11:22:36.639Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-09-10T11:22:36.640Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-09-10T11:22:36.640Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-09-10T11:22:36.865Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ 200
+[debug] [2025-09-10T11:22:36.865Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [omitted]
+[debug] [2025-09-10T11:22:36.925Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ 200
+[debug] [2025-09-10T11:22:36.925Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-10T11:22:36.929Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-09-10T11:22:36.930Z] > authorizing via signed-in user (sachinpriyadarshi03@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-10T11:25:05.956Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:05.957Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:05.957Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:05.958Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:05.959Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:05.959Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:05.960Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:05.960Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:05.960Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:05.961Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:05.963Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [none]
+[debug] [2025-09-10T11:25:05.963Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:25:06.047Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-09-10T11:25:06.047Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:25:06.052Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-09-10T11:25:06.052Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:25:06.057Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-09-10T11:25:06.057Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:25:06.064Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [none]
+[debug] [2025-09-10T11:25:06.064Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com x-goog-quota-user=projects/the-cultured-human-blog
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-10T11:25:06.183Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:06.184Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:06.184Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:06.186Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:06.187Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:06.187Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:06.188Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:06.188Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:06.188Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:06.188Z] Checked if tokens are valid: true, expires at: 1757506954593
+[debug] [2025-09-10T11:25:06.189Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [none]
+[debug] [2025-09-10T11:25:06.189Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:25:06.197Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-09-10T11:25:06.197Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:25:06.200Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-09-10T11:25:06.200Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:25:06.203Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-09-10T11:25:06.203Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:25:06.206Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [none]
+[debug] [2025-09-10T11:25:06.206Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-10T11:25:07.148Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com 403
+[debug] [2025-09-10T11:25:07.148Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [omitted]
+[debug] [2025-09-10T11:25:07.200Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-09-10T11:25:07.201Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-09-10T11:25:07.204Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-09-10T11:25:07.204Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-09-10T11:25:07.208Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-09-10T11:25:07.208Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-09-10T11:25:07.223Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com 403
+[debug] [2025-09-10T11:25:07.223Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [omitted]
+[debug] [2025-09-10T11:25:07.225Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-09-10T11:25:07.225Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-09-10T11:25:07.237Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-09-10T11:25:07.237Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-09-10T11:25:07.256Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-09-10T11:25:07.256Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-09-10T11:25:07.498Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ 200
+[debug] [2025-09-10T11:25:07.498Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [omitted]
+[debug] [2025-09-10T11:25:07.506Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ 200
+[debug] [2025-09-10T11:25:07.506Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-10T11:25:07.517Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-09-10T11:25:07.518Z] > authorizing via signed-in user (sachinpriyadarshi03@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-10T11:25:07.548Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-09-10T11:25:07.549Z] > authorizing via signed-in user (sachinpriyadarshi03@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-16T11:20:27.660Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.660Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.661Z] > refreshing access token with scopes: []
+[debug] [2025-09-16T11:20:27.663Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-16T11:20:27.664Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.696Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.697Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.697Z] > refreshing access token with scopes: []
+[debug] [2025-09-16T11:20:27.698Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-16T11:20:27.698Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.701Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.701Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.701Z] > refreshing access token with scopes: []
+[debug] [2025-09-16T11:20:27.702Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-16T11:20:27.702Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.705Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.705Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.705Z] > refreshing access token with scopes: []
+[debug] [2025-09-16T11:20:27.705Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-16T11:20:27.705Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.707Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.707Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.707Z] > refreshing access token with scopes: []
+[debug] [2025-09-16T11:20:27.708Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-16T11:20:27.708Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-16T11:20:27.765Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.765Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.765Z] > refreshing access token with scopes: []
+[debug] [2025-09-16T11:20:27.766Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-16T11:20:27.766Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.768Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.768Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.768Z] > refreshing access token with scopes: []
+[debug] [2025-09-16T11:20:27.768Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-16T11:20:27.769Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.770Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.770Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.770Z] > refreshing access token with scopes: []
+[debug] [2025-09-16T11:20:27.771Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-16T11:20:27.771Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.773Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.773Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.773Z] > refreshing access token with scopes: []
+[debug] [2025-09-16T11:20:27.773Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-16T11:20:27.773Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.775Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.776Z] Checked if tokens are valid: false, expires at: 1757506954593
+[debug] [2025-09-16T11:20:27.776Z] > refreshing access token with scopes: []
+[debug] [2025-09-16T11:20:27.776Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-16T11:20:27.776Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.816Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-16T11:20:27.816Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.829Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-09-16T11:20:27.830Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:20:27.840Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-16T11:20:27.841Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.850Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-09-16T11:20:27.851Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:20:27.858Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-16T11:20:27.858Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.868Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-09-16T11:20:27.868Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:20:27.879Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-16T11:20:27.880Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.889Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-09-16T11:20:27.890Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:20:27.893Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-16T11:20:27.893Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.905Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [none]
+[debug] [2025-09-16T11:20:27.905Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:20:27.911Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-16T11:20:27.911Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.921Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [none]
+[debug] [2025-09-16T11:20:27.922Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:20:27.923Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-16T11:20:27.924Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.933Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [none]
+[debug] [2025-09-16T11:20:27.934Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:20:27.936Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-16T11:20:27.936Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.946Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-09-16T11:20:27.946Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:20:27.959Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-16T11:20:27.960Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:27.971Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-09-16T11:20:27.971Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:20:27.989Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-16T11:20:27.989Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-16T11:20:28.000Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [none]
+[debug] [2025-09-16T11:20:28.000Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:20:28.903Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-09-16T11:20:28.903Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-09-16T11:20:28.904Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-09-16T11:20:28.904Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-09-16T11:20:28.931Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-09-16T11:20:28.931Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-09-16T11:20:28.963Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com 403
+[debug] [2025-09-16T11:20:28.963Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [omitted]
+[debug] [2025-09-16T11:20:28.965Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-09-16T11:20:28.965Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-09-16T11:20:28.986Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com 403
+[debug] [2025-09-16T11:20:28.987Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [omitted]
+[debug] [2025-09-16T11:20:29.006Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-09-16T11:20:29.006Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-09-16T11:20:29.007Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-09-16T11:20:29.007Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-09-16T11:20:29.379Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ 200
+[debug] [2025-09-16T11:20:29.380Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-16T11:20:29.383Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-09-16T11:20:29.383Z] > authorizing via signed-in user (sachinpriyadarshi03@gmail.com)
+[debug] [2025-09-16T11:20:29.397Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ 200
+[debug] [2025-09-16T11:20:29.397Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-16T11:24:23.167Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.167Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.168Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.168Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.171Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.171Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.172Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.172Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.173Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.173Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.174Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [none]
+[debug] [2025-09-16T11:24:23.174Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:24:23.232Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-09-16T11:24:23.233Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:24:23.235Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-09-16T11:24:23.236Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:24:23.238Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-09-16T11:24:23.238Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:24:23.240Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [none]
+[debug] [2025-09-16T11:24:23.240Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com x-goog-quota-user=projects/the-cultured-human-blog
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-16T11:24:23.311Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.311Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.312Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.312Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.312Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.312Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.313Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.313Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.313Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.313Z] Checked if tokens are valid: true, expires at: 1758025226989
+[debug] [2025-09-16T11:24:23.313Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [none]
+[debug] [2025-09-16T11:24:23.313Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:24:23.315Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-09-16T11:24:23.315Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:24:23.317Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-09-16T11:24:23.317Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:24:23.320Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-09-16T11:24:23.320Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:24:23.322Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [none]
+[debug] [2025-09-16T11:24:23.322Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com x-goog-quota-user=projects/the-cultured-human-blog
+[debug] [2025-09-16T11:24:24.278Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com 403
+[debug] [2025-09-16T11:24:24.280Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [omitted]
+[debug] [2025-09-16T11:24:24.307Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-09-16T11:24:24.307Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-09-16T11:24:24.310Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-09-16T11:24:24.310Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-09-16T11:24:24.310Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-09-16T11:24:24.311Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-09-16T11:24:24.330Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com 403
+[debug] [2025-09-16T11:24:24.330Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseio.com [omitted]
+[debug] [2025-09-16T11:24:24.397Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-09-16T11:24:24.397Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-09-16T11:24:24.400Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-09-16T11:24:24.400Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-09-16T11:24:24.400Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-09-16T11:24:24.400Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-09-16T11:24:24.599Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ 200
+[debug] [2025-09-16T11:24:24.600Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [omitted]
+[debug] [2025-09-16T11:24:24.703Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ 200
+[debug] [2025-09-16T11:24:24.703Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/the-cultured-human-blog/services/ [omitted]
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-16T11:24:24.711Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-09-16T11:24:24.711Z] > authorizing via signed-in user (sachinpriyadarshi03@gmail.com)
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-09-16T11:24:24.731Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-09-16T11:24:24.732Z] > authorizing via signed-in user (sachinpriyadarshi03@gmail.com)

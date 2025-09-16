@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness - The Cultured Human</title>
+    <link href="/styles/tailwind.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/style.css">
+    <script src="/scripts/theme.js"></script>
+</head>
+<body class="bg-background-color text-text-color dark:bg-gray-900 dark:text-gray-100 font-d-din">
+
+    <header-component></header-component>
+
+    <main class="container mx-auto px-4 py-8">
+        <section class="text-center mb-12">
+            <h1 class="text-5xl font-playfair font-bold text-primary-color dark:text-secondary-color">Your Weekly Workout Plan</h1>
+            <p class="text-lg text-gray-400 mt-4">A balanced routine for strength and muscle growth.</p>
+        </section>
+
+        <div class="tabs flex justify-center mb-8 gap-4">
+            <button class="tab-btn active" data-day="monday">Monday</button>
+            <button class="tab-btn" data-day="tuesday">Tuesday</button>
+            <button class="tab-btn" data-day="wednesday">Wednesday</button>
+            <button class="tab-btn" data-day="thursday">Thursday</button>
+            <button class="tab-btn" data-day="friday">Friday</button>
+            <button class="tab-btn" data-day="saturday">Saturday</button>
+        </div>
+
+        <div id="monday" class="workout-day">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </div>
+        <div id="tuesday" class="workout-day hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </div>
+        <div id="wednesday" class="workout-day hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </div>
+        <div id="thursday" class="workout-day hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </div>
+        <div id="friday" class="workout-day hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </div>
+        <div id="saturday" class="workout-day hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </div>
+
+    </main>
+
+    <footer-component></footer-component>
+
+    <script src="/scripts/components.js" type="module"></script>
+    <script src="/scripts/main.js" type="module"></script>
+
+</body>
+</html>

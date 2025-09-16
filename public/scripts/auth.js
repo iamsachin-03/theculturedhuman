@@ -35,37 +35,39 @@ const db = getFirestore(app);
 
 // --- Central Auth Promise ---
 const authReady = new Promise((resolve) => {
-    onAuthStateChanged(auth, async (user) => {
-        const loginLink = document.getElementById('login-link');
-        const userInfo = document.getElementById('user-info');
-        const userName = document.getElementById('user-name');
-        
-        let authData;
+    document.addEventListener('DOMContentLoaded', () => {
+        onAuthStateChanged(auth, async (user) => {
+            const loginLink = document.getElementById('login-link');
+            const userInfo = document.getElementById('user-info');
+            const userName = document.getElementById('user-name');
+            
+            let authData;
 
-        if (user) {
-            if(loginLink) loginLink.classList.add('hidden');
-            if(userInfo) userInfo.classList.remove('hidden');
-            if(userName) userName.textContent = user.displayName || user.email;
-            
-            const idTokenResult = await user.getIdTokenResult(true);
-            
-            authData = {
-                user: user,
-                isAdmin: idTokenResult.claims.admin === true,
-                idTokenResult: idTokenResult
-            };
+            if (user) {
+                if(loginLink) loginLink.classList.add('hidden');
+                if(userInfo) userInfo.classList.remove('hidden');
+                if(userName) userName.textContent = user.displayName || user.email;
+                
+                const idTokenResult = await user.getIdTokenResult(true);
+                
+                authData = {
+                    user: user,
+                    isAdmin: idTokenResult.claims.admin === true,
+                    idTokenResult: idTokenResult
+                };
 
-        } else {
-            if(loginLink) loginLink.classList.remove('hidden');
-            if(userInfo) userInfo.classList.add('hidden');
-            
-            authData = {
-                user: null,
-                isAdmin: false,
-                idTokenResult: null
-            };
-        }
-        resolve(authData);
+            } else {
+                if(loginLink) loginLink.classList.remove('hidden');
+                if(userInfo) userInfo.classList.add('hidden');
+                
+                authData = {
+                    user: null,
+                    isAdmin: false,
+                    idTokenResult: null
+                };
+            }
+            resolve(authData);
+        });
     });
 });
 
