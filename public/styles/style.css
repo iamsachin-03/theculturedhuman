@@ -503,3 +503,10 @@ body {
     margin-top: 1rem;
     border-top: 1px solid var(--card-border);
 }
+
+/* The Cultured Human — editorial identity refresh */
+:root{--background-color:#F3EFE6;--secondary-color:#E7E3D9;--font-color:#292925;--font-color-muted:#66665E;--primary-color:#263C32;--primary-color-rgb:38,60,50;--card-bg:#FAF8F3;--card-border:#E4DED2;--input-bg:#FAF8F3;--input-border:#D9D2C5;--input-focus-border:#A75F43;--btn-primary-bg:#263C32;--btn-primary-hover-bg:#A75F43;--btn-secondary-bg:transparent;--btn-secondary-border:#B6A68C;--btn-secondary-hover-bg:#E7E3D9}
+body{background-color:var(--background-color);color:var(--font-color);font-family:'DM Sans','Poppins',sans-serif}
+h1,h2,h3,h4,.font-playfair{font-family:'Cormorant Garamond','Playfair Display',serif}
+.card{background-color:#FAF8F3;border-color:#E4DED2}
+::selection{background:#D9DDD2;color:#263C32}
