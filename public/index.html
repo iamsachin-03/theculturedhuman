@@ -1,107 +1,53 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bihar Angan - Culture, Commerce, Community</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/styles/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-</head>
-<body class="overflow-x-hidden">
-
-    <header-component></header-component>
-
-    <main>
-        <!-- Hero Section -->
-        <section class="min-h-screen flex items-center justify-center text-center px-6 bg-dots pt-24">
-            <div class="max-w-4xl">
-                <h1 class="font-playfair text-6xl md:text-8xl font-bold leading-tight">Your Courtyard to Bihar</h1>
-                <p class="text-xl md:text-2xl text-gray-400 mt-6 max-w-2xl mx-auto">A digital platform celebrating the culture, commerce, and community of a vibrant land.</p>
-                <div class="mt-12 flex items-center justify-center gap-4">
-                    <a href="about.html" class="cta-button">Discover Our Vision</a>
-                    <a href="manch.html" class="cta-button-secondary">Join the Conversation</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Pillars Section -->
-        <section class="py-24 px-6">
-            <div class="max-w-7xl mx-auto">
-                <div class="text-center mb-16">
-                    <h2 class="font-playfair text-5xl font-bold">The Three Pillars of Bihar Angan</h2>
-                    <p class="text-lg text-gray-400 mt-4">Culture, Commerce, and Community, interwoven.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                    <!-- Culture Card -->
-                    <a href="culture.html" class="card rounded-2xl overflow-hidden group">
-                         <div class="h-64 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1621375493233-4139b4b39795?q=80&w=2070&auto=format&fit=crop" alt="Culture" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <div class="p-8">
-                            <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Culture</h3>
-                            <p class="text-gray-400">Immerse yourself in the rich tapestry of Bihari heritage, from ancient arts to vibrant festivals.</p>
-                        </div>
-                    </a>
-                    <!-- Commerce Card -->
-                    <a href="marketplace.html" class="card rounded-2xl overflow-hidden group">
-                        <div class="h-64 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1528303209531-18534b1a4a5b?q=80&w=2070&auto=format&fit=crop" alt="Commerce" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        </div>
-                        <div class="p-8">
-                            <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Bazaar</h3>
-                            <p class="text-gray-400">Connect with Bihar'''s finest artisans and creators in our digital marketplace.</p>
-                        </div>
-                    </a>
-                    <!-- Community Card -->
-                    <a href="manch.html" class="card rounded-2xl overflow-hidden group">
-                        <div class="h-64 overflow-hidden">
-                           <img src="https://images.unsplash.com/photo-1517849845537-4d257902454a?q=80&w=1974&auto=format&fit=crop" alt="Community" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                       </div>
-                       <div class="p-8">
-                           <h3 class="font-playfair text-3xl font-bold mb-3" style="color: var(--primary-color);">Manch</h3>
-                           <p class="text-gray-400">Engage in dialogue, share stories, and build connections on our community forum.</p>
-                       </div>
-                   </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Cultural Animation Section -->
-        <section class="py-24 px-6 bg-secondary-color">
-            <div class="max-w-7xl mx-auto text-center">
-                <h2 class="font-playfair text-5xl font-bold mb-12">A Glimpse into Our Heritage</h2>
-                <div id="animation-container"></div>
-            </div>
-        </section>
-
-        <!-- Featured Content Section -->
-        <section class="py-24 px-6">
-            <div class="max-w-7xl mx-auto">
-                <div class="text-center mb-16">
-                    <h2 class="font-playfair text-5xl font-bold">From the Manch</h2>
-                    <p class="text-lg text-gray-400 mt-4">Explore the latest conversations and stories from our community.</p>
-                </div>
-                <!-- Posts will be dynamically inserted here -->
-                <div id="featured-posts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"></div>
-                 <div class="text-center mt-16">
-                    <a href="manch.html" class="cta-button">See All Discussions</a>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer-component></footer-component>
-    <visitor-counter></visitor-counter>
-    
-    <script src="/scripts/logo.js"></script>
-    <script src="/scripts/theme.js"></script>
-    <script src="/scripts/animation.js"></script>
-    <script type="module" src="/scripts/components.js"></script>
-    <script type="module" src="/scripts/auth.js"></script>
-</body>
-</html>
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#F3EFE6"><meta name="description" content="The Cultured Human — wisdom, culture and conscious living. Ideas for a life well lived.">
+<title>The Cultured Human — Wisdom. Culture. Conscious Living.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="/styles/style.css">
+<style>
+:root{--ivory:#F3EFE6;--green:#263C32;--rust:#A75F43;--ink:#292925;--muted:#66665E;--line:#D9D2C5}
+body{background:var(--ivory);color:var(--ink);font-family:'DM Sans',sans-serif}
+.display{font-family:'Cormorant Garamond',serif;letter-spacing:-.025em}
+.kicker{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);font-weight:700}
+.navlink{font-size:.85rem;color:var(--green)}.navlink:hover{color:var(--rust)}
+.btn{display:inline-block;padding:14px 22px;background:var(--green);color:var(--ivory);font-size:.84rem;transition:.2s}.btn:hover{background:var(--rust)}
+.btn-outline{display:inline-block;padding:13px 22px;border:1px solid #AFA99D;color:var(--green);font-size:.84rem}
+.editorial-card{background:#FAF8F3;border:1px solid #E4DED2}.editorial-card img{width:100%;height:245px;object-fit:cover;transition:transform .6s}.editorial-card:hover img{transform:scale(1.04)}
+@media(max-width:640px){.hero-title{font-size:4rem;line-height:.9}}
+</style></head>
+<body>
+<header class="sticky top-0 z-50 bg-[#F3EFE6]/95 backdrop-blur border-b border-[#D9D2C5]">
+<nav class="max-w-7xl mx-auto px-5 md:px-8 py-4 flex items-center justify-between">
+<a href="index.html" class="tracking-[.17em] text-sm font-bold text-[#263C32]">THE CULTURED HUMAN</a>
+<div class="hidden md:flex gap-7"><a class="navlink" href="#journal">Journal</a><a class="navlink" href="culture.html">Culture</a><a class="navlink" href="proverbs.html">Wisdom</a><a class="navlink" href="bazaar.html">Discover</a><a class="navlink" href="marketplace.html">Marketplace</a><a class="navlink" href="manch.html">Community</a><a class="navlink" href="about.html">About</a></div>
+<a href="marketplace.html" class="btn text-xs">Explore ↗</a></nav>
+<div class="md:hidden flex flex-wrap justify-center gap-x-5 gap-y-2 pb-3 text-xs"><a href="#journal">Journal</a><a href="culture.html">Culture</a><a href="proverbs.html">Wisdom</a><a href="bazaar.html">Discover</a><a href="marketplace.html">Marketplace</a><a href="manch.html">Community</a></div></header>
+<main>
+<section class="relative min-h-[78vh] flex items-center overflow-hidden bg-[#E7E3D9]">
+<img class="absolute inset-0 w-full h-full object-cover opacity-30" src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=85&w=2000&auto=format&fit=crop" alt="">
+<div class="absolute inset-0 bg-gradient-to-r from-[#F3EFE6] via-[#F3EFE6]/90 to-transparent"></div>
+<div class="relative max-w-7xl mx-auto w-full px-6 md:px-10 py-24"><p class="kicker mb-7">A journal for the curious and conscious</p>
+<h1 class="display hero-title text-7xl md:text-9xl leading-[.88] text-[#263C32] max-w-4xl">A life well<br><em>considered.</em></h1>
+<p class="mt-8 text-lg md:text-xl text-[#55564E] max-w-xl leading-relaxed">Ideas, stories and discoveries that help us think deeper, live better and stay curious.</p>
+<div class="flex flex-wrap gap-3 mt-9"><a class="btn" href="#journal">Explore the journal ↗</a><a class="btn-outline" href="marketplace.html">Discover the marketplace</a></div>
+<p class="kicker mt-16">Wisdom. Culture. Conscious Living.</p></div></section>
+<section id="journal" class="py-20 md:py-28 px-6"><div class="max-w-7xl mx-auto">
+<div class="md:flex md:items-end md:justify-between mb-12"><div><p class="kicker">The editorial world</p><h2 class="display text-5xl md:text-7xl text-[#263C32] mt-3">Explore what moves you.</h2></div><p class="max-w-md text-[#66665E] leading-relaxed mt-5 md:mt-0">From ancient philosophy to everyday rituals, from regional craft to faraway cultures — a little more meaning in the everyday.</p></div>
+<div class="grid md:grid-cols-3 gap-5">
+<a href="proverbs.html" class="editorial-card"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=85&w=900&auto=format&fit=crop" alt="Mountain landscape"><div class="p-7"><p class="kicker">01 · Reflection</p><h3 class="display text-3xl text-[#263C32] mt-2">The Wisdom Within</h3><p class="text-sm text-[#66665E] mt-3">Ancient thought, timeless questions and practical philosophy for modern life.</p></div></a>
+<a href="culture.html" class="editorial-card"><img src="https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?q=85&w=900&auto=format&fit=crop" alt="Traditional artwork"><div class="p-7"><p class="kicker">02 · Heritage</p><h3 class="display text-3xl text-[#263C32] mt-2">Culture & Heritage</h3><p class="text-sm text-[#66665E] mt-3">The art, traditions, people and stories that shape how the world sees itself.</p></div></a>
+<a href="culture.html" class="editorial-card"><img src="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=85&w=900&auto=format&fit=crop" alt="Sunrise over fields"><div class="p-7"><p class="kicker">03 · Intentionality</p><h3 class="display text-3xl text-[#263C32] mt-2">Conscious Living</h3><p class="text-sm text-[#66665E] mt-3">Thoughtful choices, slower rhythms and a more intentional relationship with the world.</p></div></a>
+<a href="culture.html" class="editorial-card"><img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=85&w=900&auto=format&fit=crop" alt="Travel landscape"><div class="p-7"><p class="kicker">04 · Discovery</p><h3 class="display text-3xl text-[#263C32] mt-2">The Art of Experiencing</h3><p class="text-sm text-[#66665E] mt-3">Travel, food, places and encounters that make life richer.</p></div></a>
+<a href="fitness.html" class="editorial-card"><img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=85&w=900&auto=format&fit=crop" alt="Mindful practice"><div class="p-7"><p class="kicker">05 · Wellbeing</p><h3 class="display text-3xl text-[#263C32] mt-2">The Better Self</h3><p class="text-sm text-[#66665E] mt-3">Habits, relationships and small practices that help us grow with intention.</p></div></a>
+<a href="music.html" class="editorial-card"><img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=85&w=900&auto=format&fit=crop" alt="Music studio"><div class="p-7"><p class="kicker">06 · Curiosity</p><h3 class="display text-3xl text-[#263C32] mt-2">Curious Minds</h3><p class="text-sm text-[#66665E] mt-3">Questions, puzzles, music and unexpected facts that keep wonder alive.</p></div></a>
+</div></div></section>
+<section class="bg-[#263C32] text-[#F3EFE6] py-20 md:py-28 px-6"><div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center"><div><p class="kicker text-[#D5A58D]">A thought to carry</p><h2 class="display text-5xl md:text-7xl mt-5 leading-[.95]">“The unexamined life is not worth living.”</h2><p class="text-[#D9DDD2] mt-6">— Socrates, as recorded in Plato’s <em>Apology</em></p></div><div class="md:pl-12 md:border-l border-[#718074]"><p class="text-lg leading-relaxed text-[#E2E3D9]">A reminder to pause, question our assumptions and live with awareness. Wisdom becomes valuable when it moves beyond the page and into the way we live.</p><a href="proverbs.html" class="inline-block mt-8 text-[#D5A58D] border-b border-[#D5A58D] pb-1">More thoughts to carry ↗</a></div></div></section>
+<section class="py-20 md:py-28 px-6"><div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center"><img class="w-full h-[420px] object-cover" src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=85&w=1200&auto=format&fit=crop" alt="Curated art and objects"><div><p class="kicker">The Cultured Human marketplace</p><h2 class="display text-5xl md:text-7xl text-[#263C32] mt-4 leading-[.95]">Objects with a story. Experiences with meaning.</h2><p class="mt-6 text-[#66665E] leading-relaxed">Discover thoughtful products, books, handmade craft and cultural experiences from independent makers and creators. A marketplace where discovery begins with a story.</p><a href="marketplace.html" class="btn mt-8">Explore the marketplace ↗</a></div></div></section>
+<section class="bg-[#E7E3D9] py-20 px-6 text-center"><div class="max-w-4xl mx-auto"><p class="kicker">A space for thoughtful people</p><h2 class="display text-5xl md:text-7xl text-[#263C32] mt-4">Culture is a conversation.</h2><p class="text-[#66665E] max-w-2xl mx-auto mt-5 leading-relaxed">Share a perspective, ask a better question or bring a story worth remembering. The Cultured Human grows through curious minds and open conversations.</p><a href="manch.html" class="btn mt-8">Join the conversation ↗</a></div></section>
+</main>
+<footer class="bg-[#202F28] text-[#F3EFE6] px-6 py-12"><div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-8"><div><p class="tracking-[.2em] text-sm">THE CULTURED HUMAN</p><p class="text-[#C6C9BE] mt-3 text-sm">Wisdom. Culture. Conscious Living.</p><p class="text-[#AEB6A9] mt-2 text-xs">Ideas for a life well lived.</p></div><div class="flex flex-wrap gap-6 text-sm"><a href="about.html">About</a><a href="culture.html">Culture</a><a href="bazaar.html">Discover</a><a href="marketplace.html">Marketplace</a><a href="manch.html">Community</a></div></div><div class="max-w-7xl mx-auto border-t border-[#536258] mt-9 pt-5 text-xs text-[#AEB6A9]">© <span id="year"></span> The Cultured Human. Made for the curious.</div></footer>
+<script>document.getElementById('year').textContent=new Date().getFullYear()</script>
+<script src="/scripts/logo.js"></script><script src="/scripts/theme.js"></script><script type="module" src="/scripts/components.js"></script><script type="module" src="/scripts/auth.js"></script>
+</body></html>
