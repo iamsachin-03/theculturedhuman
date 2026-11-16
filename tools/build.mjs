@@ -1,0 +1,258 @@
+#!/usr/bin/env node
+// Builds every HTML page in public/ with no dependencies.
+//
+//   node tools/build.mjs           write the site
+//   node tools/build.mjs --check   change nothing; exit 1 if public/ is stale or broken
+//
+// Sources:
+//   src/pages/*.html        front matter + the page's <main> content
+//   content/articles/*.md   journal articles (see content/articles/README.md)
+//   content/site.json       navigation, footer, pillars, site URL
+//   public/assets/register.json   every image, with its creator and licence
+//
+// Inside pages, {{img id}}, {{figure id caption="…"}} and {{credit id}} expand
+// into responsive images and credit lines drawn from the register.
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, statSync, rmSync } from 'node:fs';
+import { join, relative, dirname, posix } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { parseFrontMatter, renderMarkdown, wordCount, inline, escapeHtml } from './lib/markdown.mjs';
+import * as t from './lib/templates.mjs';
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const PUBLIC = join(ROOT, 'public');
+const CHECK = process.argv.includes('--check');
+
+const site = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8'));
+const register = JSON.parse(readFileSync(join(PUBLIC, 'assets/register.json'), 'utf8'));
+const assets = new Map(register.map((a) => [a.id, a]));
+const quiz = JSON.parse(readFileSync(join(ROOT, 'content/quiz.json'), 'utf8'));
+quiz.forEach((q, i) => {
+  if (!q.q || !Array.isArray(q.options) || !(q.answer in q.options) || !q.explain) {
+    throw new Error(`content/quiz.json: question ${i + 1} needs q, options, a valid answer index and explain`);
+  }
+});
+
+const problems = [];
+/** @type {Map<string, string>} absolute output path → file contents */
+const outputs = new Map();
+
+function asset(id, where) {
+  const a = assets.get(id);
+  if (!a) throw new Error(`${where}: unknown image "${id}" — add it to public/assets/register.json first`);
+  return a;
+}
+
+function walk(dir, ext) {
+  return readdirSync(dir).flatMap((name) => {
+    const p = join(dir, name);
+    if (statSync(p).isDirectory()) return name === 'assets' ? [] : walk(p, ext);
+    return p.endsWith(ext) ? [p] : [];
+  });
+}
+
+function outFile(path) {
+  return join(PUBLIC, path.endsWith('/') ? path + 'index.html' : path);
+}
+
+function emit(page, main, imageId) {
+  outputs.set(outFile(page.path), t.layout({ site, page, image: assets.get(imageId || site.defaultImage), main }));
+}
+
+// ---------- articles ----------
+const REQUIRED_ARTICLE = ['title', 'description', 'dek', 'pillar', 'author', 'date', 'heroImage'];
+const articleDir = join(ROOT, 'content/articles');
+const articles = readdirSync(articleDir)
+  .filter((f) => f.endsWith('.md') && f !== 'README.md')
+  .map((file) => {
+    const where = `content/articles/${file}`;
+    const { data, body } = parseFrontMatter(readFileSync(join(articleDir, file), 'utf8'));
+    for (const key of REQUIRED_ARTICLE) if (!data[key]) throw new Error(`${where}: front matter needs "${key}"`);
+    if (!site.pillars[data.pillar]) throw new Error(`${where}: pillar "${data.pillar}" is not in content/site.json`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date)) throw new Error(`${where}: date must be YYYY-MM-DD`);
+    const slug = file.replace(/\.md$/, '');
+    return { ...data, slug, where, body, path: `/journal/${slug}.html`, related: data.related || [], hero: asset(data.heroImage, where) };
+  })
+  .filter((a) => a.draft !== 'true')
+  .sort((a, b) => b.date.localeCompare(a.date));
+
+const bySlug = new Map(articles.map((a) => [a.slug, a]));
+const card = (a) => t.storyCard(a, a.hero, site.pillars[a.pillar].label);
+
+for (const article of articles) {
+  const [main, sourcesMd = ''] = article.body.split(/^## Sources\s*$/m);
+  const rendered = renderMarkdown(main, {
+    figure: (id, caption, wide) => t.figure(asset(id, article.where), caption, wide),
+  });
+
+  const sources = [...sourcesMd.matchAll(/^(\d+)\. (.+)$/gm)].map((m) => ({ n: Number(m[1]), text: m[2] }));
+  for (const n of rendered.footnotes) {
+    if (!sources.some((s) => s.n === n)) problems.push(`${article.where}: footnote [^${n}] has no matching entry under "## Sources"`);
+  }
+  for (const s of sources) {
+    if (!rendered.footnotes.has(s.n)) problems.push(`${article.where}: source ${s.n} is never cited in the text`);
+  }
+  const sourcesHtml = sources.length
+    ? `<section class="sources container--narrow" aria-labelledby="sources-title"><h2 id="sources-title">Sources &amp; further reading</h2><ol>${sources
+        .map((s) => `<li id="source-${s.n}" value="${s.n}">${inline(s.text)}</li>`)
+        .join('')}</ol></section>`
+    : '';
+
+  article.readingMinutes = Math.max(1, Math.round(wordCount(main) / 220));
+  const related = article.related.map((slug) => {
+    const r = bySlug.get(slug);
+    if (!r) throw new Error(`${article.where}: related article "${slug}" does not exist`);
+    return card(r);
+  });
+
+  const page = {
+    path: article.path,
+    title: `${article.title} — ${site.name}`,
+    description: article.description,
+    type: 'article',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: article.title,
+      description: article.description,
+      datePublished: article.date,
+      dateModified: article.updated || article.date,
+      author: { '@type': 'Person', name: article.author },
+      publisher: { '@type': 'Organization', name: site.name },
+      image: site.url + article.hero.files[1600],
+      mainEntityOfPage: site.url + article.path,
+    },
+  };
+  emit(page, t.articleMain({ site, article, hero: article.hero, bodyHtml: rendered.html, sourcesHtml, related }), article.heroImage);
+}
+
+emit(
+  {
+    path: '/journal/',
+    title: `The Journal — ${site.name}`,
+    description: 'Researched essays and explainers on Indian art, philosophy, food, craft and conscious living from The Cultured Human.',
+  },
+  t.journalMain({ cards: articles.map(card) }),
+  articles[0]?.heroImage,
+);
+emit(
+  {
+    path: '/credits.html',
+    title: `Image credits — ${site.name}`,
+    description: 'Credits and licences for every photograph and artwork used on The Cultured Human.',
+  },
+  t.creditsMain({ assets: register }),
+);
+
+// ---------- hand-written pages ----------
+function attrs(s) {
+  const out = {};
+  for (const m of s.matchAll(/([\w-]+)(?:="([^"]*)")?/g)) out[m[1]] = m[2] ?? true;
+  return out;
+}
+
+const pagesDir = join(ROOT, 'src/pages');
+for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
+  const where = `src/pages/${file}`;
+  const { data, body } = parseFrontMatter(readFileSync(join(pagesDir, file), 'utf8'));
+  for (const key of ['title', 'description']) if (!data[key]) throw new Error(`${where}: front matter needs "${key}"`);
+  const path = file === 'index.html' ? '/' : `/${file}`;
+
+  const main = body
+    .replace(/\{\{(img|figure|credit)\s+([\w-]+)([^}]*)\}\}/g, (_, kind, id, rest) => {
+      const a = asset(id, where);
+      const opt = attrs(rest);
+      if (kind === 'credit') return t.creditLine(a);
+      if (kind === 'figure') return t.figure(a, escapeHtml(opt.caption ?? a.subject), Boolean(opt.wide));
+      return t.picture(a, { sizes: opt.sizes, className: opt.class, eager: Boolean(opt.eager), alt: opt.alt });
+    })
+    .replace(/\{\{latest-articles(?:\s+(\d+))?\}\}/g, (_, n) => articles.slice(0, Number(n) || 3).map(card).join('\n'))
+    .replace(/\{\{quiz\}\}/g, () => t.quiz(quiz));
+  if (/\{\{/.test(main)) problems.push(`${where}: unrecognised {{…}} placeholder`);
+
+  emit(
+    { path, title: data.title, description: data.description, noindex: data.noindex === 'true' },
+    main,
+    data.image,
+  );
+}
+
+// ---------- sitemap & robots ----------
+const indexable = [...outputs.entries()]
+  .filter(([, html]) => !html.includes('<meta name="robots" content="noindex'))
+  .map(([file]) => '/' + relative(PUBLIC, file).split('\\').join('/').replace(/(^|\/)index\.html$/, '$1'))
+  .sort();
+outputs.set(
+  join(PUBLIC, 'sitemap.xml'),
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${indexable
+    .map((p) => `  <url><loc>${escapeHtml(site.url + p)}</loc></url>`)
+    .join('\n')}\n</urlset>\n`,
+);
+outputs.set(join(PUBLIC, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${site.url}/sitemap.xml\n`);
+
+// ---------- checks ----------
+const registered = new Set(register.flatMap((a) => Object.values(a.files)));
+for (const [file, html] of outputs) {
+  if (!file.endsWith('.html')) continue;
+  const where = relative(ROOT, file);
+  const base = '/' + posix.dirname(relative(PUBLIC, file).split('\\').join('/')) + '/';
+  for (const m of html.matchAll(/<img\b[^>]*>/g)) {
+    if (!/\salt="/.test(m[0])) problems.push(`${where}: image without alt text: ${m[0].slice(0, 80)}`);
+  }
+  for (const m of html.matchAll(/\s(href|src|srcset)="([^"]+)"/g)) {
+    const urls = m[1] === 'srcset' ? m[2].split(',').map((s) => s.trim().split(/\s+/)[0]) : [m[2]];
+    for (const raw of urls) {
+      if (/^(https?:|mailto:|tel:|data:)/.test(raw)) {
+        if (m[1] !== 'href' && /^https?:/.test(raw)) {
+          problems.push(`${where}: hotlinked image ${raw} — add it to the image library instead`);
+        }
+        continue;
+      }
+      const [pathPart, hash] = raw.split('#');
+      const clean = pathPart.split('?')[0];
+      if (!clean) {
+        if (hash && !new RegExp(`id="${hash}"`).test(html)) problems.push(`${where}: link to missing anchor #${hash}`);
+        continue;
+      }
+      const target = posix.normalize(clean.startsWith('/') ? clean : base + clean);
+      const onDisk = outFile(target);
+      if (!outputs.has(onDisk) && !existsSync(onDisk)) problems.push(`${where}: broken link ${raw}`);
+      else if (hash && outputs.has(onDisk) && !new RegExp(`id="${hash}"`).test(outputs.get(onDisk))) {
+        problems.push(`${where}: link to missing anchor ${raw}`);
+      }
+      if (target.startsWith('/assets/') && /\.(jpe?g|png|webp)$/i.test(target) && !registered.has(target)) {
+        problems.push(`${where}: ${target} is not in the image register`);
+      }
+    }
+  }
+}
+
+function fail() {
+  console.error(`\n${problems.length} problem(s):\n` + problems.map((p) => `  • ${p}`).join('\n'));
+  process.exit(1);
+}
+if (problems.length && !CHECK) fail();
+
+// ---------- write or compare ----------
+const stray = walk(PUBLIC, '.html').filter((f) => !outputs.has(f));
+let changed = 0;
+for (const [file, contents] of outputs) {
+  const current = existsSync(file) ? readFileSync(file, 'utf8') : null;
+  if (current === contents) continue;
+  changed++;
+  if (CHECK) problems.push(`${relative(ROOT, file)} is out of date — run npm run build`);
+  else {
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, contents);
+  }
+}
+for (const f of stray) {
+  if (CHECK) problems.push(`${relative(ROOT, f)} has no source in src/pages or content/articles`);
+  else rmSync(f);
+}
+
+if (problems.length) fail();
+console.log(
+  CHECK
+    ? `OK — ${outputs.size} files are up to date.`
+    : `Built ${outputs.size} files (${changed} changed${stray.length ? `, ${stray.length} removed` : ''}), ${articles.length} articles.`,
+);
