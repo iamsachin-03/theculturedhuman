@@ -9,6 +9,7 @@ date: 2026-11-14
 heroImage: kerala-sadya
 heroCaption: A Kerala sadya served on a banana leaf
 related: [madhubani-painting, indian-philosophical-traditions]
+offers: [journeys, gifting, family-stories]
 ---
 Ask ten people in India what they ate for lunch and you may get ten different maps of the country. Rice or wheat or millet; mustard oil, coconut oil or ghee; fish, mutton or no meat at all. Regional food in India is a record of geography and history — of how much rain falls, which rivers run nearby, who traded along the coast and who arrived from elsewhere.
 

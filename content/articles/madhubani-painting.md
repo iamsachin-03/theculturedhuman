@@ -9,6 +9,7 @@ date: 2026-11-16
 heroImage: madhubani-kohbar-arti-kumari
 heroCaption: A kohbar painting by Arti Kumari, built around a central lotus
 related: [regional-food-cultures, indian-philosophical-traditions]
+offers: [commission, journeys, organisations]
 ---
 Walk into a home in Mithila on the eve of a wedding and you may find women at work on a wall. They are painting the *kohbar ghar*, the room where a newly married couple will spend their first nights — and filling it with gods, goddesses, lotuses, fish and birds. What the world now calls Madhubani painting began here, as a ritual made by women for their families, long before anyone thought of it as art to sell.
 

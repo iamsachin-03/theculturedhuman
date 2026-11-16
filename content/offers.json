@@ -1,0 +1,106 @@
+[
+  {
+    "id": "organisations",
+    "label": "For organisations",
+    "title": "Culture sessions for teams",
+    "summary": "Painting hours with named artists, regional food stories and short introductions to Indian thought, for offsites, festival weeks and onboarding.",
+    "href": "/for-organisations.html",
+    "image": "madhubani-artist-dilli-haat",
+    "action": "Plan a session",
+    "form": {
+      "organisation": true,
+      "choiceLabel": "What are you interested in?",
+      "choices": ["A culture session for a team", "Festive or corporate gifting", "Schools and colleges", "A partnership or CSR project", "Something else"],
+      "messageLabel": "Tell us about your team and what you have in mind",
+      "messageHint": "Roughly how many people, online or in person, the city, and any dates."
+    }
+  },
+  {
+    "id": "commission",
+    "label": "Commission a piece",
+    "title": "Commission original work",
+    "summary": "Ask a named artist to make something for you: a painting for a new home or a gift for a wedding. The artist sets the price.",
+    "href": "/commission.html",
+    "image": "madhubani-kohbar-arti-kumari",
+    "action": "Start a commission",
+    "form": {
+      "choiceLabel": "Which tradition interests you?",
+      "choices": ["Madhubani (Mithila) painting", "Pattachitra", "Warli painting", "Not sure yet, please suggest"],
+      "messageLabel": "Describe the piece you have in mind",
+      "messageHint": "The occasion, the size or the space it is for, a rough budget and when you need it."
+    }
+  },
+  {
+    "id": "gifting",
+    "label": "Gifting",
+    "title": "Gifts with a story",
+    "summary": "Festive and corporate gift boxes from named makers, each with a card that tells their story. Made to pre-order, never mass-stocked.",
+    "href": "/gifting.html",
+    "image": "bankura-horses",
+    "action": "Ask about gifting",
+    "form": {
+      "organisation": true,
+      "organisationOptional": true,
+      "choiceLabel": "What is the occasion?",
+      "choices": ["Diwali", "Raksha Bandhan", "A wedding", "Company gifting", "Something else"],
+      "messageLabel": "Tell us what you are looking for",
+      "messageHint": "How many gifts, a budget per gift, and the date they need to arrive."
+    }
+  },
+  {
+    "id": "journeys",
+    "label": "Journeys",
+    "title": "Small-group cultural journeys",
+    "summary": "A few days with a tradition and the people who keep it, travelling slowly in a small group.",
+    "href": "/journeys.html",
+    "image": "rani-ki-vav",
+    "action": "Register interest",
+    "form": {
+      "choiceLabel": "Which journey interests you most?",
+      "choices": ["Mithila: painting at home", "Stepwells of Gujarat and Rajasthan", "Kerala at the table", "Somewhere else"],
+      "messageLabel": "Anything we should know?",
+      "messageHint": "When you could travel, who you would come with, and what you would most like to experience."
+    }
+  },
+  {
+    "id": "family-stories",
+    "label": "Family stories",
+    "title": "Keep your family's stories",
+    "summary": "We record a grandparent's memories, recipes and rituals, and turn them into a printed booklet and an audio keepsake.",
+    "href": "/family-stories.html",
+    "image": "gita-palm-leaf-malayalam",
+    "action": "Ask about family stories",
+    "form": {
+      "choiceLabel": "Is this a gift?",
+      "choices": ["Yes, for a birthday or anniversary", "No, it is for our own family", "Not sure yet"],
+      "messageLabel": "Tell us about the person whose stories you would like to keep",
+      "messageHint": "Who they are to you, where they live, the languages they speak and any date you have in mind."
+    }
+  },
+  {
+    "id": "drops",
+    "label": "Coming drops",
+    "title": "Small seasonal drops",
+    "summary": "A few makers at a time, a limited number of pieces and the full story behind each one. Join the list to hear first.",
+    "href": "/marketplace.html#drops",
+    "image": "pattachitra-painting",
+    "action": "Hear about the first drop",
+    "form": {
+      "choiceLabel": "What would you most like to see?",
+      "choices": ["Art and craft", "Home and living", "Books and ideas"],
+      "messageLabel": "Anything you would love us to find?",
+      "messageHint": "A craft, a region or a maker you admire.",
+      "messageOptional": true
+    }
+  },
+  {
+    "id": "makers",
+    "label": "For makers",
+    "form": {
+      "choiceLabel": "What do you make?",
+      "choices": ["Painting or illustration", "Textiles and embroidery", "Pottery, wood or metal", "Food", "Books and writing", "Something else"],
+      "messageLabel": "Tell us about your work",
+      "messageHint": "Your craft, where you work, how long you have practised, and a link to photographs of your work if you have one."
+    }
+  }
+]

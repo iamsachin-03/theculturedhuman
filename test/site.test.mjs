@@ -71,8 +71,29 @@ test('articles cite their sources and link each footnote to an entry', () => {
   }
 });
 
-test('the marketplace is honest that nothing is for sale yet', () => {
+test('the marketplace is honest that there is no checkout', () => {
   const html = read('marketplace.html');
-  assert.match(html, /does not take orders or payments/);
+  assert.match(html, /No online checkout yet/);
   assert.doesNotMatch(html, /add to cart|checkout now|buy now/i);
+});
+
+test('every enquiry form field has a label and the form says how details are used', () => {
+  let forms = 0;
+  for (const page of pages) {
+    const html = read(page);
+    for (const [form] of html.matchAll(/<form class="enquiry"[\s\S]*?<\/form>/g)) {
+      forms++;
+      for (const [, id] of form.matchAll(/<(?:input|select|textarea) id="([^"]+)"/g)) {
+        assert.match(form, new RegExp(`<label for="${id}">`), `${page}: #${id} has no label`);
+      }
+      assert.match(form, /only to reply to you/, `${page}: missing privacy note`);
+    }
+  }
+  assert.ok(forms >= 7, `expected at least 7 enquiry forms, found ${forms}`);
+});
+
+test('articles with offers end with a "Bring this home" block', () => {
+  const html = read('journal/madhubani-painting.html');
+  assert.match(html, /Bring this home/);
+  assert.match(html, /<a class="offer-card" href="\/commission.html">/);
 });

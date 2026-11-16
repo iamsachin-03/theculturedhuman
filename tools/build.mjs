@@ -7,11 +7,13 @@
 // Sources:
 //   src/pages/*.html        front matter + the page's <main> content
 //   content/articles/*.md   journal articles (see content/articles/README.md)
-//   content/site.json       navigation, footer, pillars, site URL
+//   content/site.json       navigation, footer, pillars, site URL, enquiry settings
+//   content/offers.json     what readers can commission, book or join, with each enquiry form
 //   public/assets/register.json   every image, with its creator and licence
 //
 // Inside pages, {{img id}}, {{figure id caption="…"}} and {{credit id}} expand
 // into responsive images and credit lines drawn from the register.
+// {{offer-cards id id …}} lists offers as cards and {{enquiry id}} renders an offer's enquiry form.
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, statSync, rmSync } from 'node:fs';
 import { join, relative, dirname, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,6 +33,23 @@ quiz.forEach((q, i) => {
     throw new Error(`content/quiz.json: question ${i + 1} needs q, options, a valid answer index and explain`);
   }
 });
+
+const offers = new Map();
+for (const [i, o] of JSON.parse(readFileSync(join(ROOT, 'content/offers.json'), 'utf8')).entries()) {
+  const where = `content/offers.json: offer ${i + 1}`;
+  if (!o.id || !o.label || !o.form?.messageLabel) throw new Error(`${where} needs id, label and form.messageLabel`);
+  if (offers.has(o.id)) throw new Error(`${where}: duplicate id "${o.id}"`);
+  offers.set(o.id, o);
+}
+
+function offer(id, where, { card = false } = {}) {
+  const o = offers.get(id);
+  if (!o) throw new Error(`${where}: unknown offer "${id}" — add it to content/offers.json first`);
+  if (card && !(o.href && o.title && o.summary && o.action && o.image)) {
+    throw new Error(`${where}: offer "${id}" needs href, title, summary, action and image to appear as a card`);
+  }
+  return o;
+}
 
 const problems = [];
 /** @type {Map<string, string>} absolute output path → file contents */
@@ -77,6 +96,11 @@ const articles = readdirSync(articleDir)
 
 const bySlug = new Map(articles.map((a) => [a.slug, a]));
 const card = (a) => t.storyCard(a, a.hero, site.pillars[a.pillar].label);
+const offerCards = (ids, where) =>
+  ids.map((id) => {
+    const o = offer(id, where, { card: true });
+    return t.offerCard(o, asset(o.image, where));
+  });
 
 for (const article of articles) {
   const [main, sourcesMd = ''] = article.body.split(/^## Sources\s*$/m);
@@ -122,7 +146,8 @@ for (const article of articles) {
       mainEntityOfPage: site.url + article.path,
     },
   };
-  emit(page, t.articleMain({ site, article, hero: article.hero, bodyHtml: rendered.html, sourcesHtml, related }), article.heroImage);
+  const offersHtml = article.offers?.length ? t.bringHome(offerCards(article.offers, article.where)) : '';
+  emit(page, t.articleMain({ site, article, hero: article.hero, bodyHtml: rendered.html, sourcesHtml, related, offers: offersHtml }), article.heroImage);
 }
 
 emit(
@@ -166,7 +191,9 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
       return t.picture(a, { sizes: opt.sizes, className: opt.class, eager: Boolean(opt.eager), alt: opt.alt });
     })
     .replace(/\{\{latest-articles(?:\s+(\d+))?\}\}/g, (_, n) => articles.slice(0, Number(n) || 3).map(card).join('\n'))
-    .replace(/\{\{quiz\}\}/g, () => t.quiz(quiz));
+    .replace(/\{\{quiz\}\}/g, () => t.quiz(quiz))
+    .replace(/\{\{offer-cards\s+([\w\s-]+)\}\}/g, (_, ids) => `<div class="offer-grid">${offerCards(ids.trim().split(/\s+/), where).join('')}</div>`)
+    .replace(/\{\{enquiry\s+([\w-]+)\}\}/g, (_, id) => t.enquiryForm(site, offer(id, where)));
   if (/\{\{/.test(main)) problems.push(`${where}: unrecognised {{…}} placeholder`);
 
   emit(

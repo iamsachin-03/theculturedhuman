@@ -1,60 +1,96 @@
 ---
 title: The Cultured Human Bazaar — Thoughtful things from India
-description: A curated discovery preview celebrating Indian makers, independent artists, craft traditions, books and experiences. Not a shop yet — no orders or payments.
+description: Commission original work from named Indian artists, give gifts with a story, and hear first about small seasonal drops. No online checkout: every path starts with a conversation.
 image: bankura-horses
 ---
 <section class="page-hero">
   <div class="container">
     <p class="eyebrow">The Cultured Human Bazaar · Discover with intention</p>
     <h1>Thoughtful things. <em>Remarkable stories.</em></h1>
-    <p class="lede">A curated discovery platform celebrating Indian makers, independent artists, craft traditions, books and experiences — with the story behind every find.</p>
+    <p class="lede">Indian makers, independent artists and craft traditions, with the story behind every piece. Commission something made for you, give a gift that means something, or wait for a small seasonal drop.</p>
   </div>
 </section>
 
 <div class="editorial-content">
-  <p class="notice"><strong>A preview, not a shop.</strong> The Bazaar does not take orders or payments yet. When it does, every listing will name its maker.</p>
+  <p class="notice"><strong>No online checkout yet.</strong> Every path below starts with a conversation, every piece names its maker, and nothing is charged until you have agreed a price.</p>
 
   <div class="section-head">
-    <p class="eyebrow">The first collections</p>
-    <h2>Bring home a little meaning.</h2>
+    <p class="eyebrow">Three ways to bring something home</p>
+    <h2>Choose how you would like to begin.</h2>
   </div>
-  <div class="market-grid">
-    <article class="market-card">
-      {{img pattachitra-painting sizes="(max-width: 860px) 100vw, 400px"}}
-      <div>
-        <p class="eyebrow">01 · Made by hand</p>
-        <h2>Art &amp; Craft</h2>
-        <p>Painting traditions, pottery, textiles, embroidery, toys and handmade objects — and the makers and communities behind them.</p>
-        {{credit pattachitra-painting}}
-      </div>
-    </article>
-    <article class="market-card">
-      {{img bankura-horses sizes="(max-width: 860px) 100vw, 400px"}}
-      <div>
-        <p class="eyebrow">02 · Spaces with soul</p>
-        <h2>Home &amp; Living</h2>
-        <p>Handloom, tableware, decor and everyday objects shaped by material, craft, function and a sense of place.</p>
-        {{credit bankura-horses}}
-      </div>
-    </article>
-    <article class="market-card">
-      {{img gita-palm-leaf-malayalam sizes="(max-width: 860px) 100vw, 400px"}}
-      <div>
-        <p class="eyebrow">03 · Ideas to keep</p>
-        <h2>Books &amp; Ideas</h2>
-        <p>Indian literature, philosophy, regional writing, journals, games and tools for curious minds.</p>
-        {{credit gita-palm-leaf-malayalam}}
-      </div>
-    </article>
-  </div>
+  {{offer-cards commission gifting drops}}
 
   <div class="section-gap"></div>
 
-  <section class="editorial-invite">
-    <p class="eyebrow">For independent makers and creators</p>
-    <h2>Good work deserves to be seen — and understood.</h2>
-    <p>We want to connect independent artisans, creators, publishers and thoughtful brands with people who value their work. We will prioritise maker stories, transparent product details, responsible sourcing claims and verified seller identities. Seller applications, listings, checkout and fulfilment will be introduced in stages.</p>
-    <p>If you are a maker and would like to hear when applications open, send us a message on Instagram.</p>
-    <a class="text-link" href="https://www.instagram.com/theculturedhuman/" rel="noopener">Message @theculturedhuman</a>
+  <section id="drops" aria-labelledby="drops-title">
+    <div class="section-head">
+      <p class="eyebrow">Coming drops</p>
+      <h2 id="drops-title">A few makers at a time.</h2>
+      <p>Each drop brings together a small number of makers around a season or a theme, with a limited number of pieces because handmade work is limited, not to create a rush. These are the collections we are building towards.</p>
+    </div>
+    <div class="market-grid">
+      <article class="market-card">
+        {{img pattachitra-painting sizes="(max-width: 860px) 100vw, 400px"}}
+        <div>
+          <p class="eyebrow">01 · Made by hand</p>
+          <h2>Art &amp; Craft</h2>
+          <p>Painting traditions, pottery, textiles, embroidery, toys and handmade objects, and the makers and communities behind them.</p>
+          {{credit pattachitra-painting}}
+        </div>
+      </article>
+      <article class="market-card">
+        {{img pochampally-handloom sizes="(max-width: 860px) 100vw, 400px"}}
+        <div>
+          <p class="eyebrow">02 · Spaces with soul</p>
+          <h2>Home &amp; Living</h2>
+          <p>Handloom, tableware, decor and everyday objects shaped by material, craft, function and a sense of place.</p>
+          {{credit pochampally-handloom}}
+        </div>
+      </article>
+      <article class="market-card">
+        {{img kabir-weaving sizes="(max-width: 860px) 100vw, 400px"}}
+        <div>
+          <p class="eyebrow">03 · Ideas to keep</p>
+          <h2>Books &amp; Ideas</h2>
+          <p>Indian literature, philosophy, regional writing, journals, games and tools for curious minds.</p>
+          {{credit kabir-weaving}}
+        </div>
+      </article>
+    </div>
+    <div class="section-gap"></div>
+    <section class="enquiry-section" aria-labelledby="drops-enquire-title">
+      <div>
+        <p class="eyebrow">Hear first</p>
+        <h2 id="drops-enquire-title">Join the list for the first drop.</h2>
+        <p>One message when a drop opens. No newsletters you did not ask for.</p>
+      </div>
+      {{enquiry drops}}
+    </section>
+  </section>
+
+  <div class="section-gap"></div>
+
+  <section class="two-col">
+    <div>
+      <p class="eyebrow">Honest commerce</p>
+      <h2>How the money is shared.</h2>
+      <a class="text-link" href="/about.html#how-we-share-money">Read the full note</a>
+    </div>
+    <ul class="promise-list">
+      <li><strong>Makers set their own prices.</strong> Our fee is added on top and shown separately.</li>
+      <li><strong>Every maker is named</strong> on the piece, its card and anywhere we share it.</li>
+      <li><strong>No imitations.</strong> We do not sell copies of a living tradition or a living artist's work.</li>
+    </ul>
+  </section>
+
+  <div class="section-gap"></div>
+
+  <section class="enquiry-section" id="makers" aria-labelledby="makers-title">
+    <div>
+      <p class="eyebrow">For independent makers and creators</p>
+      <h2 id="makers-title">Good work deserves to be seen, and understood.</h2>
+      <p>We are looking for artisans, artists, cooks, writers and small studios whose work carries a tradition forward. You set your price, your name goes on everything, and we tell your story with care.</p>
+    </div>
+    {{enquiry makers}}
   </section>
 </div>

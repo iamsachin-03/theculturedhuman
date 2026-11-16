@@ -106,6 +106,63 @@ export function quiz(questions) {
 </div>`;
 }
 
+export function offerCard(offer, asset) {
+  return `<a class="offer-card" href="${offer.href}"><div class="offer-card__media">${picture(asset, { sizes: '(max-width: 700px) 100vw, 360px', alt: '' })}</div><div class="offer-card__body"><span class="eyebrow">${e(offer.label)}</span><h3>${e(offer.title)}</h3><p>${e(offer.summary)}</p><span class="offer-card__action">${e(offer.action)}</span></div></a>`;
+}
+
+export function bringHome(cards) {
+  return `<section class="bring-home container" aria-labelledby="bring-home-title">
+<p class="eyebrow">Bring this home</p>
+<h2 id="bring-home-title">From the story to your own life.</h2>
+<div class="offer-grid">${cards.join('')}</div>
+</section>`;
+}
+
+/**
+ * An enquiry form. With site.enquiries.endpoint set it posts there; without one,
+ * site.js turns the message into an email (site.enquiries.email) or an Instagram message.
+ */
+export function enquiryForm(site, offer) {
+  const f = offer.form;
+  const id = (name) => `enq-${offer.id}-${name}`;
+  const field = (name, label, input, hint = '') =>
+    `<p class="field${name === 'message' ? ' field--wide' : ''}"><label for="${id(name)}">${label}</label>${hint ? `<span class="field__hint" id="${id(name)}-hint">${e(hint)}</span>` : ''}${input}</p>`;
+  const { endpoint = '', email = '' } = site.enquiries || {};
+  const fields = [
+    field('name', 'Your name', `<input id="${id('name')}" name="name" type="text" autocomplete="name" required>`),
+    field('email', 'Email', `<input id="${id('email')}" name="email" type="email" autocomplete="email" required>`),
+    field('phone', 'Phone or WhatsApp <span class="field__optional">(optional)</span>', `<input id="${id('phone')}" name="phone" type="tel" autocomplete="tel">`),
+    f.organisation &&
+      field(
+        'organisation',
+        `Organisation${f.organisationOptional ? ' <span class="field__optional">(optional)</span>' : ''}`,
+        `<input id="${id('organisation')}" name="organisation" type="text" autocomplete="organization"${f.organisationOptional ? '' : ' required'}>`,
+      ),
+    f.choices &&
+      field(
+        'choice',
+        e(f.choiceLabel),
+        `<select id="${id('choice')}" name="${e(f.choiceLabel)}"><option value="">Choose one</option>${f.choices.map((c) => `<option>${e(c)}</option>`).join('')}</select>`,
+      ),
+    field(
+      'message',
+      `${e(f.messageLabel)}${f.messageOptional ? ' <span class="field__optional">(optional)</span>' : ''}`,
+      `<textarea id="${id('message')}" name="message" rows="5"${f.messageHint ? ` aria-describedby="${id('message')}-hint"` : ''}${f.messageOptional ? '' : ' required'}></textarea>`,
+      f.messageHint,
+    ),
+  ].filter(Boolean);
+  return `<form class="enquiry" data-enquiry${endpoint ? ` action="${e(endpoint)}" method="post"` : ''} data-email="${e(email)}" data-dm="${e(site.instagramDm)}" data-handle="${e(site.instagramHandle)}">
+<input type="hidden" name="enquiry" value="${e(offer.label)}">
+<div class="enquiry__grid">
+${fields.join('\n')}
+</div>
+<p class="enquiry__trap" aria-hidden="true"><label>Leave this empty <input name="_gotcha" type="text" tabindex="-1" autocomplete="off"></label></p>
+<div class="enquiry__footer"><button class="btn" type="submit">Send enquiry</button><p class="enquiry__note">We use your details only to reply to you.</p></div>
+<div class="enquiry__status" role="status" aria-live="polite" tabindex="-1"></div>
+${endpoint ? '' : `<noscript><p class="enquiry__note">This form needs JavaScript. You can also <a href="${e(site.instagramDm)}" rel="noopener">message ${e(site.instagramHandle)} on Instagram</a>.</p></noscript>`}
+</form>`;
+}
+
 function formatDate(iso) {
   return new Date(iso + 'T00:00:00Z').toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 }
@@ -134,7 +191,7 @@ ${footerBlock({ site })}
 `;
 }
 
-export function articleMain({ site, article, hero, bodyHtml, sourcesHtml, related }) {
+export function articleMain({ site, article, hero, bodyHtml, sourcesHtml, related, offers = '' }) {
   const pillar = site.pillars[article.pillar];
   const main = `<article>
 <header class="article-header container">
@@ -149,6 +206,7 @@ ${bodyHtml}
 </div>
 ${sourcesHtml}
 </article>
+${offers}
 ${related.length ? `<section class="related container" aria-labelledby="related-title"><h2 id="related-title" class="eyebrow">Keep reading</h2><div class="card-grid">${related.join('')}</div></section>` : ''}
 <div class="section"></div>`;
   return main;

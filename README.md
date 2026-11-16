@@ -23,12 +23,13 @@ Node 18 or newer is all you need. There is nothing to `npm install`.
 | --- | --- |
 | `src/pages/*.html` | Hand-written pages: a short front-matter block, then the page's main content. |
 | `content/articles/*.md` | Journal articles in Markdown, with citations. See [`content/articles/README.md`](content/articles/README.md). |
-| `content/site.json` | Navigation, footer links, the six editorial pillars and the site URL. |
+| `content/site.json` | Navigation, footer links, the six editorial pillars, the site URL and where enquiries are sent. |
+| `content/offers.json` | What readers can commission, book or join: each offer's card text, page and enquiry form questions. |
 | `content/quiz.json` | Questions for the Curious Minds quiz. |
 | `public/assets/register.json` | Every image, with its creator, source, licence and alt text. |
 | `public/styles/editorial.css` | The design system: five themes, type scale, spacing and components. |
 | `public/scripts/theme-init.js` | Applies the saved theme in `<head>`, before the page paints. |
-| `public/scripts/site.js` | Theme picker, mobile menu and quiz. |
+| `public/scripts/site.js` | Theme picker, mobile menu, quiz and enquiry forms. |
 | `public/brand/` | The logo badge at several sizes, the favicon and the phone home-screen icon. `public/site.webmanifest` points to them. |
 | `tools/build.mjs` | Builds every page, the journal index, image credits, `sitemap.xml` and `robots.txt`, and checks links and images. |
 | `tools/add-commons-asset.mjs` | Downloads a Wikimedia Commons image at two sizes and records its licence in the register. |
@@ -60,6 +61,24 @@ Only use images whose licence allows reuse, and keep their credit. The build ref
 - `{{credit asset-id}}` inserts only the photo credit.
 - `{{quiz}}` inserts the Curious Minds quiz.
 - `{{latest-articles 3}}` inserts cards for the newest articles.
+- `{{offer-cards commission gifting}}` inserts cards for offers from `content/offers.json`.
+- `{{enquiry commission}}` inserts that offer's enquiry form.
+
+In an article, `offers: [commission, journeys]` in the front matter adds a "Bring this home" block after the sources.
+
+## Enquiries
+
+Every offer page ends with an enquiry form. Where the messages go is set in `content/site.json`:
+
+```json
+"enquiries": { "endpoint": "", "email": "" }
+```
+
+- **`endpoint`**: the address of a form service (for example Formspree, Basin or Web3Forms) or your own serverless function. Forms post there and readers see a thank-you message. The hidden `_gotcha` field is a spam trap that most form services recognise.
+- **`email`**: used only when there is no endpoint. Submitting opens the reader's email app with the message ready to send.
+- **Neither set** (the current state): the message is copied for the reader, with a button that opens an Instagram message to `instagramDm`.
+
+Run `npm run build` after changing these settings.
 
 ## Themes
 

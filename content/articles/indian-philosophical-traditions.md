@@ -9,6 +9,7 @@ date: 2026-11-15
 heroImage: rigveda-palm-leaf-sharada
 heroCaption: A fragment of a Rigveda manuscript in Sharada script, Bhandarkar Oriental Research Institute, Pune
 related: [madhubani-painting, regional-food-cultures]
+offers: [organisations, family-stories]
 ---
 "Indian philosophy" is often presented as a single, serene wisdom. The reality is livelier. For centuries, thinkers across the subcontinent built rival systems, wrote commentaries on commentaries and attacked one another's arguments in detail. Even the idea that there are exactly "six schools" turns out to have a history of its own.
 
