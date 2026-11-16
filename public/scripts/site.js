@@ -1,6 +1,6 @@
 // Shared behaviour for every page: theme picker, mobile menu and the Curious Minds quiz.
 (function () {
-  var THEMES = ['marigold', 'indigo', 'gulmohar', 'evening'];
+  var THEMES = ['marigold', 'haldi', 'indigo', 'gulmohar', 'evening'];
   var STORAGE_KEY = 'tch-theme';
   var root = document.documentElement;
 

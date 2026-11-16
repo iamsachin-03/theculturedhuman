@@ -26,9 +26,10 @@ Node 18 or newer is all you need. There is nothing to `npm install`.
 | `content/site.json` | Navigation, footer links, the six editorial pillars and the site URL. |
 | `content/quiz.json` | Questions for the Curious Minds quiz. |
 | `public/assets/register.json` | Every image, with its creator, source, licence and alt text. |
-| `public/styles/editorial.css` | The design system: four themes, type scale, spacing and components. |
+| `public/styles/editorial.css` | The design system: five themes, type scale, spacing and components. |
 | `public/scripts/theme-init.js` | Applies the saved theme in `<head>`, before the page paints. |
 | `public/scripts/site.js` | Theme picker, mobile menu and quiz. |
+| `public/brand/` | The logo badge at several sizes, the favicon and the phone home-screen icon. `public/site.webmanifest` points to them. |
 | `tools/build.mjs` | Builds every page, the journal index, image credits, `sitemap.xml` and `robots.txt`, and checks links and images. |
 | `tools/add-commons-asset.mjs` | Downloads a Wikimedia Commons image at two sizes and records its licence in the register. |
 | `legacy/bihar-angan/` | Unused code from an earlier project, kept for reference. Not deployed. |
@@ -62,7 +63,7 @@ Only use images whose licence allows reuse, and keep their credit. The build ref
 
 ## Themes
 
-Marigold (the default), Indigo, Gulmohar and Evening. Each one is a set of CSS custom properties on `html[data-theme]`. The reader's choice is saved in `localStorage` under `tch-theme` and applied before the first paint, so pages never flash the wrong colours. All text colour pairs meet WCAG AA contrast.
+Marigold (the default), Haldi, Indigo, Gulmohar and Evening. Haldi takes its turmeric yellow, burnt orange and leaf green from the logo. Each theme is a set of CSS custom properties on `html[data-theme]`. The reader's choice is saved in `localStorage` under `tch-theme` and applied before the first paint, so pages never flash the wrong colours. All text colour pairs meet WCAG AA contrast.
 
 ## Deployment
 

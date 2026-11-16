@@ -30,6 +30,29 @@
   color-scheme: light;
 }
 
+/* Haldi: drawn from the logo, a turmeric sky over burnt-orange earth with leaf-green lettering. */
+:root[data-theme="haldi"] {
+  --page: #FFF5D9;
+  --surface: #FFFBEC;
+  --surface-2: #FBE3A1;
+  --primary: #1E4A27;
+  --primary-2: #2F6A37;
+  --accent: #DC4F0E;
+  --accent-2: #F5B323;
+  --ink: #1C2B1C;
+  --muted: #5A5536;
+  --line: #EDD596;
+  --accent-ink: #A83A07;
+  --on-primary: #FFF6DC;
+  --band: #983507;
+  --band-ink: #FFF5DD;
+  --band-accent: #FFD35E;
+  --footer: #14281A;
+  --footer-ink: #FFF1CF;
+  --shadow: 0 1px 2px rgba(110, 60, 0, .07), 0 12px 32px rgba(110, 60, 0, .10);
+  color-scheme: light;
+}
+
 :root[data-theme="indigo"] {
   --page: #F4F0F8;
   --surface: #FCF9FF;
@@ -248,7 +271,18 @@ p { margin: 0 0 1em; }
   display: inline-flex; align-items: center; gap: .6rem; text-decoration: none; color: var(--primary);
   font: 600 .8rem/1.1 var(--sans); letter-spacing: .2em; text-transform: uppercase; white-space: nowrap;
 }
-.wordmark svg { width: 30px; height: 30px; color: var(--accent); flex-shrink: 0; }
+.wordmark img { width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; }
+.wordmark--footer { flex-direction: column; align-items: flex-start; gap: .9rem; }
+.wordmark--footer img { width: 96px; height: 96px; }
+@media (max-width: 480px) {
+  .site-header .wordmark { gap: .5rem; font-size: .72rem; letter-spacing: .12em; }
+  .site-header .wordmark img { width: 38px; height: 38px; }
+}
+/* The badge carries the name itself, so the smallest phones drop the repeated text. */
+@media (max-width: 379px) {
+  .site-header .wordmark span { display: none; }
+  .site-header .wordmark img { width: 44px; height: 44px; }
+}
 
 .primary-nav { margin-left: auto; }
 .primary-nav ul { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: clamp(.9rem, 1.4vw, 1.6rem); }
