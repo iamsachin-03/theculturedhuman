@@ -1,0 +1,38 @@
+[
+  {
+    "q": "Madhubani, or Mithila, painting grew out of a region that today spans northern Bihar and which neighbouring country?",
+    "options": ["Bhutan", "Nepal", "Bangladesh", "Myanmar"],
+    "answer": 1,
+    "explain": "The Mithila region stretches across north Bihar and south-eastern Nepal; painting traditions live on both sides of the border."
+  },
+  {
+    "q": "Warli painting, with its white stick figures on mud walls, comes from Adivasi communities chiefly in which state?",
+    "options": ["Odisha", "Assam", "Maharashtra", "Madhya Pradesh"],
+    "answer": 2,
+    "explain": "The Warli live mainly in the Thane and Palghar districts of Maharashtra, with communities across the Gujarat border."
+  },
+  {
+    "q": "Chilli is now everywhere in Indian cooking. Who first brought it to India?",
+    "options": ["Arab traders", "The Portuguese", "The Mughals", "The British"],
+    "answer": 1,
+    "explain": "Chilli comes from the Americas. Food historians, including K. T. Achaya, trace its arrival in India to Portuguese ships in the sixteenth century."
+  },
+  {
+    "q": "Which school of Indian philosophy accepted perception as the only reliable source of knowledge?",
+    "options": ["Nyāya", "Mīmāṃsā", "Sāṃkhya", "Cārvāka"],
+    "answer": 3,
+    "explain": "The Cārvāka, or Lokāyata, school rejected inference and scripture as independent sources of knowledge, trusting perception alone."
+  },
+  {
+    "q": "On India's proposal, the United Nations declared 2023 the International Year of…",
+    "options": ["Rice", "Millets", "Pulses", "Spices"],
+    "answer": 1,
+    "explain": "The UN General Assembly adopted India's proposal, which was backed by more than 70 countries, to make 2023 the International Year of Millets."
+  },
+  {
+    "q": "Rani ki Vav, the stepwell carved with hundreds of sculptures, stands in which state?",
+    "options": ["Gujarat", "Rajasthan", "Karnataka", "Telangana"],
+    "answer": 0,
+    "explain": "Rani ki Vav is in Patan, Gujarat. It dates from the eleventh century and became a UNESCO World Heritage Site in 2014."
+  }
+]

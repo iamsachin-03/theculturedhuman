@@ -1,0 +1,57 @@
+{
+  "name": "The Cultured Human",
+  "url": "https://theculturedhuman.vercel.app",
+  "tagline": "Wisdom. Culture. Conscious Living.",
+  "supportingLine": "Think deeper. Live better. Stay curious.",
+  "locale": "en_IN",
+  "defaultImage": "madhubani-kohbar-arti-kumari",
+  "instagram": "https://www.instagram.com/theculturedhuman/",
+  "nav": [
+    { "label": "Home", "href": "/" },
+    { "label": "Explore", "href": "/journal/" },
+    { "label": "Indian Culture", "href": "/culture.html" },
+    { "label": "Wisdom", "href": "/proverbs.html" },
+    { "label": "Food & Travel", "href": "/experiences.html" },
+    { "label": "Conscious Living", "href": "/conscious-living.html" },
+    { "label": "Better Self", "href": "/fitness.html" },
+    { "label": "Bazaar", "href": "/marketplace.html" },
+    { "label": "The Commons", "href": "/manch.html" }
+  ],
+  "footer": [
+    {
+      "title": "Explore",
+      "links": [
+        { "label": "The Journal", "href": "/journal/" },
+        { "label": "India, Many Cultures", "href": "/culture.html" },
+        { "label": "Wisdom of the Ages", "href": "/proverbs.html" },
+        { "label": "Food, Places & Journeys", "href": "/experiences.html" },
+        { "label": "Music, Arts & Curious Minds", "href": "/music.html" }
+      ]
+    },
+    {
+      "title": "Live & discover",
+      "links": [
+        { "label": "Conscious Living", "href": "/conscious-living.html" },
+        { "label": "The Better Self", "href": "/fitness.html" },
+        { "label": "The Bazaar", "href": "/marketplace.html" },
+        { "label": "The Commons", "href": "/manch.html" }
+      ]
+    },
+    {
+      "title": "About",
+      "links": [
+        { "label": "Our story", "href": "/about.html" },
+        { "label": "Image credits", "href": "/credits.html" },
+        { "label": "Instagram", "href": "https://www.instagram.com/theculturedhuman/" }
+      ]
+    }
+  ],
+  "pillars": {
+    "culture": { "label": "India, Many Cultures", "href": "/culture.html" },
+    "wisdom": { "label": "Wisdom of the Ages", "href": "/proverbs.html" },
+    "food-travel": { "label": "Food, Places & Journeys", "href": "/experiences.html" },
+    "conscious-living": { "label": "Conscious Living", "href": "/conscious-living.html" },
+    "better-self": { "label": "The Better Self", "href": "/fitness.html" },
+    "curious-minds": { "label": "Music, Arts & Curious Minds", "href": "/music.html" }
+  }
+}

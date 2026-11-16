@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://theculturedhuman.vercel.app/sitemap.xml
