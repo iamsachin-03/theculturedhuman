@@ -154,6 +154,29 @@ test('the portrait can be worded in Hindi, without spacing Devanagari letters ap
   }
 });
 
+test('a generation can carry its own photo, drawn only from a safe image data URL', () => {
+  const jpeg = 'data:image/jpeg;base64,' + Buffer.from('fake jpeg').toString('base64');
+  const photos = { abc123: jpeg, bad1: 'javascript:alert(1)', bad2: 'data:image/svg+xml;base64,PHN2Zz4=' };
+  const line = { generations: [{ label: 'Me', place: 'Pune', photo: 'abc123' }, { label: 'My parents', place: 'Goa', photo: 'bad1' }, { label: 'My grandparents', place: 'Agra', photo: 'bad2' }] };
+  const sides = { me: { label: 'Me', place: 'Pune', photo: 'abc123' }, sides: [{ generations: [{ label: 'My mother', place: 'Goa', photo: 'abc123' }] }, { generations: [] }] };
+  for (const { id } of Art.STYLES) {
+    const svg = Art.render(line, colours, { style: id, photos, idPrefix: 'p' });
+    assertWellFormed(svg, `${id}/photo`);
+    assert.doesNotMatch(svg, /javascript:|svg\+xml/, id);
+    const images = (svg.match(/<image /g) || []).length;
+    assert.equal(images, id === 'rings' ? 0 : 1, `${id}: one safe photo`);
+    const two = Art.render(sides, colours, { style: id, photos, idPrefix: 'q' });
+    assertWellFormed(two, `${id}/photo/sides`);
+    assert.equal((two.match(/<image /g) || []).length, id === 'rings' ? 0 : 2, `${id}: both sides`);
+    const ids = [...two.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]);
+    assert.equal(new Set(ids).size, ids.length, `${id}: unique ids`);
+    assert.doesNotMatch(Art.render(line, colours, { style: id }), /<image /, `${id}: no photos without the photo store`);
+  }
+  assert.equal(Art.clean({ me: { photo: 'abc123' } }).me.photo, 'abc123');
+  assert.equal(Art.clean({ me: { photo: '../../etc' } }).me.photo, undefined);
+  assert.equal(Art.unpack(Art.pack({ generations: [{ place: 'Pune', photo: 'abc123' }] })).saved.generations[0].photo, undefined, 'photos never travel in invite links');
+});
+
 test('the river runs from the oldest place down to you', () => {
   const svg = Art.render(family, colours, { style: 'river' });
   assert.ok(svg.indexOf('Kundapura') < svg.indexOf('Udupi') && svg.indexOf('Udupi') < svg.indexOf('Pune'));

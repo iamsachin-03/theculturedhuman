@@ -535,6 +535,13 @@ p { margin: 0 0 1em; }
 .trace-gen { position: relative; margin: 0; padding: 1rem 1.1rem 1.1rem; border: 1px solid var(--line); border-radius: var(--radius-sm); display: grid; grid-template-columns: 1.4fr 1fr; gap: .8rem 1rem; }
 .trace-gen + .trace-gen { margin-top: .9rem; }
 .trace-gen legend { padding: 0 .4rem; font: 600 .74rem/1.4 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-ink); }
+.trace-gen legend[lang="hi"] { letter-spacing: 0; text-transform: none; font-size: .88rem; }
+.trace-gen__photo { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .9rem; font-size: .86rem; }
+.trace-gen__photo img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
+.trace-gen__photo img[hidden] { display: none; }
+.trace-gen__photo-add, .trace-gen__photo-remove { padding: .2rem 0; border: 0; background: none; font: inherit; color: var(--accent-ink); text-decoration: underline; cursor: pointer; }
+.trace-gen__photo-note { flex-basis: 100%; color: var(--accent-ink); }
+.trace-gen__photo-note:empty { display: none; }
 .trace-gen__remove { position: absolute; top: -.7rem; right: .8rem; padding: .1rem .5rem; font-size: .8rem; color: var(--accent-ink); background: var(--surface); border: 0; cursor: pointer; text-decoration: underline; }
 .trace__add { justify-self: start; }
 .trace__actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.25rem; }

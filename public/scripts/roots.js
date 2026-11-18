@@ -74,6 +74,9 @@
   var placeLinks = document.querySelector('[data-place-links]');
   var shareBtn = form.querySelector('[data-share]');
   var STORAGE = 'tch-roots';
+  var PHOTOS = 'tch-roots-photos';
+  var photoStore = {};
+  try { photoStore = JSON.parse(localStorage.getItem(PHOTOS) || '{}') || {}; } catch (e) {}
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var counter = 0;
   var places = [];
@@ -151,7 +154,9 @@
 
   function setRowLabel(fs, label) {
     fs.dataset.label = label;
-    fs.querySelector('legend').textContent = label;
+    var legend = fs.querySelector('legend');
+    legend.textContent = label;
+    if (/[\u0900-\u097F]/.test(label)) legend.lang = 'hi'; else legend.removeAttribute('lang');
     var rm = fs.querySelector('.trace-gen__remove');
     if (rm) rm.setAttribute('aria-label', 'Remove ' + label);
   }
@@ -177,6 +182,7 @@
     setRowLabel(fs, g.label);
     fs.dataset.row = String(n);
     ['place', 'years', 'detail'].forEach(function (k) { fs.querySelector('[data-k="' + k + '"]').value = g[k] || ''; });
+    fs.appendChild(photoControl(fs, g.photo && photoStore[g.photo] ? g.photo : ''));
     var placeholders = [['Bengaluru', 'now', 'learning to cook my mother\'s dal'], ['Patna', '1980s', 'met at a cousin\'s wedding']];
     var ph = placeholders[Art.LABELS.en.line.indexOf(g.label) === -1 ? Art.LABELS.hi.line.indexOf(g.label) : Art.LABELS.en.line.indexOf(g.label)];
     if (ph) ['place', 'years', 'detail'].forEach(function (k, i) { fs.querySelector('[data-k="' + k + '"]').placeholder = 'e.g. ' + ph[i]; });
@@ -199,8 +205,94 @@
 
   function rowsData(box) {
     return Array.prototype.map.call(box.querySelectorAll('.trace-gen'), function (fs) {
-      return { row: fs.dataset.row, label: fs.dataset.label, place: fs.querySelector('[data-k="place"]').value, years: fs.querySelector('[data-k="years"]').value, detail: fs.querySelector('[data-k="detail"]').value };
+      return { row: fs.dataset.row, label: fs.dataset.label, place: fs.querySelector('[data-k="place"]').value, years: fs.querySelector('[data-k="years"]').value, detail: fs.querySelector('[data-k="detail"]').value, photo: fs.dataset.photo || '' };
     });
+  }
+
+  // ---------- a photo for each generation, kept in this browser only ----------
+  var PHOTO_SIZE = 360;
+
+  function keepPhotos() {
+    try { localStorage.setItem(PHOTOS, JSON.stringify(photoStore)); return true; } catch (e) { return false; }
+  }
+
+  /** A square, centred crop of the picture, small enough to keep many in the browser. */
+  function shrink(file, done, failed) {
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      var side = Math.min(img.naturalWidth, img.naturalHeight);
+      var canvas = document.createElement('canvas');
+      canvas.width = canvas.height = PHOTO_SIZE;
+      canvas.getContext('2d').drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, PHOTO_SIZE, PHOTO_SIZE);
+      URL.revokeObjectURL(url);
+      done(canvas.toDataURL('image/jpeg', 0.84));
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); failed(); };
+    img.src = url;
+  }
+
+  function photoControl(fs, id) {
+    var box = document.createElement('div');
+    box.className = 'trace-gen__photo';
+    var thumb = document.createElement('img');
+    thumb.alt = '';
+    thumb.width = thumb.height = 48;
+    var pick = document.createElement('input');
+    pick.type = 'file';
+    pick.accept = 'image/*';
+    pick.hidden = true;
+    pick.setAttribute('aria-hidden', 'true');
+    pick.tabIndex = -1;
+    var add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'trace-gen__photo-add';
+    var remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'trace-gen__photo-remove';
+    remove.textContent = 'Remove photo';
+    var note = document.createElement('span');
+    note.className = 'trace-gen__photo-note';
+    note.setAttribute('aria-live', 'polite');
+
+    function show(next) {
+      if (next) fs.dataset.photo = next; else delete fs.dataset.photo;
+      thumb.hidden = !next;
+      if (next) thumb.src = photoStore[next];
+      add.textContent = next ? 'Change photo' : 'Add a photo';
+      add.setAttribute('aria-label', (next ? 'Change the photo for ' : 'Add a photo for ') + fs.dataset.label);
+      remove.hidden = !next;
+    }
+    add.addEventListener('click', function () { pick.click(); });
+    pick.addEventListener('change', function () {
+      var file = pick.files && pick.files[0];
+      pick.value = '';
+      if (!file) return;
+      note.textContent = '';
+      shrink(file, function (dataUrl) {
+        var nextId = Math.random().toString(36).slice(2, 10);
+        photoStore[nextId] = dataUrl;
+        if (!keepPhotos()) {
+          delete photoStore[nextId];
+          note.textContent = 'There is no room for another photo in this browser.';
+          return;
+        }
+        show(nextId);
+        update();
+      }, function () { note.textContent = 'That file could not be opened as a picture.'; });
+    });
+    remove.addEventListener('click', function () {
+      show('');
+      update();
+      add.focus();
+    });
+    box.appendChild(thumb);
+    box.appendChild(add);
+    box.appendChild(remove);
+    box.appendChild(pick);
+    box.appendChild(note);
+    show(id);
+    return box;
   }
 
   function mode() {
@@ -235,6 +327,7 @@
 
   function art(data, opts) {
     opts.lang = look.lang;
+    if (opts.photos === undefined) opts.photos = photoStore;
     return Art.render(data, colours(opts.palette), opts);
   }
 
@@ -291,7 +384,11 @@
     thumbTimer = setTimeout(function () { drawThumbs(data); }, 160);
   }
 
-  function strip(g) { return { label: g.label, place: g.place, years: g.years, detail: g.detail }; }
+  function strip(g) {
+    var out = { label: g.label, place: g.place, years: g.years, detail: g.detail };
+    if (g.photo) out.photo = g.photo;
+    return out;
+  }
 
   /** Everything on the form, in the saved form (TCHRootsArt.clean): both modes, whichever is showing. */
   function snapshot() {
@@ -303,15 +400,31 @@
     };
   }
 
+  /** Forgets photos that neither this portrait nor the one put aside for an invite uses. */
+  function tidyPhotos(snap) {
+    var used = {};
+    var aside = null;
+    try { aside = JSON.parse(localStorage.getItem('tch-roots-before-invite') || 'null'); } catch (e) {}
+    [snap, aside && Art.clean(aside)].forEach(function (one) {
+      if (!one) return;
+      [one.me].concat(one.generations, one.sides[0], one.sides[1]).forEach(function (g) { if (g && g.photo) used[g.photo] = true; });
+    });
+    var changed = false;
+    Object.keys(photoStore).forEach(function (id) { if (!used[id]) { delete photoStore[id]; changed = true; } });
+    if (changed) keepPhotos();
+  }
+
   function save() {
-    try { localStorage.setItem(STORAGE, JSON.stringify(snapshot())); } catch (e) {}
+    var snap = snapshot();
+    tidyPhotos(snap);
+    try { localStorage.setItem(STORAGE, JSON.stringify(snap)); } catch (e) {}
     updateInvite();
   }
 
   function drawThumbs(data) {
     Array.prototype.forEach.call(stylesBox.querySelectorAll('.style-card'), function (card) {
       var id = card.querySelector('input').value;
-      card.querySelector('.style-card__art').innerHTML = art(data, { style: id, palette: look.palette, format: 'post', idPrefix: 'tt' + id });
+      card.querySelector('.style-card__art').innerHTML = art(data, { style: id, palette: look.palette, format: 'post', idPrefix: 'tt' + id, photos: null });
     });
   }
 

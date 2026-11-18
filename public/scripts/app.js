@@ -561,6 +561,9 @@
     try { saved = JSON.parse(localStorage.getItem(ROOTS_DEVICE) || 'null'); } catch (e) {}
     return saved ? Art.clean(saved) : null;
   }
+  function devicePhotos() {
+    try { return JSON.parse(localStorage.getItem('tch-roots-photos') || '{}') || {}; } catch (e) { return {}; }
+  }
   function hasRoots(saved) { return !!saved && Art.places(Art.fromSaved(saved)).length > 0; }
   function drawn(saved) {
     var s = Art.clean(saved);
@@ -568,12 +571,13 @@
   }
   function sameRoots(a, b) { return drawn(a) === drawn(b); }
 
+  var portraits = 0;
   function portrait(saved) {
     var p = Art.paletteById(saved.palette);
     var data = Art.fromSaved(saved);
     var label = 'Roots portrait: ' + Art.places(data).map(function (g) { return g.label + ', ' + g.place; }).join('; ') + '.';
     var box = h('div', { class: 'app-roots__art', role: 'img', 'aria-label': label, 'data-format': saved.format });
-    box.innerHTML = Art.render(data, p.c || Art.siteColours(), { style: saved.style, format: saved.format, lang: saved.lang, idPrefix: 'app-roots' });
+    box.innerHTML = Art.render(data, p.c || Art.siteColours(), { style: saved.style, format: saved.format, lang: saved.lang, idPrefix: 'app-roots' + (++portraits), photos: devicePhotos() });
     return box;
   }
 

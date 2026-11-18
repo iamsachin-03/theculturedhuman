@@ -253,6 +253,17 @@
     }
   }
 
+  /** A generation's own photo in a round frame, in place of its usual marker, when there is one. */
+  function framed(ctx, g, x, y, r, marker) {
+    var src = g && g.photo && ctx.photos && ctx.photos[g.photo];
+    if (!src || !/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(src)) return marker;
+    var id = ctx.id + 'ph' + (ctx.photoCount = (ctx.photoCount || 0) + 1);
+    var ring = ctx.dark ? ctx.c.gold : ctx.c.accent;
+    return '<g><circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + f(r + 5) + '" fill="' + (ctx.dark ? ctx.c.night : ctx.c.page) + '" stroke="' + ring + '" stroke-width="4"/>' +
+      '<clipPath id="' + id + '"><circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + f(r) + '"/></clipPath>' +
+      '<image href="' + src + '" xlink:href="' + src + '" x="' + f(x - r) + '" y="' + f(y - r) + '" width="' + f(2 * r) + '" height="' + f(2 * r) + '" preserveAspectRatio="xMidYMid slice" clip-path="url(#' + id + ')"/></g>';
+  }
+
   function rootNode(c, x, y, oldest) {
     var s = '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + (oldest ? 36 : 28) + '" fill="' + c.gold + '" fill-opacity="0.22"/>';
     if (oldest) s += '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="27" fill="none" stroke="' + c.accent + '" stroke-width="2" stroke-dasharray="4 5"/>';
@@ -416,7 +427,7 @@
     out.push(stroke('M' + f(last.x) + ' ' + f(last.y) + ' C' + f(last.x) + ' ' + f(last.y + 40) + ' ' + f(cx + 10) + ' ' + f(last.y + 60) + ' ' + f(cx - 4) + ' ' + f(last.y + 90), c.accent, 3, n));
     pts.forEach(function (p, i) {
       out.push(genOpen(i, i));
-      out.push(rootNode(c, p.x, p.y, i === n - 1 && n > 1));
+      out.push(framed(ctx, gens[i], p.x, p.y, 34, rootNode(c, p.x, p.y, i === n - 1 && n > 1)));
       out.push(sideLabel(ctx, p.x + p.side * 58, p.y, p.side, gens[i], layout, ink(c)));
       out.push('</g>');
     });
@@ -445,12 +456,12 @@
     cols.forEach(function (pts) {
       pts.forEach(function (p, i) {
         out.push(genOpen(p.key, p.order));
-        out.push(rootNode(c, p.x, p.y, i === pts.length - 1 && pts.length > 1));
+        out.push(framed(ctx, p.g, p.x, p.y, 28, rootNode(c, p.x, p.y, i === pts.length - 1 && pts.length > 1)));
         out.push(innerLabel(ctx, p.x, p.y, p.col, p.g, layout, ink(c)));
         out.push('</g>');
       });
     });
-    out.push(genOpen('me', 0) + rootNode(c, cx, meY, false) + meLabel(ctx, meY + 112, me, ink(c), false) + '</g>');
+    out.push(genOpen('me', 0) + framed(ctx, me, cx, meY, 44, rootNode(c, cx, meY, false)) + meLabel(ctx, meY + 112, me, ink(c), false) + '</g>');
     return groundY + 300;
   }
 
@@ -476,7 +487,7 @@
       var mx = tx + side * 96;
       var my = y - 26;
       out.push(stroke('M' + f(tx) + ' ' + f(y + 14) + ' Q' + f(tx + side * 42) + ' ' + f(y + 4) + ' ' + f(mx) + ' ' + f(my), c.primary, 8, n - 1 - i));
-      out.push(genOpen(i, i) + rosette(c, mx, my, i, i === 0));
+      out.push(genOpen(i, i) + framed(ctx, g, mx, my, 36, rosette(c, mx, my, i, i === 0)));
       out.push(sideLabel(ctx, mx + side * 52, my, side, g, layout, ink(c)));
       out.push('</g>');
     });
@@ -513,12 +524,12 @@
     out.push(treeGround(ctx, cx, groundY));
     cols.forEach(function (pts) {
       pts.forEach(function (p, i) {
-        out.push(genOpen(p.key, p.order) + rosette(c, p.x, p.y, i + p.col * 3, false));
+        out.push(genOpen(p.key, p.order) + framed(ctx, p.g, p.x, p.y, 28, rosette(c, p.x, p.y, i + p.col * 3, false)));
         out.push(innerLabel(ctx, p.x, p.y, p.col, p.g, flipped, ink(c)));
         out.push('</g>');
       });
     });
-    out.push(genOpen('me', 0) + rosette(c, cx, groundY - 74, 0, true) + meLabel(ctx, groundY + 94, me, ink(c), true) + '</g>');
+    out.push(genOpen('me', 0) + framed(ctx, me, cx, groundY - 74, 44, rosette(c, cx, groundY - 74, 0, true)) + meLabel(ctx, groundY + 94, me, ink(c), true) + '</g>');
     return (topY + forkY) / 2;
   }
 
@@ -544,7 +555,7 @@
     water(ctx, segs);
     pts.forEach(function (p, i) {
       var hx = p.x + p.side * ((8 + i * (34 / n)) / 2 + 40);
-      out.push(genOpen(n - 1 - i, i) + house(c, hx, p.y, i === n - 1));
+      out.push(genOpen(n - 1 - i, i) + framed(ctx, list[i], hx, p.y, 32, house(c, hx, p.y, i === n - 1)));
       out.push(sideLabel(ctx, hx + p.side * 42, p.y, p.side, list[i], layout, ink(c)));
       out.push('</g>');
     });
@@ -573,13 +584,13 @@
     cols.forEach(function (pts) {
       pts.forEach(function (p, i) {
         var hx = p.x - p.dir * ((6 + (pts.length - i) * 3) / 2 + 40);
-        out.push(genOpen(p.key, p.order) + house(c, hx, p.y, false));
+        out.push(genOpen(p.key, p.order) + framed(ctx, p.g, hx, p.y, 28, house(c, hx, p.y, false)));
         out.push(innerLabel(ctx, hx, p.y, p.col, p.g, { crowded: layout.crowded, tight: layout.tight }, ink(c)));
         out.push('</g>');
       });
     });
     var hx = cx + 64;
-    out.push(genOpen('me', 0) + house(c, hx, mergeY + 56, true));
+    out.push(genOpen('me', 0) + framed(ctx, me, hx, mergeY + 56, 30, house(c, hx, mergeY + 56, true)));
     out.push(sideLabel(ctx, hx + 42, mergeY + 56, 1, me, { crowded: true, tight: true }, ink(c)) + '</g>');
     return (srcY + mergeY) / 2;
   }
@@ -705,7 +716,7 @@
     });
     out.push(stroke('M' + pts.map(function (p) { return f(p.x) + ' ' + f(p.y); }).join(' L'), c.nightInk, 2, 0, ' stroke-opacity="0.5" stroke-linejoin="round"'));
     pts.forEach(function (p, i) {
-      out.push(genOpen(i, i) + star(ctx, p.x, p.y, 15 + i * 2.6, i === 0));
+      out.push(genOpen(i, i) + framed(ctx, gens[i], p.x, p.y, 32, star(ctx, p.x, p.y, 15 + i * 2.6, i === 0)));
       out.push(sideLabel(ctx, p.x + p.side * 46, p.y, p.side, gens[i], layout, nightInk(c)));
       out.push('</g>');
     });
@@ -724,12 +735,12 @@
     });
     cols.forEach(function (pts) {
       pts.forEach(function (p, i) {
-        out.push(genOpen(p.key, p.order) + star(ctx, p.x, p.y, 14 + i * 2.6, false));
+        out.push(genOpen(p.key, p.order) + framed(ctx, p.g, p.x, p.y, 28, star(ctx, p.x, p.y, 14 + i * 2.6, false)));
         out.push(innerLabel(ctx, p.x, p.y, p.col, p.g, layout, nightInk(c)));
         out.push('</g>');
       });
     });
-    out.push(genOpen('me', 0) + star(ctx, cx, meY, 20, true) + meLabel(ctx, meY + 104, me, nightInk(c), false) + '</g>');
+    out.push(genOpen('me', 0) + framed(ctx, me, cx, meY, 40, star(ctx, cx, meY, 20, true)) + meLabel(ctx, meY + 104, me, nightInk(c), false) + '</g>');
     return (meY + ctx.bottom) / 2 + 60;
   }
 
@@ -774,7 +785,8 @@
    *   sides[1] (father's), each from the parent back. Entries without a place are skipped.
    *   Generation is { label: string, place: string, years?: string, detail?: string }.
    * @param {{ page: string, surface: string, primary: string, accent: string, accentInk: string, gold: string, ink: string, muted: string, line: string, night?: string, nightInk?: string, water?: string }} colours
-   * @param {{ style?: string, format?: 'post' | 'story' | 'print', lang?: 'en' | 'hi', idPrefix?: string }} [opts]
+   * @param {{ style?: string, format?: 'post' | 'story' | 'print', lang?: 'en' | 'hi', idPrefix?: string, photos?: Object<string, string> }} [opts]
+   *   photos maps a generation's photo id to a data: URL of a JPEG, PNG or WebP image.
    */
   function render(data, colours, opts) {
     opts = opts || {};
@@ -782,7 +794,7 @@
     var style = styleById(opts.style).id;
     var c = complete(colours);
     var dark = style === 'stars';
-    var ctx = { W: fmt.w, H: fmt.h, c: c, id: (opts.idPrefix || 'tch') + '-', out: [], rand: seeded(style), inset: Math.round((fmt.h - 1350) * 150 / 570) };
+    var ctx = { W: fmt.w, H: fmt.h, c: c, id: (opts.idPrefix || 'tch') + '-', out: [], rand: seeded(style), inset: Math.round((fmt.h - 1350) * 150 / 570), photos: opts.photos, dark: style === 'stars' };
     var gens = places(data);
     var name = (data.name || '').trim();
     var words = langById(opts.lang);
@@ -814,7 +826,9 @@
   function str(v, max) { return typeof v === 'string' ? v.slice(0, max) : ''; }
   function cleanGen(g) {
     g = g && typeof g === 'object' ? g : {};
-    return { label: str(g.label, 60), place: str(g.place, 80), years: str(g.years, 40), detail: str(g.detail, 120) };
+    var out = { label: str(g.label, 60), place: str(g.place, 80), years: str(g.years, 40), detail: str(g.detail, 120) };
+    if (typeof g.photo === 'string' && /^[a-z0-9]{1,16}$/.test(g.photo)) out.photo = g.photo;
+    return out;
   }
   function cleanList(list, max) { return Array.isArray(list) ? list.slice(0, max).map(cleanGen) : []; }
 
