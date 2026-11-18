@@ -196,7 +196,7 @@
   },
   "backend": {
     "provider": "supabase",
-    "url": "",
+    "url": "https://biaogexcislxxzxiifib.supabase.co",
     "anonKey": "",
     "google": false
   }

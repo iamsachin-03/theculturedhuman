@@ -42,7 +42,8 @@
       Object.keys(opts.headers || {}).forEach(function (k) { headers[k] = opts.headers[k]; });
       if (opts.json !== undefined) headers['content-type'] = 'application/json';
       return (opts.auth === false ? Promise.resolve(null) : token()).then(function (t) {
-        headers.authorization = 'Bearer ' + (t || cfg.anonKey);
+        // Legacy anon keys are JWTs and double as a bearer token; newer sb_publishable_ keys are not.
+        if (t || /^eyJ/.test(cfg.anonKey)) headers.authorization = 'Bearer ' + (t || cfg.anonKey);
         return fetch(base + path, {
           method: opts.method || 'GET',
           headers: headers,
