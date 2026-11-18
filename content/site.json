@@ -194,6 +194,9 @@
       "href": "/music.html"
     }
   },
+  "analytics": {
+    "vercel": false
+  },
   "backend": {
     "provider": "supabase",
     "url": "https://biaogexcislxxzxiifib.supabase.co",

@@ -105,6 +105,15 @@ Marigold (the default), Haldi, Indigo, Gulmohar and Evening. Haldi takes its tur
 
 The `firebase.json`, `.firebaserc` and `firestore.*` files belong to the earlier Firebase project and are not used by the Vercel site.
 
+## Visit counts
+
+The site can count visits with [Vercel Web Analytics](https://vercel.com/docs/analytics), which uses no cookies and stores no personal data, so no consent banner is needed. It is off until both are done:
+
+1. In the Vercel dashboard, open the project, then **Analytics** → **Enable**.
+2. In `content/site.json`, set `"analytics": { "vercel": true }`, then build and push.
+
+Every public page then loads `/_vercel/insights/script.js`. Private pages (`noindex`, such as the archive app) never do, and the app's own addresses after `#` are never sent.
+
 ## Editorial rules
 
 - Never invent facts or quotations. Cite sources, and distinguish history from legend.

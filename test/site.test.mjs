@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { headBlock } from '../tools/lib/templates.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -137,4 +138,15 @@ test('directories with nobody listed invite the first people instead of showing 
     assert.match(read(page), new RegExp(`<div class="empty-state">[^]*?href="/join.html#${anchor}"`), page);
   }
   assert.match(read('join.html'), /id="makers"[^]*id="hosts"[^]*id="storytellers"/);
+});
+
+test('visit counts are cookie-free, off until switched on, and never on private pages', () => {
+  const site = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8'));
+  const tag = '<script src="/_vercel/insights/script.js" defer></script>';
+  const on = { ...site, analytics: { vercel: true } };
+  assert.ok(headBlock({ site: on, page: { title: 'x', path: '/x.html' } }).includes(tag));
+  assert.ok(!headBlock({ site: on, page: { title: 'x', path: '/app.html', noindex: true } }).includes(tag));
+  assert.ok(!headBlock({ site: { ...site, analytics: { vercel: false } }, page: { title: 'x', path: '/x.html' } }).includes(tag));
+  const built = pages.filter((p) => read(p).includes('/_vercel/insights/'));
+  assert.deepEqual(built, site.analytics.vercel ? pages.filter((p) => !read(p).includes('noindex')) : []);
 });

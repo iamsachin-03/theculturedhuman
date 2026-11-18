@@ -29,6 +29,8 @@ export function headBlock({ site, page, image }) {
     `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap">`,
     `<link rel="stylesheet" href="/styles/editorial.css">`,
     `<script src="/scripts/theme-init.js"></script>`,
+    // Vercel Web Analytics counts visits without cookies; it only answers once switched on for the project.
+    site.analytics && site.analytics.vercel && !page.noindex && `<script src="/_vercel/insights/script.js" defer></script>`,
     page.jsonLd && `<script type="application/ld+json">${JSON.stringify(page.jsonLd).replace(/</g, '\\u003c')}</script>`,
   ].filter(Boolean).join('\n');
 }
