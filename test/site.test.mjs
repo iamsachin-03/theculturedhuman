@@ -166,8 +166,10 @@ test('every place has a page, a point on the roots map and a contribution form t
 });
 
 test('directories with nobody listed invite the first people instead of showing an empty list', () => {
-  for (const [page, anchor] of [['marketplace.html', 'makers'], ['journeys.html', 'hosts'], ['family-stories.html', 'storytellers']]) {
-    assert.match(read(page), new RegExp(`<div class="empty-state">[^]*?href="/join.html#${anchor}"`), page);
+  for (const [page, role] of [['marketplace.html', 'maker'], ['journeys.html', 'host'], ['family-stories.html', 'storyteller']]) {
+    const html = read(page);
+    assert.match(html, new RegExp(`<div class="directory" data-listings data-role="${role}" data-url="https://[^"]+" data-key="[^"]+"><div class="empty-state">[^]*?href="/app\\.html#/offer\\?role=${role}"`), page);
+    assert.match(html, /\/scripts\/community-live\.js/, page);
   }
   assert.match(read('join.html'), /id="makers"[^]*id="hosts"[^]*id="storytellers"/);
 });

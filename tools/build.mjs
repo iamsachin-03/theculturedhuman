@@ -86,7 +86,7 @@ for (const [i, person] of people.entries()) {
   if (!placeBySlug.has(person.place)) throw new Error(`${where}: place "${person.place}" has no file in content/places`);
 }
 const withPlace = (person) => ({ ...person, placeInfo: placeBySlug.get(person.place) });
-const directory = (role) => t.directory(role, people.filter((p) => p.role === role).map(withPlace));
+const directory = (role) => t.directory(site, role, people.filter((p) => p.role === role).map(withPlace));
 
 const problems = [];
 /** @type {Map<string, string>} absolute output path → file contents */

@@ -280,7 +280,66 @@
     return c;
   }
 
+  // ---------- makers, hosts and storytellers ----------
+  var LISTING_ROLES = [
+    { id: 'maker', label: 'Maker', what: 'Paintings, crafts and keepsakes made to order', ask: 'Ask for a piece' },
+    { id: 'host', label: 'Host', what: 'Journeys back to a family\'s town or village', ask: 'Plan a journey' },
+    { id: 'storyteller', label: 'Storyteller', what: 'Recording an elder\'s stories, in their language', ask: 'Book a storyteller' },
+  ];
+  function listingRole(id) { return LISTING_ROLES.filter(function (r) { return r.id === id; })[0] || null; }
+  function listing(f) {
+    var l = {
+      role: String(f.role || ''),
+      placeSlug: String(f.placeSlug || '').trim(),
+      name: String(f.name || '').trim(),
+      summary: String(f.summary || '').trim(),
+      languages: String(f.languages || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 8),
+      link: String(f.link || '').trim() || null,
+      priceNote: String(f.priceNote || '').trim() || null,
+    };
+    if (!listingRole(l.role)) throw new Error('Please choose what you offer.');
+    if (!l.placeSlug) throw new Error('Please choose the place you work in.');
+    if (!l.name) throw new Error('Please add the name families will see.');
+    if (l.name.length > 80) throw new Error('Please keep the name under 80 characters.');
+    if (!l.summary) throw new Error('Please describe what you offer.');
+    if (l.summary.length > 600) throw new Error('Please keep the description under 600 characters.');
+    if (l.link && !/^https:\/\/\S+\.\S+$/.test(l.link)) throw new Error('Please give a link that starts with https://');
+    if (l.priceNote && l.priceNote.length > 80) throw new Error('Please keep the price guide under 80 characters.');
+    return l;
+  }
+  function bookingMessage(text) {
+    var m = String(text || '').trim();
+    if (!m) throw new Error('Please tell them what you would like.');
+    if (m.length > 5000) throw new Error('Please keep it under 5,000 characters.');
+    return m;
+  }
+  /** A quote in rupees as typed ("8,000" or "8000.50") becomes whole paise. */
+  function quote(f) {
+    var rupees = Number(String(f.rupees || '').replace(/[,\s₹]/g, ''));
+    if (!isFinite(rupees) || rupees <= 0) throw new Error('Please enter your price in rupees.');
+    if (rupees > 10000000) throw new Error('Please check the price.');
+    var reply = String(f.reply || '').trim();
+    if (reply.length > 2000) throw new Error('Please keep your note under 2,000 characters.');
+    return { pricePaise: Math.round(rupees * 100), reply: reply || null };
+  }
+  /** The same sum as platform_fee() in schema.sql. */
+  function platformFee(paise, percent) { return Math.round(paise * percent / 100); }
+  function formatRupees(paise) {
+    var r = paise / 100;
+    return '₹' + r.toLocaleString('en-IN', { minimumFractionDigits: r % 1 ? 2 : 0, maximumFractionDigits: 2 });
+  }
+  var BOOKING_STATUS = {
+    requested: { family: 'Waiting for a quote', provider: 'New request: send a quote' },
+    quoted: { family: 'Quote received: accept it to go ahead', provider: 'Quote sent: waiting for the family' },
+    accepted: { family: 'Accepted: we will email you a payment link', provider: 'Accepted: you will hear when it is paid' },
+    paid: { family: 'Paid', provider: 'Paid: you can begin' },
+    completed: { family: 'Completed', provider: 'Completed' },
+    cancelled: { family: 'Cancelled', provider: 'Cancelled' },
+  };
+
   var core = {
+    LISTING_ROLES: LISTING_ROLES, listingRole: listingRole, listing: listing, bookingMessage: bookingMessage, quote: quote,
+    platformFee: platformFee, formatRupees: formatRupees, BOOKING_STATUS: BOOKING_STATUS,
     CONTRIBUTION_KINDS: CONTRIBUTION_KINDS, contribution: contribution,
     KINDS: KINDS, ROLES: ROLES, AUDIENCES: AUDIENCES, QUESTIONS: QUESTIONS, find: find,
     canSee: canSee, canAdd: canAdd, canEdit: canEdit, audienceLabel: audienceLabel,

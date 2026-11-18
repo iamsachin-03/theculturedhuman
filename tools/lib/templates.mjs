@@ -206,7 +206,7 @@ export function layout({ site, page, image, main }) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${e(page.title)}</title>
 <meta name="description" content="${e(page.description)}">
-${page.noindex ? '<meta name="robots" content="noindex, follow">\n' : ''}${/(^|\s)app(\s|$)/.test(page.script || '') ? `<meta name="tch-backend" content="${e(JSON.stringify(site.backend || {}))}">\n` : ''}${headBlock({ site, page, image })}
+${page.noindex ? '<meta name="robots" content="noindex, follow">\n' : ''}${/(^|\s)app(\s|$)/.test(page.script || '') ? `<meta name="tch-backend" content="${e(JSON.stringify(site.backend || {}))}">\n<meta name="tch-fee" content="${site.platformFeePercent}">\n` : ''}${headBlock({ site, page, image })}
 </head>
 <body>
 ${headerBlock({ site, page })}
@@ -302,13 +302,20 @@ export function personCard(p) {
   return `<article class="person-card"><p class="eyebrow">${r.one} · <a href="${p.placeInfo.path}">${e(p.placeInfo.name)}</a></p><h3>${e(p.name)}</h3><p>${e(p.summary)}</p>${p.languages ? `<p class="person-card__meta">Speaks ${e(p.languages.join(', '))}</p>` : ''}${p.link ? `<a class="text-link" href="${e(p.link)}" rel="noopener">See their work</a>` : ''}</article>`;
 }
 
-/** Everyone with one role, or an honest empty state that invites the first of them. */
-export function directory(role, list) {
+function backendAttrs(site) {
+  return site.backend && site.backend.url ? ` data-url="${e(site.backend.url)}" data-key="${e(site.backend.anonKey)}"` : '';
+}
+
+/**
+ * Everyone with one role, or an honest empty state that invites the first of them. community-live.js
+ * adds the makers, hosts and storytellers who have listed themselves in the app and been reviewed.
+ */
+export function directory(site, role, list) {
   const r = ROLE_LABELS[role];
-  if (!list.length) {
-    return `<div class="empty-state"><p><strong>${r.none}</strong> The first ${r.join} are being invited now.</p><a class="text-link" href="/join.html#${r.join}">Join as a ${r.one.toLowerCase()}</a></div>`;
-  }
-  return `<div class="person-grid">${list.map(personCard).join('')}</div>`;
+  const inner = list.length
+    ? `<div class="person-grid">${list.map(personCard).join('')}</div>`
+    : `<div class="empty-state"><p><strong>${r.none}</strong> The first ${r.join} are being invited now.</p><a class="text-link" href="/app.html#/offer?role=${role}">List yourself as a ${r.one.toLowerCase()}</a></div>`;
+  return `<div class="directory" data-listings data-role="${role}"${backendAttrs(site)}>${inner}</div>`;
 }
 
 export function placeCards(places) {
@@ -364,7 +371,7 @@ export function communityFeed({ site, limit = 6, kind, style = 'cards', place })
   const empty = words
     ? '<p><strong>The first words will appear here.</strong> Add a word from your family that has no translation, and where it comes from.</p><a class="text-link" href="/app.html#/contribute?kind=A%20word%20or%20saying">Add your word</a>'
     : '<p><strong>Nothing shared yet.</strong> Be the first: answer this week\'s question, or add something to your place.</p><a class="text-link" href="/app.html#/contribute">Add to a place</a>';
-  const backend = site.backend && site.backend.url ? ` data-url="${e(site.backend.url)}" data-key="${e(site.backend.anonKey)}"` : '';
+  const backend = backendAttrs(site);
   return `<div class="community-feed community-feed--${words ? 'words' : 'cards'}" data-community-feed data-limit="${limit}"${kind ? ` data-kind="${e(kind)}"` : ''}${place ? ` data-place="${e(place)}"` : ''}${backend}>
 <div class="empty-state">${empty}</div>
 </div>`;
@@ -414,7 +421,7 @@ export function placeMain({ site, place, hero, carries, people, form }) {
     : `<div class="empty-state"><p><strong>Nothing shared yet.</strong> Be the first family from ${e(place.name)} to add a word, a dish or a memory.</p><a class="text-link" href="#contribute">Add to ${e(place.name)}</a></div>`;
   const listed = people.length
     ? `<div class="person-grid">${people.map(personCard).join('')}</div>`
-    : `<div class="empty-state"><p><strong>No makers, hosts or storytellers from ${e(place.name)} are listed yet.</strong> If you make, guide or record here, you could be the first.</p><a class="text-link" href="/join.html">Join the platform</a></div>`;
+    : `<div class="empty-state"><p><strong>No makers, hosts or storytellers from ${e(place.name)} are listed yet.</strong> If you make, guide or record here, you could be the first.</p><a class="text-link" href="/app.html#/offer">List yourself</a></div>`;
   return `<section class="page-hero">
 <div class="container">
 <p class="eyebrow"><a class="eyebrow--plain" href="/places/">Places</a> · ${e(place.region)}</p>
@@ -434,7 +441,7 @@ ${shared}
 </div>
 <div class="section-gap"></div>
 <div class="section-head"><p class="eyebrow">People on the platform</p><h2>Makers, hosts and storytellers from ${e(place.name)}.</h2></div>
-${listed}
+<div class="directory" data-listings data-place="${e(place.slug)}"${backendAttrs(site)}>${listed}</div>
 <div class="section-gap"></div>
 <section class="enquiry-section" id="contribute" aria-labelledby="contribute-title">
 <div><p class="eyebrow">Add to ${e(place.name)}</p><h2 id="contribute-title">What does your family carry from here?</h2><p>A word with no translation, a dish, a festival as your grandparents kept it, a song, a street that has changed. Everything is read before it appears, and credited the way you choose.</p></div>

@@ -104,3 +104,24 @@ test('a contribution names a place, has a title, words and a credit, within the 
   assert.throws(() => core.contribution({ placeSlug: 'assam', title: 't', body: 'x'.repeat(5001), credit: 'c' }), /5,000/);
   assert.throws(() => core.contribution({ placeSlug: 'assam', title: 't', body: 'b', credit: '' }), /credited/);
 });
+
+test('listings need a role, a place, a name and a description, and links must be https', () => {
+  const ok = core.listing({ role: 'host', placeSlug: 'mithila', name: ' Ravi ', summary: 'Village walks', languages: 'Maithili, Hindi,, ', priceNote: 'From ₹2,500 a day' });
+  assert.deepEqual(ok, { role: 'host', placeSlug: 'mithila', name: 'Ravi', summary: 'Village walks', languages: ['Maithili', 'Hindi'], link: null, priceNote: 'From ₹2,500 a day' });
+  assert.throws(() => core.listing({ ...ok, role: 'seller' }), /what you offer/);
+  assert.throws(() => core.listing({ ...ok, placeSlug: '' }), /place/);
+  assert.throws(() => core.listing({ ...ok, link: 'http://example.com' }), /https/);
+  assert.throws(() => core.listing({ ...ok, summary: 'x'.repeat(601) }), /600/);
+});
+
+test('quotes are typed in rupees and kept in paise, with the fee added on top', () => {
+  assert.deepEqual(core.quote({ rupees: '₹8,000', reply: ' Two weeks ' }), { pricePaise: 800000, reply: 'Two weeks' });
+  assert.equal(core.quote({ rupees: '1250.5' }).pricePaise, 125050);
+  assert.throws(() => core.quote({ rupees: '0' }), /price/);
+  assert.throws(() => core.quote({ rupees: 'eight' }), /price/);
+  assert.equal(core.platformFee(800000, 10), 80000);
+  assert.equal(core.platformFee(125055, 10), 12506);
+  assert.equal(core.formatRupees(880000), '₹8,800');
+  assert.equal(core.formatRupees(12345678), '₹1,23,456.78');
+  assert.throws(() => core.bookingMessage('  '), /what you would like/);
+});

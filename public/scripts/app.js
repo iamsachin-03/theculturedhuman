@@ -25,7 +25,8 @@
   var returnTo = location.origin + location.pathname + (store.mode === 'local' && location.search ? location.search : '');
   var MAX_BYTES = store.mode === 'supabase' ? 50 * 1024 * 1024 : 500 * 1024 * 1024;
 
-  var state = { user: null, legacy: null, people: null };
+  var state = { user: null, legacy: null, people: null, market: false };
+  var FEE_PERCENT = Number(document.querySelector('meta[name="tch-fee"]').content);
 
   // ---------- tiny DOM helpers ----------
   function h(tag, attrs) {
@@ -95,7 +96,7 @@
 
   var TABS = [
     ['#/', 'Home'], ['#/archive', 'My archive'], ['#/weekly', 'Weekly question'],
-    ['#/people', 'My people'], ['#/shared', 'Shared with me'], ['#/settings', 'Settings'],
+    ['#/people', 'My people'], ['#/shared', 'Shared with me'], ['#/requests', 'Requests', 'market'], ['#/settings', 'Settings'],
   ];
   function drawNav(route) {
     nav.textContent = '';
@@ -103,6 +104,7 @@
     if (!state.user) return;
     var ul = h('ul');
     TABS.forEach(function (t) {
+      if (t[2] === 'market' && !state.market && route !== 'requests') return;
       var current = t[0] === '#/' ? route === '' : route.indexOf(t[0].slice(2)) === 0;
       ul.appendChild(h('li', null, h('a', { href: t[0], 'aria-current': current ? 'page' : null }, t[1])));
     });
@@ -137,6 +139,7 @@
     [/^$/, home], [/^archive$/, archive], [/^entry\/new$/, editor], [/^entry\/([\w-]+)\/edit$/, editor],
     [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^people$/, people], [/^shared$/, shared],
     [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings], [/^contribute$/, contribute], [/^moderate$/, moderate],
+    [/^offer$/, offer], [/^request$/, requestForm], [/^requests$/, requests], [/^echo$/, echo],
   ];
 
   var rendering = 0;
@@ -190,9 +193,15 @@
   }
 
   function signin() {
-    var adding = parse().path === 'contribute';
-    var h1 = adding
-      ? page('Add to a place', 'Sign in with your email to write it. It takes a minute, and you choose how you are credited.')
+    var why = {
+      contribute: ['Add to a place', 'Sign in with your email to write it. It takes a minute, and you choose how you are credited.'],
+      offer: ['Offer your work', 'Sign in with your email to create your listing. Families find you through the places you work in.'],
+      request: ['Send a request', 'Sign in with your email so they can reply to you. Nothing is charged until you accept a quote.'],
+      requests: ['Your requests', 'Sign in with your email to see your requests and quotes.'],
+      echo: ['We have this too', 'Sign in with your email to say your family has this too.'],
+    }[parse().path];
+    var h1 = why
+      ? page(why[0], why[1])
       : page('Your family archive', 'Keep the stories, voices, photographs and wisdom of your family in one private place, and choose who receives each one, now or later.');
     var form = h('form', { class: 'app-card app-signin' });
     var email = h('input', { type: 'email', name: 'email', autocomplete: 'email', required: true });
@@ -1110,17 +1119,19 @@
   }
 
   function moderate() {
-    var h1 = page('Contributions to read', 'Publish what families have sent so it appears on the place page, or leave it unpublished. Check it is theirs to share and contains nothing private about someone else.');
+    var h1 = page('To read', 'Publish what families and makers have sent so it appears on the site, or leave it unpublished. Check it is theirs to share and contains nothing private about someone else.');
     return store.isModerator().then(function (yes) {
       if (!yes) {
         add(view, h('p', null, 'Only moderators can read contributions before they are published.'));
         return h1;
       }
-      return Promise.all([loadPlaces(), store.pendingContributions()]).then(function (r) {
+      return Promise.all([loadPlaces(), store.pendingContributions(), store.pendingListings(), store.bookingsToSettle()]).then(function (r) {
+        moderateMarket(r[0], r[2], r[3]);
         if (!r[1].length) {
           add(view, h('p', { class: 'app-empty' }, 'Nothing is waiting. Everything sent has been read.'));
           return h1;
         }
+        add(view, h('h2', { class: 'app-sub' }, 'Contributions'));
         add(view, h('div', { class: 'app-list' }, r[1].map(function (c) {
           function review(status) {
             return function () {
@@ -1142,6 +1153,265 @@
     });
   }
 
+  // ---------- makers, hosts and storytellers ----------
+  var LISTING_STATUS = { pending: 'Being read: not public yet', published: 'Public', paused: 'Not public' };
+  function roleLabel(id) { var r = core.listingRole(id); return r ? r.label : id; }
+  function listingCard(l, places) {
+    var p = places.filter(function (x) { return x.slug === l.placeSlug; })[0];
+    return h('article', { class: 'app-card app-listing' },
+      h('p', { class: 'eyebrow' }, roleLabel(l.role) + ' · ' + (p ? p.name : l.placeSlug)),
+      h('h2', null, l.name),
+      h('p', null, l.summary),
+      l.languages.length ? h('p', { class: 'app-listing__meta' }, 'Speaks ' + l.languages.join(', ')) : null,
+      l.priceNote ? h('p', { class: 'app-listing__meta' }, l.priceNote) : null,
+      l.link ? h('p', { class: 'app-listing__meta' }, h('a', { href: l.link, rel: 'noopener nofollow' }, 'See their work')) : null);
+  }
+  function money(b, side) {
+    if (b.pricePaise == null) return null;
+    var fee = b.feePaise != null ? b.feePaise : core.platformFee(b.pricePaise, FEE_PERCENT);
+    return h('dl', { class: 'app-quote' },
+      h('div', null, h('dt', null, side === 'provider' ? 'Your price' : side === 'moderator' ? 'Their price (pay them this)' : 'Their price'), h('dd', null, core.formatRupees(b.pricePaise))),
+      h('div', null, h('dt', null, 'Platform fee (' + FEE_PERCENT + '%)'), h('dd', null, core.formatRupees(fee))),
+      h('div', { class: 'app-quote__total' }, h('dt', null, 'Total'), h('dd', null, core.formatRupees(b.pricePaise + fee))));
+  }
+
+  function offer(_, query) {
+    return Promise.all([loadPlaces(), store.myListings()]).then(function (r) {
+      var places = r[0];
+      var mine = r[1];
+      var editing = mine.filter(function (l) { return l.id === query.get('edit'); })[0] || null;
+      var h1 = page(editing ? 'Edit your listing' : 'Offer your work', 'Makers, hosts and storytellers list themselves here. Families find you on the page of the place you work in, and send you requests. You set your price; the ' + FEE_PERCENT + '% platform fee is added on top and shown separately.');
+      if (mine.length && !editing) {
+        add(view, h('h2', { class: 'app-sub' }, 'Your listings'));
+        add(view, h('div', { class: 'app-list' }, mine.map(function (l) {
+          var card = listingCard(l, places);
+          add(card, [
+            h('p', { class: 'app-sent__status app-sent__status--' + (l.status === 'published' ? 'published' : l.status === 'paused' ? 'rejected' : 'pending') }, LISTING_STATUS[l.status] || l.status),
+            h('div', { class: 'btn-row' }, link('#/offer?edit=' + l.id, 'Edit', 'btn btn--ghost'), link('#/requests', 'Requests to you', 'text-link')),
+          ]);
+          return card;
+        })));
+        add(view, h('h2', { class: 'app-sub' }, 'Add another listing'));
+      }
+      var start = editing || { role: core.listingRole(query.get('role')) ? query.get('role') : 'maker', placeSlug: '', name: state.user.name || '', summary: '', languages: [], link: '', priceNote: '' };
+      var form = h('form', { class: 'app-card app-form app-offer' });
+      var role = options(h('select', { name: 'role' }), core.LISTING_ROLES.map(function (x) { return { id: x.id, label: x.label + ': ' + x.what }; }), start.role);
+      var place = options(h('select', { name: 'place', required: true }), [{ id: '', label: 'Choose a place' }].concat(places.map(function (p) { return { id: p.slug, label: p.name }; })), start.placeSlug);
+      var name = h('input', { name: 'name', required: true, maxlength: 80, value: start.name });
+      var summary = h('textarea', { name: 'summary', rows: 6, required: true, maxlength: 600 });
+      summary.value = start.summary;
+      var languages = h('input', { name: 'languages', maxlength: 200, value: start.languages.join(', ') });
+      var priceNote = h('input', { name: 'priceNote', maxlength: 80, value: start.priceNote || '' });
+      var site = h('input', { name: 'link', type: 'url', maxlength: 300, value: start.link || '', placeholder: 'https://' });
+      add(form, [
+        h('div', { class: 'app-form-grid' },
+          field('What do you offer?', role),
+          field('Where do you work?', place, 'Your listing appears on this place\'s page. Not listed? Add your place first from Add to a place.'),
+          field('Name families will see', name, 'Your own name, or your studio\'s.'),
+          field('Languages you speak', languages, 'Separated by commas, for example Maithili, Hindi, English.'),
+          field('What you offer', summary, 'What you make or do, the tradition it comes from, how long it usually takes, and anything a family should know before asking.', true),
+          field('Price guide (optional)', priceNote, 'For example "From ₹2,500 a session" or "Paintings from ₹6,000". You quote the real price for each request.'),
+          field('Link to your work (optional)', site, 'Instagram, a website or a portfolio.')),
+        h('p', { class: 'field__hint' }, 'A person reads every listing, and every change, before it is public. ' + (store.mode === 'local' ? 'Preview mode: this stays in this browser and nobody reads it.' : '')),
+        h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, editing ? 'Save and send to be read' : 'Send my listing to be read'), editing ? link('#/offer', 'Cancel', 'btn btn--ghost') : null),
+      ]);
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var btn = form.querySelector('[type="submit"]');
+        btn.disabled = true;
+        Promise.resolve().then(function () {
+          return store.saveListing({ id: editing && editing.id, role: role.value, placeSlug: place.value, name: name.value, summary: summary.value, languages: languages.value, priceNote: priceNote.value, link: site.value });
+        }).then(function () {
+          state.market = true;
+          flash = 'Thank you. Your listing will be public once a person has read it. You can see its status here.';
+          if (editing) location.hash = '#/offer';
+          else return render();
+        }).catch(fail).then(function () { btn.disabled = false; });
+      });
+      add(view, form);
+      return h1;
+    });
+  }
+
+  var ASK_HINT = {
+    maker: 'What you would like made, for whom, any size or deadline, and what it should remember: a place, a family name, a story.',
+    host: 'Where your family comes from, what you already know (a village, a family name, an old photograph), when you might travel and who is coming.',
+    storyteller: 'Who you would like recorded, where they live, the language they are most at ease in, and what you hope to keep.',
+  };
+  function requestForm(_, query) {
+    return Promise.all([loadPlaces(), store.listing(query.get('listing') || '')]).then(function (r) {
+      var l = r[1];
+      if (!l || l.status !== 'published') {
+        var h0 = page('Send a request', null);
+        add(view, h('p', null, 'This listing is not available. ', link('/journeys.html', 'Find a host', 'text-link'), ' · ', link('/marketplace.html', 'Find a maker', 'text-link')));
+        return h0;
+      }
+      var h1 = page('Ask ' + l.name, 'Tell them what you would like. They reply with a price; the ' + FEE_PERCENT + '% platform fee is added on top and shown separately. Nothing is charged until you accept.');
+      add(view, listingCard(l, r[0]));
+      var form = h('form', { class: 'app-card app-form app-request' });
+      var message = h('textarea', { name: 'message', rows: 8, required: true, maxlength: 5000 });
+      add(form, [
+        field('Your request', message, ASK_HINT[l.role] || '', true),
+        h('p', { class: 'field__hint' }, 'Your email is shared with them only if you accept their quote.'),
+        h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, (core.listingRole(l.role) || {}).ask || 'Send request')),
+      ]);
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var btn = form.querySelector('[type="submit"]');
+        btn.disabled = true;
+        Promise.resolve().then(function () { return store.requestBooking(l.id, message.value); }).then(function () {
+          state.market = true;
+          flash = 'Sent. ' + l.name + ' will reply here with a price.';
+          location.hash = '#/requests';
+        }).catch(fail).then(function () { btn.disabled = false; });
+      });
+      add(view, form);
+      return h1;
+    });
+  }
+
+  function bookingCard(b, places, opts) {
+    var l = b.listing || { name: 'A listing', role: '', placeSlug: '' };
+    var p = places.filter(function (x) { return x.slug === l.placeSlug; })[0];
+    var side = opts.side || b.side;
+    var card = h('article', { class: 'app-card app-booking', 'data-booking': b.id },
+      h('p', { class: 'eyebrow' }, (side === 'provider' ? 'Request to ' : roleLabel(l.role) + ' · ') + l.name + (p ? ' · ' + p.name : '')),
+      h('p', { class: 'app-sent__status app-sent__status--' + (b.status === 'cancelled' ? 'rejected' : /paid|completed|accepted/.test(b.status) ? 'published' : 'pending') }, (core.BOOKING_STATUS[b.status] || {})[side === 'moderator' ? 'provider' : side] || b.status),
+      h('p', { class: 'app-booking__message' }, b.message),
+      money(b, side),
+      b.reply ? h('p', { class: 'app-booking__reply' }, h('strong', null, l.name + ': '), b.reply) : null,
+      h('p', { class: 'field__hint' }, 'Sent ' + core.formatDate(b.createdAt)));
+    function act(change, done) {
+      return function (ev) {
+        if (ev && ev.preventDefault) ev.preventDefault();
+        store.updateBooking(b.id, change).then(function () { flash = done; return render(); }).catch(fail);
+      };
+    }
+    if (side === 'provider' && (b.status === 'requested' || b.status === 'quoted')) {
+      var form = h('form', { class: 'app-form app-quote-form' });
+      var rupees = h('input', { name: 'rupees', inputmode: 'decimal', required: true, value: b.pricePaise != null ? String(b.pricePaise / 100) : '' });
+      var reply = h('textarea', { name: 'reply', rows: 3, maxlength: 2000 });
+      reply.value = b.reply || '';
+      var preview = h('p', { class: 'field__hint', 'aria-live': 'polite' });
+      function showFee() {
+        try {
+          var q = core.quote({ rupees: rupees.value });
+          var fee = core.platformFee(q.pricePaise, FEE_PERCENT);
+          preview.textContent = 'You receive ' + core.formatRupees(q.pricePaise) + '. The family pays ' + core.formatRupees(q.pricePaise + fee) + ', including the ' + FEE_PERCENT + '% platform fee.';
+        } catch (e) { preview.textContent = 'You receive your full price. The ' + FEE_PERCENT + '% platform fee is added on top for the family.'; }
+      }
+      rupees.addEventListener('input', showFee);
+      showFee();
+      add(form, [
+        h('div', { class: 'app-form-grid' },
+          field('Your price in rupees', rupees),
+          field('A note with your quote (optional)', reply, 'What is included, how long it takes, and any questions.', true)),
+        preview,
+        h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, b.status === 'quoted' ? 'Update quote' : 'Send quote'),
+          button('I can\'t take this on', function () { act({ status: 'cancelled', reply: reply.value.trim() || null }, 'Done. The family will see that you can\'t take this on.')(); }, 'btn btn--ghost')),
+      ]);
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var q;
+        try { q = core.quote({ rupees: rupees.value, reply: reply.value }); } catch (e) { return fail(e); }
+        act({ quote: q }, 'Quote sent. The family will see it here.')();
+      });
+      add(card, form);
+    }
+    if (side === 'family' && b.status === 'quoted') {
+      add(card, h('div', { class: 'btn-row' },
+        button('Accept ' + core.formatRupees(b.pricePaise + b.feePaise), act({ status: 'accepted' }, 'Accepted. We will email you a secure payment link, and you can now reach ' + l.name + ' directly.')),
+        button('Decline', act({ status: 'cancelled' }, 'Declined.'), 'btn btn--ghost')));
+    }
+    if (side === 'family' && b.status === 'requested') {
+      add(card, h('div', { class: 'btn-row' }, button('Cancel request', act({ status: 'cancelled' }, 'Request cancelled.'), 'btn btn--ghost')));
+    }
+    if (/^(accepted|paid|completed)$/.test(b.status)) {
+      var box = h('div', { class: 'app-contacts' });
+      add(card, box);
+      store.bookingContacts(b.id).then(function (rows) {
+        add(box, rows.map(function (c) {
+          return h('p', null, (c.side === 'provider' ? 'Reach ' : 'The family: ') + c.name + ' at ', c.email ? h('a', { href: 'mailto:' + c.email }, c.email) : 'their email is not on file');
+        }));
+      }).catch(function () {});
+    }
+    if (opts.settle) add(card, opts.settle);
+    return card;
+  }
+
+  function requests() {
+    var h1 = page('Requests', 'Requests you have sent to makers, hosts and storytellers, and requests families have sent you.');
+    return Promise.all([loadPlaces(), store.myBookings(), store.myListings()]).then(function (r) {
+      var places = r[0];
+      var sent = r[1].filter(function (b) { return b.side === 'family'; });
+      var received = r[1].filter(function (b) { return b.side === 'provider'; });
+      if (r[2].length) {
+        add(view, h('h2', { class: 'app-sub' }, 'Requests to you'));
+        add(view, received.length
+          ? h('div', { class: 'app-list' }, received.map(function (b) { return bookingCard(b, places, {}); }))
+          : h('p', { class: 'app-empty' }, r[2].some(function (l) { return l.status === 'published'; }) ? 'No requests yet. Share your place\'s page so families can find you.' : 'Requests will appear here once your listing is public.'));
+      }
+      add(view, h('h2', { class: 'app-sub' }, 'Requests you sent'));
+      add(view, sent.length
+        ? h('div', { class: 'app-list' }, sent.map(function (b) { return bookingCard(b, places, {}); }))
+        : h('p', { class: 'app-empty' }, 'None yet. Find a ', link('/marketplace.html', 'maker', 'text-link'), ', a ', link('/journeys.html', 'host', 'text-link'), ' or a ', link('/family-stories.html', 'storyteller', 'text-link'), ' on the page of your family\'s place.'));
+      add(view, h('p', null, link('#/offer', r[2].length ? 'Your listings' : 'Are you a maker, host or storyteller? Offer your work', 'text-link')));
+      return h1;
+    });
+  }
+
+  function echo(_, query) {
+    var id = query.get('c') || '';
+    var back = query.get('back') || '/manch.html';
+    if (!/^\/(?!\/)[\w\/.#-]*$/.test(back)) back = '/manch.html';
+    var h1 = page('We have this too', null);
+    return store.echo(id).then(function () {
+      location.replace(back);
+      return h1;
+    });
+  }
+
+  function moderateMarket(places, listings, bookings) {
+    if (listings.length) {
+      add(view, h('h2', { class: 'app-sub' }, 'Listings to read'));
+      add(view, h('div', { class: 'app-list' }, listings.map(function (l) {
+        var card = listingCard(l, places);
+        card.classList.add('app-review');
+        function review(status) {
+          return function () {
+            store.reviewListing(l.id, status).then(function () {
+              flash = status === 'published' ? l.name + ' is public.' : l.name + ' will stay private.';
+              return render();
+            }).catch(fail);
+          };
+        }
+        add(card, h('div', { class: 'btn-row' }, button('Publish listing', review('published')), button('Not now', review('paused'), 'btn btn--ghost')));
+        return card;
+      })));
+    }
+    if (bookings.length) {
+      add(view, h('h2', { class: 'app-sub' }, 'Bookings to settle'));
+      add(view, h('p', { class: 'field__hint' }, 'Send the family a payment link for the total. When it is paid, record the payment reference; when the work is done, mark it completed. Pay the maker their price.'));
+      add(view, h('div', { class: 'app-list' }, bookings.map(function (b) {
+        var settle;
+        if (b.status === 'accepted') {
+          var ref = h('input', { name: 'paymentRef', maxlength: 120 });
+          settle = h('form', { class: 'app-form' }, field('Payment reference', ref, 'From the payment link, once the family has paid.'), h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, 'Mark as paid')));
+          settle.addEventListener('submit', function (ev) {
+            ev.preventDefault();
+            if (!ref.value.trim()) return fail(new Error('Please add the payment reference.'));
+            store.updateBooking(b.id, { status: 'paid', paymentRef: ref.value.trim() }).then(function () { flash = 'Recorded as paid.'; return render(); }).catch(fail);
+          });
+        } else {
+          settle = h('div', { class: 'btn-row' }, button('Mark as completed', function () {
+            store.updateBooking(b.id, { status: 'completed' }).then(function () { flash = 'Marked as completed.'; return render(); }).catch(fail);
+          }));
+        }
+        return bookingCard(b, places, { side: 'moderator', settle: settle });
+      })));
+    }
+  }
+
   function signedOut() {
     state.user = null;
     state.people = null;
@@ -1160,7 +1430,10 @@
       state.people = null;
       if (!state.user) return;
       restoreWanted();
-      return store.touchSeen().then(function (l) { state.legacy = l; });
+      return Promise.all([
+        store.touchSeen().then(function (l) { state.legacy = l; }),
+        Promise.all([store.myListings(), store.myBookings()]).then(function (r) { state.market = r[0].length + r[1].length > 0; }, function () {}),
+      ]);
     }).then(function () {
       try {
         if (state.user) localStorage.setItem('tch-signed-in', '1');

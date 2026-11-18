@@ -4,13 +4,13 @@
 (function (root) {
   var core = root.TCH.core;
   var SESSION = 'tch-local-session';
-  var STORES = ['users', 'people', 'entries', 'media', 'legacy', 'elders', 'roots', 'contributions'];
+  var STORES = ['users', 'people', 'entries', 'media', 'legacy', 'elders', 'roots', 'contributions', 'listings'];
   var dbPromise = null;
 
   function db() {
     if (!dbPromise) {
       dbPromise = new Promise(function (resolve, reject) {
-        var req = indexedDB.open('tch-app', 3);
+        var req = indexedDB.open('tch-app', 4);
         req.onupgradeneeded = function () {
           STORES.forEach(function (name) {
             if (req.result.objectStoreNames.contains(name)) return;
@@ -361,9 +361,31 @@
     pendingContributions: function () { return Promise.resolve([]); },
     reviewContribution: function () { return Promise.reject(new Error('Reviewing needs the real backend.')); },
 
+    myListings: function () {
+      var owner = need();
+      return all('listings').then(function (list) { return list.filter(function (l) { return l.userId === owner; }); });
+    },
+    saveListing: function (fields) {
+      var owner = need();
+      var l = core.listing(fields);
+      l.id = fields.id || uid(); l.userId = owner; l.owner = owner; l.status = 'pending'; l.createdAt = now().toISOString();
+      return put('listings', l);
+    },
+    deleteListing: function (id) { return del('listings', id); },
+    listing: function (id) { return get('listings', id).then(function (l) { return l || null; }); },
+    requestBooking: function () { return Promise.reject(new Error('Requests need the real backend. In preview mode nobody would receive them.')); },
+    myBookings: function () { return Promise.resolve([]); },
+    updateBooking: function () { return Promise.reject(new Error('Requests need the real backend.')); },
+    bookingContacts: function () { return Promise.resolve([]); },
+    pendingListings: function () { return Promise.resolve([]); },
+    reviewListing: function () { return Promise.reject(new Error('Reviewing needs the real backend.')); },
+    bookingsToSettle: function () { return Promise.resolve([]); },
+    myEchoes: function () { return Promise.resolve([]); },
+    echo: function () { return Promise.reject(new Error('Needs the real backend.')); },
+
     deleteAccount: function () {
       var owner = need();
-      return Promise.all(['entries', 'media', 'people', 'elders', 'contributions'].map(function (name) {
+      return Promise.all(['entries', 'media', 'people', 'elders', 'contributions', 'listings'].map(function (name) {
         return all(name).then(function (list) {
           return Promise.all(list.filter(function (x) { return x.owner === owner || (name === 'people' && x.userId === owner); })
             .map(function (x) { return del(name, x.id); }));

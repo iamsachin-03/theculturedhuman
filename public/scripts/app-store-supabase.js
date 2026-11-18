@@ -87,6 +87,17 @@
     function contributionOut(c) {
       return { id: c.id, placeSlug: c.place_slug, suggestedPlace: c.suggested_place, kind: c.kind, title: c.title, body: c.body, credit: c.credit, status: c.status, createdAt: c.created_at };
     }
+    function listingOut(l) {
+      return { id: l.id, userId: l.user_id, role: l.role, placeSlug: l.place_slug, name: l.name, summary: l.summary, languages: l.languages || [], link: l.link, priceNote: l.price_note, status: l.status, createdAt: l.created_at };
+    }
+    function bookingOut(b) {
+      var l = b.listings ? listingOut(b.listings) : null;
+      return {
+        id: b.id, listingId: b.listing_id, listing: l, requestedBy: b.requested_by, message: b.message, pricePaise: b.price_paise,
+        feePaise: b.platform_fee_paise, reply: b.reply, status: b.status, createdAt: b.created_at,
+        side: l && session && session.user && l.userId === session.user.id ? 'provider' : 'family',
+      };
+    }
     function personOut(p) { return { id: p.id, owner: p.owner_id, name: p.name, email: p.email, role: p.role, userId: p.user_id }; }
     function legacyOut(l) {
       if (!l || !l.owner_id) return null;
@@ -356,6 +367,86 @@
             if (!rows.length) throw new Error('Only moderators can review contributions.');
             return contributionOut(rows[0]);
           });
+      },
+
+      myListings: function () {
+        return rest('listings?user_id=eq.' + me() + '&order=created_at').then(function (rows) { return rows.map(listingOut); });
+      },
+
+      /** New listings and every edit wait for a moderator before they are public again. */
+      saveListing: function (fields) {
+        var l = core.listing(fields);
+        var row = { role: l.role, place_slug: l.placeSlug, name: l.name, summary: l.summary, languages: l.languages, link: l.link, price_note: l.priceNote };
+        var req = fields.id
+          ? rest('listings?id=eq.' + fields.id, { method: 'PATCH', json: row, headers: { prefer: 'return=representation' } })
+          : rest('listings', { method: 'POST', json: row, headers: { prefer: 'return=representation' } });
+        return req.then(function (rows) { return listingOut(rows[0]); });
+      },
+
+      deleteListing: function (id) { return rest('listings?id=eq.' + id, { method: 'DELETE' }); },
+
+      listing: function (id) {
+        return rest('listings?id=eq.' + enc(id)).then(function (rows) { return rows[0] ? listingOut(rows[0]) : null; });
+      },
+
+      requestBooking: function (listingId, message) {
+        var m = core.bookingMessage(message);
+        return rest('bookings?select=*,listings(*)', { method: 'POST', json: { listing_id: listingId, message: m }, headers: { prefer: 'return=representation' } })
+          .then(function (rows) { return bookingOut(rows[0]); }, function (err) {
+            if (/row-level security/i.test(err.message)) throw new Error('You can\'t send a request to your own listing.');
+            throw err;
+          });
+      },
+
+      /** Requests you have sent and requests sent to your listings, newest first. */
+      myBookings: function () {
+        return rest('bookings?select=*,listings(*)&order=created_at.desc').then(function (rows) {
+          var id = me();
+          return rows.filter(function (b) { return b.requested_by === id || (b.listings && b.listings.user_id === id); }).map(bookingOut);
+        });
+      },
+
+      updateBooking: function (id, change) {
+        var row = {};
+        if (change.quote) { row.price_paise = change.quote.pricePaise; row.reply = change.quote.reply; row.status = 'quoted'; }
+        if (change.status) row.status = change.status;
+        if ('reply' in change) row.reply = change.reply;
+        if (change.paymentRef) row.payment_ref = change.paymentRef;
+        return rest('bookings?id=eq.' + id + '&select=*,listings(*)', { method: 'PATCH', json: row, headers: { prefer: 'return=representation' } })
+          .then(function (rows) {
+            if (!rows.length) throw new Error('This request could not be changed.');
+            return bookingOut(rows[0]);
+          });
+      },
+
+      bookingContacts: function (id) { return rpc('booking_contacts', { booking: id }); },
+
+      pendingListings: function () {
+        return rest('listings?status=eq.pending&order=created_at').then(function (rows) { return rows.map(listingOut); });
+      },
+
+      reviewListing: function (id, status) {
+        if (status !== 'published' && status !== 'paused') throw new Error('Unknown review: ' + status);
+        return rest('listings?id=eq.' + id, { method: 'PATCH', json: { status: status }, headers: { prefer: 'return=representation' } })
+          .then(function (rows) {
+            if (!rows.length) throw new Error('Only moderators can review listings.');
+            return listingOut(rows[0]);
+          });
+      },
+
+      /** For moderators: accepted bookings waiting for a payment link, and paid ones to complete. */
+      bookingsToSettle: function () {
+        return rest('bookings?select=*,listings(*)&status=in.(accepted,paid)&order=created_at').then(function (rows) { return rows.map(bookingOut); });
+      },
+
+      myEchoes: function () {
+        if (!session) return Promise.resolve([]);
+        return rest('contribution_echoes?select=contribution_id&user_id=eq.' + me()).then(function (rows) { return rows.map(function (r) { return r.contribution_id; }); });
+      },
+
+      echo: function (contributionId, on) {
+        if (on === false) return rest('contribution_echoes?contribution_id=eq.' + enc(contributionId) + '&user_id=eq.' + me(), { method: 'DELETE' });
+        return rest('contribution_echoes', { method: 'POST', json: { contribution_id: contributionId }, headers: { prefer: 'resolution=ignore-duplicates,return=minimal' } });
       },
 
       deleteAccount: function () {
