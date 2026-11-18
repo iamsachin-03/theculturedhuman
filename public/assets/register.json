@@ -569,5 +569,49 @@
     "alt": "Illustration of an elder's hands passing a ribbon-tied family book to a child's reaching hands, old photographs and marigold petals around them",
     "usage": "Original work made for The Cultured Human",
     "addedAt": "2026-11-18"
+  },
+  {
+    "id": "places-journey-map",
+    "kind": "illustration",
+    "files": {
+      "800": "/assets/illustrations/places-journey-map-800.jpg",
+      "1600": "/assets/illustrations/places-journey-map-1600.jpg"
+    },
+    "width": 1536,
+    "height": 1024,
+    "subject": "A family's journey across India",
+    "region": "",
+    "artForm": "Illustration",
+    "creator": "The Cultured Human",
+    "source": "Original illustration",
+    "sourceUrl": "/about.html",
+    "licence": "© The Cultured Human",
+    "licenceUrl": "",
+    "attribution": "Illustration: The Cultured Human",
+    "alt": "Illustrated map of a family's journey along a dotted path from a riverside temple town and a paddy-field village to a desert town, a palm-fringed coast and a modern city",
+    "usage": "Original work made for The Cultured Human",
+    "addedAt": "2026-11-18"
+  },
+  {
+    "id": "book-of-stories",
+    "kind": "illustration",
+    "files": {
+      "800": "/assets/illustrations/book-of-stories-800.jpg",
+      "1600": "/assets/illustrations/book-of-stories-1600.jpg"
+    },
+    "width": 1536,
+    "height": 1024,
+    "subject": "A book of stories",
+    "region": "",
+    "artForm": "Illustration",
+    "creator": "The Cultured Human",
+    "source": "Original illustration",
+    "sourceUrl": "/about.html",
+    "licence": "© The Cultured Human",
+    "licenceUrl": "",
+    "attribution": "Illustration: The Cultured Human",
+    "alt": "Illustration of an open book with small scenes rising from its pages: a weaver at a loom, a family cooking together, musicians, a painter decorating a wall and a boat on a river",
+    "usage": "Original work made for The Cultured Human",
+    "addedAt": "2026-11-18"
   }
 ]
