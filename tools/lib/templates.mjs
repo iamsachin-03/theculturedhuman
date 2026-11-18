@@ -84,7 +84,7 @@ export function picture(asset, { sizes = '100vw', className = '', eager = false,
 }
 
 export function creditLine(asset) {
-  return `<span class="credit">Photo: <a href="${e(asset.sourceUrl)}" rel="noopener">${e(asset.creator)}</a>, ${e(asset.licence)}${asset.licenceUrl ? ` (<a href="${e(asset.licenceUrl)}" rel="noopener">licence</a>)` : ''}</span>`;
+  return `<span class="credit">${asset.kind === 'illustration' ? 'Illustration' : 'Photo'}: <a href="${e(asset.sourceUrl)}" rel="noopener">${e(asset.creator)}</a>, ${e(asset.licence)}${asset.licenceUrl ? ` (<a href="${e(asset.licenceUrl)}" rel="noopener">licence</a>)` : ''}</span>`;
 }
 
 export function figure(asset, captionHtml, wide) {

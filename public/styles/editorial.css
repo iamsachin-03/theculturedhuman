@@ -360,7 +360,7 @@ p { margin: 0 0 1em; }
   .home-hero__grid { grid-template-columns: 1fr; }
   .home-hero__art { order: -1; max-width: 420px; }
   .home-hero__art::before { display: none; }
-  .home-hero__art img { aspect-ratio: 1 / 1; border-radius: 160px 160px var(--radius) var(--radius); }
+  .home-hero__art img { aspect-ratio: 1 / 1; object-position: 50% 30%; border-radius: 160px 160px var(--radius) var(--radius); }
 }
 
 /* ── 7. Editorial blocks ─────────────────────────────────────────────────── */

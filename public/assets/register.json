@@ -481,5 +481,27 @@
     "alt": "A waza, a Kashmiri cook, preparing dishes for a wazwan feast over large pots",
     "usage": "Free to use with attribution under the stated licence",
     "addedAt": "2026-11-16"
+  },
+  {
+    "id": "three-generations-story",
+    "kind": "illustration",
+    "files": {
+      "800": "/assets/illustrations/three-generations-story-800.jpg",
+      "1600": "/assets/illustrations/three-generations-story-1600.jpg"
+    },
+    "width": 1024,
+    "height": 1536,
+    "subject": "Three generations sharing a story",
+    "region": "",
+    "artForm": "Illustration",
+    "creator": "The Cultured Human",
+    "source": "Original illustration",
+    "sourceUrl": "/about.html",
+    "licence": "© The Cultured Human",
+    "licenceUrl": "",
+    "attribution": "Illustration: The Cultured Human",
+    "alt": "Illustration of a grandmother telling a story while her granddaughter records her voice on a phone, old family photographs on the table and a painted tree with spreading roots behind them",
+    "usage": "Original work made for The Cultured Human",
+    "addedAt": "2026-11-18"
   }
 ]
