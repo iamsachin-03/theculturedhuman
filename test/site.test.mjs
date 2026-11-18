@@ -37,9 +37,30 @@ test('the navigation is built around the platform and marks the current page', (
   const html = read('marketplace.html');
   const nav = html.match(/<nav class="primary-nav"[\s\S]*?<\/nav>/)[0];
   const labels = [...nav.matchAll(/<a [^>]*>([^<]+)<\/a>/g)].map((m) => m[1].replace('&amp;', '&'));
-  assert.deepEqual(labels, ['Home', 'Trace Your Roots', 'Family Archive', 'Places', 'Stories', 'Keepsakes', 'Journeys', 'The Commons']);
+  assert.deepEqual(labels, ['Trace Your Roots', 'Family Archive', 'Places', 'Stories', 'Keepsakes', 'Journeys', 'The Commons', 'Plans']);
   assert.match(nav, /<a href="\/marketplace.html" aria-current="page">/);
   assert.equal((nav.match(/aria-current/g) || []).length, 1);
+  assert.match(html, /<a class="account-link" href="\/app.html" data-account-link>Sign in<\/a>/);
+});
+
+test('the homepage has four sections and leads to the archive', () => {
+  const main = read('index.html').match(/<main id="main">([\s\S]*)<\/main>/)[1];
+  assert.equal((main.match(/<section\b/g) || []).length, 4);
+  assert.match(main, /href="\/app.html">Start your family archive/);
+  for (const href of ['/trace.html', '/places/', '/journal/']) assert.ok(main.includes(`href="${href}"`), href);
+});
+
+test('the app page carries its backend settings, loads its scripts in order and is not indexed', () => {
+  const html = read('app.html');
+  const site = JSON.parse(readFileSync(new URL('../content/site.json', import.meta.url), 'utf8'));
+  const meta = html.match(/<meta name="tch-backend" content="([^"]*)">/);
+  assert.ok(meta, 'backend meta tag');
+  assert.deepEqual(JSON.parse(meta[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&')), site.backend);
+  const scripts = [...html.matchAll(/<script src="\/scripts\/([\w-]+)\.js" defer><\/script>/g)].map((m) => m[1]);
+  assert.deepEqual(scripts, ['site', 'app-core', 'app-store-local', 'app-store-supabase', 'app']);
+  assert.match(html, /<meta name="robots" content="noindex/);
+  assert.ok(!read('sitemap.xml').includes('/app.html'));
+  assert.ok(!read('index.html').includes('tch-backend'), 'only the app page carries the settings');
 });
 
 test('every image is local, registered and has alt text', () => {

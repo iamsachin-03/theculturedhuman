@@ -321,7 +321,7 @@ for (const [file, html] of outputs) {
       const target = posix.normalize(clean.startsWith('/') ? clean : base + clean);
       const onDisk = outFile(target);
       if (!outputs.has(onDisk) && !existsSync(onDisk)) problems.push(`${where}: broken link ${raw}`);
-      else if (hash && outputs.has(onDisk) && !new RegExp(`id="${hash}"`).test(outputs.get(onDisk))) {
+      else if (hash && !hash.startsWith('/') && outputs.has(onDisk) && !new RegExp(`id="${hash}"`).test(outputs.get(onDisk))) {
         problems.push(`${where}: link to missing anchor ${raw}`);
       }
       if (target.startsWith('/assets/') && /\.(jpe?g|png|webp)$/i.test(target) && !registered.has(target)) {

@@ -14,10 +14,6 @@
   },
   "nav": [
     {
-      "label": "Home",
-      "href": "/"
-    },
-    {
       "label": "Trace Your Roots",
       "href": "/trace.html"
     },
@@ -44,12 +40,20 @@
     {
       "label": "The Commons",
       "href": "/manch.html"
+    },
+    {
+      "label": "Plans",
+      "href": "/plans.html"
     }
   ],
   "footer": [
     {
       "title": "Your roots",
       "links": [
+        {
+          "label": "My archive",
+          "href": "/app.html"
+        },
         {
           "label": "Begin here",
           "href": "/roots.html"
@@ -73,10 +77,6 @@
         {
           "label": "The Roots Kit",
           "href": "/roots-kit.html"
-        },
-        {
-          "label": "Plans",
-          "href": "/plans.html"
         }
       ]
     },
@@ -150,6 +150,10 @@
           "href": "/about.html"
         },
         {
+          "label": "Plans",
+          "href": "/plans.html"
+        },
+        {
           "label": "The Commons",
           "href": "/manch.html"
         },
@@ -189,5 +193,11 @@
       "label": "Music, Arts & Curious Minds",
       "href": "/music.html"
     }
+  },
+  "backend": {
+    "provider": "supabase",
+    "url": "",
+    "anonKey": "",
+    "google": false
   }
 }

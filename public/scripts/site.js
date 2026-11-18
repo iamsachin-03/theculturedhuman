@@ -21,6 +21,13 @@
     if (e.key === STORAGE_KEY && e.newValue) applyTheme(e.newValue);
   });
 
+  var account = document.querySelector('[data-account-link]');
+  if (account) {
+    try {
+      if (localStorage.getItem('tch-signed-in') === '1') account.textContent = 'My archive';
+    } catch (e) {}
+  }
+
   var header = document.querySelector('.site-header');
   var toggle = document.querySelector('.menu-toggle');
   if (header && toggle) {

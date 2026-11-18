@@ -49,6 +49,7 @@ export function headerBlock({ site, page }) {
 <a class="wordmark" href="/" aria-label="${e(site.name)} — home">${logo(44)}<span>${e(site.name)}</span></a>
 <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span class="menu-toggle__label">Menu</span></button>
 <nav class="primary-nav" id="primary-nav" aria-label="Main"><ul>${links}</ul></nav>
+<a class="account-link" href="/app.html" data-account-link${page.path === '/app.html' ? ' aria-current="page"' : ''}>Sign in</a>
 <label class="theme-picker"><span class="theme-swatch" aria-hidden="true"></span><span>Theme</span>
 <select data-theme-picker aria-label="Colour theme">
 <option value="marigold">Marigold</option>
@@ -178,7 +179,7 @@ export function layout({ site, page, image, main }) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${e(page.title)}</title>
 <meta name="description" content="${e(page.description)}">
-${page.noindex ? '<meta name="robots" content="noindex, follow">\n' : ''}${headBlock({ site, page, image })}
+${page.noindex ? '<meta name="robots" content="noindex, follow">\n' : ''}${/(^|\s)app(\s|$)/.test(page.script || '') ? `<meta name="tch-backend" content="${e(JSON.stringify(site.backend || {}))}">\n` : ''}${headBlock({ site, page, image })}
 </head>
 <body>
 ${headerBlock({ site, page })}

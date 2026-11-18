@@ -1,10 +1,10 @@
 # The Cultured Human
 
-**Everyone comes from somewhere.** The Cultured Human is a platform where families trace where they come from, keep what their elders know for the generations after them, add to the pages of the places they come from, and find the makers, hosts and storytellers who keep those places alive. It begins in India and welcomes everyone.
+**What your family knows, kept for the ones who come next.** The Cultured Human is a private family archive: each person signs in to keep their family's stories, voice notes, videos, photographs, sayings and documents, shares each one with the people they choose, and decides what is passed on when they are gone. Around it, an open public side helps everyone trace where they come from: the roots tool, places, stories, keepsakes, journeys and The Commons. It begins in India and welcomes everyone.
 
 Live site: <https://theculturedhuman.vercel.app> · Instagram: [@theculturedhuman](https://www.instagram.com/theculturedhuman/)
 
-The site is plain HTML, CSS and a little JavaScript, built by a small Node script with **no dependencies**. Vercel runs the build and serves `public/`.
+The site is plain HTML, CSS and a little JavaScript, built by a small Node script with **no dependencies**. Vercel runs the build and serves `public/`. Signed-in archives are stored in a Supabase project (see [`backend/README.md`](backend/README.md)); until one is connected, the app runs in preview mode in the visitor's browser.
 
 ## Quick start
 
@@ -12,7 +12,7 @@ The site is plain HTML, CSS and a little JavaScript, built by a small Node scrip
 npm run dev      # build, then serve at http://localhost:4321
 npm run build    # regenerate every page in public/
 npm run check    # fail if public/ is out of date or has broken links, missing alt text or unlicensed images
-npm test         # unit and site tests (node --test)
+npm test         # unit, site and app tests (node --test)
 ```
 
 Node 18 or newer is all you need. There is nothing to `npm install`.
@@ -28,9 +28,11 @@ Node 18 or newer is all you need. There is nothing to `npm install`.
 | `content/quiz.json` | Questions for the Curious Minds quiz. |
 | `content/places/*.json` | One file per place. The build turns each into `/places/<name>.html`, adds it to the roots map and to `/places/places.json`, which the Trace tool uses to link typed places to their pages. `carries` must come from sourced stories; `contributions` are what families sent in, added after review with the credit they chose. |
 | `content/people.json` | Makers, hosts and storytellers listed on the platform (`id`, `name`, `role`, `place`, `summary`, optional `languages` and `link`). Empty until the first people are reviewed; pages show an invitation to join instead. |
-| `public/scripts/archive.js` | The family archive: stories, photo memories, wisdom, things for hard days and letters to the future, with voice notes and photographs. Stored in the browser's IndexedDB until family accounts exist; saved copies can be exported, merged and printed as a book. |
-| `public/scripts/weekly.js` | The weekly question: a year of 52 questions for an elder, sent by WhatsApp or copied into any app, with replies saved into the family archive and a calendar reminder. Remembered in the browser. |
-| `backend/` | The database for family accounts and the marketplace (Supabase/Postgres), with tested access rules. See [`backend/README.md`](backend/README.md). |
+| `src/pages/app.html`, `public/scripts/app.js` | The signed-in family archive app at `/app.html`: sign in and out, the archive with voice, video, photo and document uploads, the weekly question, the people you share with, archives shared with you, passing your archive on, export and account deletion. Screens are hash routes (`#/archive`, `#/weekly`, `#/people`, …). |
+| `public/scripts/app-core.js` | The app's rules, shared with the tests: kinds of entry, the 52 weekly questions, who may see an entry, and how an archive is passed on. `backend/schema.sql` enforces the same rules; keep them in step. |
+| `public/scripts/app-store-supabase.js` | The app's connection to Supabase (sign-in by email link or Google, the database and file storage), using `fetch` only. Used when `content/site.json` has a `backend` URL and anon key. |
+| `public/scripts/app-store-local.js` | Preview mode: the same app with everything in the browser's IndexedDB and pretend accounts on the device, used when no backend is configured. |
+| `backend/` | The database for family archives and the marketplace (Supabase/Postgres), its tested access rules and a local stand-in for development. See [`backend/README.md`](backend/README.md). |
 | `public/assets/register.json` | Every image, with its creator, source, licence and alt text. |
 | `public/styles/editorial.css` | The design system: five themes, type scale, spacing and components. |
 | `public/scripts/theme-init.js` | Applies the saved theme in `<head>`, before the page paints. |
@@ -70,7 +72,7 @@ Only use images whose licence allows reuse, and keep their credit. The build ref
 - `{{latest-articles 3}}` inserts cards for the newest articles.
 - `{{offer-cards commission gifting}}` inserts cards for offers from `content/offers.json`.
 - `{{enquiry commission}}` inserts that offer's enquiry form.
-- `script: roots` in a page's front matter loads `public/scripts/roots.js` on that page only. List several names separated by spaces (`script: archive weekly`) to load more than one.
+- `script: roots` in a page's front matter loads `public/scripts/roots.js` on that page only. List several names separated by spaces (`script: app-core app`) to load more than one, in that order. A page that loads `app` also gets the `backend` settings from `content/site.json` in a `<meta name="tch-backend">` tag.
 - `{{directory maker}}`, `{{directory host}}` and `{{directory storyteller}}` list people from `content/people.json`; `{{place-cards}}` and `{{roots-map}}` show the places.
 
 In an article, `offers: [commission, journeys]` in the front matter adds a "Bring this home" block after the sources.
@@ -88,6 +90,10 @@ Every offer page ends with an enquiry form. Where the messages go is set in `con
 - **Neither set** (the current state): the message is copied for the reader, with a button that opens an Instagram message to `instagramDm`.
 
 Run `npm run build` after changing these settings.
+
+## Accounts
+
+The header has a **Sign in** button that becomes **My archive** once someone is signed in on that device. Both lead to `/app.html`. To connect real accounts, create a Supabase project and fill in `backend` in `content/site.json`; [`backend/README.md`](backend/README.md) has the steps. Visitors who used the earlier on-device archive or weekly question are offered to bring them into their account the first time they sign in.
 
 ## Themes
 

@@ -212,16 +212,16 @@
   },
   {
     "id": "family-plan",
-    "label": "Family accounts",
+    "label": "Family plan",
     "form": {
       "choiceLabel": "What would you use first?",
       "choices": [
-        "Keeping recordings and photos safe",
-        "Inviting relatives to add their side",
+        "Room for years of video",
+        "The weekly question sent for me",
         "Printing a family book",
         "All of these"
       ],
-      "messageLabel": "Anything you would like family accounts to do?",
+      "messageLabel": "Anything you would like the Family plan to do?",
       "messageOptional": true
     }
   }

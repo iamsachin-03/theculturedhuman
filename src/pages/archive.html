@@ -1,130 +1,75 @@
 ---
 title: Your family archive — The Cultured Human
-description: Keep what lives only in memory for the generations after you: favourite tales, photographs and the moments behind them, wisdom and proverbs, what helps on hard days, and letters to the future.
+description: A private archive for your family's stories, voice notes, videos, photographs, sayings and documents. Share with the people you choose, leave things for later, and decide what is passed on.
 image: gita-palm-leaf-malayalam
-script: archive weekly
 ---
 <section class="page-hero">
   <div class="container">
     <p class="eyebrow">Family archive</p>
     <h1>What you know, <em>kept for those who come next.</em></h1>
-    <p class="lede">Our photos are in the cloud, on hard disks and in albums. But the stories behind them, the tales we were told, the sayings that steadied us and the way a grandparent laughed live only in our memories. Keep them here, in your own words and voice, for the generations after you.</p>
+    <p class="lede">Our photos are in the cloud, on hard disks and in albums. But the stories behind them, the tales we were told, the sayings that steadied us and the way a grandparent laughed live only in our memories. Keep them in your own private archive, in your family's words and voices.</p>
+    <div class="btn-row"><a class="btn" href="/app.html">Open your archive</a><a class="btn btn--ghost" href="/app.html#/weekly">Start the weekly question</a></div>
   </div>
 </section>
 
 <div class="editorial-content">
-  <p class="notice"><strong>Family accounts are coming.</strong> Until then, your archive is saved in this browser on this device. Use <em>Save a copy</em> to keep a backup or to send it to a relative. <a href="/plans.html">About family accounts</a>.</p>
-
-  <section class="weekly" id="weekly" data-weekly aria-labelledby="weekly-title">
-    <div class="weekly__intro">
-      <p class="eyebrow">The weekly question</p>
-      <h2 id="weekly-title">One question a week. <em>A year of their voice.</em></h2>
-      <p>Send an elder one question each week on WhatsApp. They reply with a voice note, in whichever language feels right, whenever they like. You keep the reply here. Fifty-two weeks later, you have a year of their stories, sayings and wisdom, enough for a book.</p>
-      <ol class="weekly__how">
-        <li>Tell us who you're asking.</li>
-        <li>Send this week's question with one tap.</li>
-        <li>Save their voice note when it arrives.</li>
-      </ol>
-    </div>
-    <div class="weekly__panel">
-      <form class="weekly__setup" data-weekly-setup aria-labelledby="weekly-setup-title">
-        <h3 id="weekly-setup-title" class="archive__heading">Who will you ask?</h3>
-        <p class="field"><label for="wk-name">Their name, as you call them</label><input id="wk-name" name="name" type="text" maxlength="40" required placeholder="e.g. Nani"></p>
-        <p class="field"><label for="wk-relation">Who they are to you <span class="field__optional">(optional)</span></label><input id="wk-relation" name="relation" type="text" maxlength="40" placeholder="e.g. my grandmother"></p>
-        <p class="field"><label for="wk-phone">Their WhatsApp number <span class="field__optional">(optional)</span></label><input id="wk-phone" name="phone" type="tel" maxlength="20" autocomplete="off" aria-describedby="wk-phone-hint" placeholder="+91 98765 43210"><span class="field__hint" id="wk-phone-hint">With the country code. Leave it empty to choose the chat in WhatsApp yourself.</span></p>
-        <p class="field"><label for="wk-day">Which day will you send it?</label><select id="wk-day" name="day"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></p>
-        <p class="field field--wide"><label for="wk-from">Your name, to sign the questions <span class="field__optional">(optional)</span></label><input id="wk-from" name="from" type="text" maxlength="40" placeholder="e.g. Riya"></p>
-        <div class="weekly__actions"><button class="btn" type="submit">Start the weekly question</button><button class="trace__clear" type="button" data-weekly-cancel hidden>Cancel</button></div>
-        <p class="enquiry__note">Names and numbers stay in this browser. Nothing is sent to us.</p>
-      </form>
-      <div class="weekly__card" data-weekly-card hidden>
-        <div class="weekly__elders" data-weekly-elders role="group" aria-label="Who you are asking"></div>
-        <p class="eyebrow" data-weekly-week></p>
-        <h3 tabindex="-1">This week's question</h3>
-        <p class="field field--wide"><label for="wk-message">Your message <span class="field__optional">(change the words or translate it)</span></label><textarea id="wk-message" rows="8" data-weekly-message></textarea></p>
-        <div class="weekly__actions">
-          <a class="btn" href="https://wa.me/" target="_blank" rel="noopener" data-weekly-whatsapp>Send on WhatsApp</a>
-          <button class="btn btn--ghost" type="button" data-weekly-copy>Copy message</button>
-        </div>
-        <p class="weekly__asked" data-weekly-asked></p>
-        <div class="weekly__actions">
-          <button class="btn btn--ghost" type="button" data-weekly-save>Save their answer</button>
-          <button class="trace__clear" type="button" data-weekly-skip>Skip this question</button>
-        </div>
-        <div class="weekly__progress"><label for="wk-progress" data-weekly-answered></label><progress id="wk-progress" data-weekly-progress></progress></div>
-        <div class="weekly__more">
-          <button class="trace__clear" type="button" data-weekly-reminder>Add a weekly reminder to my calendar</button>
-          <button class="trace__clear" type="button" data-weekly-add>Ask someone else too</button>
-          <button class="trace__clear" type="button" data-weekly-stop>Stop</button>
-        </div>
-      </div>
-      <p class="archive__status" data-weekly-status role="status" aria-live="polite"></p>
-    </div>
-  </section>
-
-  <div class="section-gap"></div>
-
-  <div class="archive" data-archive>
-    <aside class="archive__side" aria-labelledby="archive-side-title">
-      <h2 id="archive-side-title" class="archive__heading">Your archive</h2>
-      <div class="archive__roots" data-archive-roots></div>
-      <p class="archive__count" data-archive-count aria-live="polite"></p>
-      <div class="archive__tools">
-        <button class="btn btn--ghost" type="button" data-archive-export>Save a copy</button>
-        <label class="btn btn--ghost archive__import">Add from a copy<input type="file" accept="application/json,.json" data-archive-import></label>
-        <button class="btn btn--ghost" type="button" data-archive-invite>Invite a relative</button>
-        <button class="btn btn--ghost" type="button" data-archive-print>Print as a book</button>
-      </div>
-      <p class="archive__status" data-archive-status role="status" aria-live="polite"></p>
-    </aside>
-
-    <div class="archive__main">
-      <form class="archive-form" data-archive-form aria-labelledby="archive-form-title">
-        <h2 id="archive-form-title" class="archive__heading">Add something to keep</h2>
-        <p class="field"><label for="arc-kind">What are you keeping?</label><select id="arc-kind" name="kind"></select></p>
-        <p class="field"><label for="arc-prompt">Start from a question <span class="field__optional">(optional)</span></label><select id="arc-prompt" name="prompt"></select></p>
-        <p class="field field--wide"><label for="arc-title">A title</label><input id="arc-title" name="title" type="text" maxlength="80" required placeholder="e.g. Nani's house in Darbhanga"></p>
-        <p class="field"><label for="arc-teller">From <span class="field__optional">(optional)</span></label><input id="arc-teller" name="teller" type="text" maxlength="40" placeholder="e.g. Nani"></p>
-        <p class="field"><label for="arc-for">For <span class="field__optional">(optional)</span></label><input id="arc-for" name="forWhom" type="text" maxlength="60" placeholder="e.g. my grandchildren"></p>
-        <p class="field"><label for="arc-place">Where <span class="field__optional">(optional)</span></label><input id="arc-place" name="place" type="text" maxlength="40"></p>
-        <p class="field" data-only="letter"><label for="arc-open">Open when… <span class="field__optional">(optional)</span></label><input id="arc-open" name="openWhen" type="text" maxlength="60" placeholder="e.g. when you leave home"></p>
-        <p class="field field--wide"><label for="arc-text">In their own words <span class="field__optional">(optional)</span></label><textarea id="arc-text" name="text" rows="6"></textarea></p>
-        <div class="archive-form__media">
-          <div class="archive-voice" data-voice>
-            <p class="archive-voice__label">Voice note <span class="field__optional">(optional)</span></p>
-            <div class="archive-voice__controls">
-              <button class="btn btn--ghost" type="button" data-record>Record</button>
-              <label class="archive-voice__upload">or choose a file<input type="file" accept="audio/*,.opus,.ogg,.m4a" data-audio-file></label>
-            </div>
-            <p class="field__hint" data-voice-status aria-live="polite">Ask first if you may record.</p>
-            <audio controls hidden data-voice-preview></audio>
-          </div>
-          <p class="field"><label for="arc-photo">A photograph <span class="field__optional">(optional)</span></label><input id="arc-photo" name="photo" type="file" accept="image/*"></p>
-        </div>
-        <div class="archive-form__footer"><button class="btn" type="submit">Keep it</button></div>
-      </form>
-
-      <section class="archive-list" aria-labelledby="archive-list-title">
-        <h2 id="archive-list-title" class="archive__heading">What your family has kept</h2>
-        <div data-archive-list></div>
-      </section>
-    </div>
-  </div>
-  <noscript><p class="notice">The family archive needs JavaScript. You can still use the <a href="/roots.html#ask">twelve questions</a> with your phone's voice recorder.</p></noscript>
-
-  <div class="section-gap"></div>
-
   <div class="section-head">
     <p class="eyebrow">What to keep</p>
     <h2>Everything in between the photographs.</h2>
   </div>
   <ol class="steps steps--five">
-    <li><h3>Stories and tales</h3><p>The tale you asked for every night. How they met. Why the family moved.</p></li>
-    <li><h3>Moments together</h3><p>A photograph, and what was happening just outside the frame.</p></li>
+    <li><h3>Stories and tales</h3><p>The tale you asked for every night. How they met. Why the family moved. Written, or in their own voice.</p></li>
+    <li><h3>Moments together</h3><p>Photographs and videos, and what was happening just outside the frame.</p></li>
     <li><h3>Wisdom and sayings</h3><p>The proverb your grandmother repeated, and what she meant by it.</p></li>
     <li><h3>For hard days</h3><p>What helped them stay calm, grounded and confident when life was uncertain.</p></li>
     <li><h3>Letters to the future</h3><p>Words for someone not yet grown, or not yet born: open when you leave home, open when you feel lost.</p></li>
   </ol>
+  <p>Old certificates, letters, land records and family documents can be kept too, with the story of what they mean.</p>
+
+  <div class="section-gap"></div>
+
+  <section class="weekly" id="weekly" aria-labelledby="weekly-title">
+    <div class="weekly__intro">
+      <p class="eyebrow">The weekly question</p>
+      <h2 id="weekly-title">One question a week. <em>A year of their voice.</em></h2>
+      <p>Send an elder one question each week on WhatsApp. They reply with a voice note, in whichever language feels right, whenever they like. You keep the reply in your archive. Fifty-two weeks later, you have a year of their stories, sayings and wisdom, enough for a book.</p>
+      <a class="btn" href="/app.html#/weekly">Start the weekly question</a>
+    </div>
+    <ol class="weekly__how">
+      <li>Tell us who you're asking.</li>
+      <li>Send this week's question with one tap.</li>
+      <li>Keep their voice note when it arrives.</li>
+    </ol>
+  </section>
+
+  <div class="section-gap"></div>
+
+  <div class="section-head">
+    <p class="eyebrow">Who sees what</p>
+    <h2>You choose, for every single entry.</h2>
+  </div>
+  <dl class="audience-list">
+    <dt>Only me</dt><dd>Stays private forever, even after your archive is passed on.</dd>
+    <dt>My family</dt><dd>Everyone you have added as family, as soon as you keep it. Family who can add may keep their own stories in your archive too.</dd>
+    <dt>Specific people</dt><dd>Only the people you choose.</dd>
+    <dt>Specific people, on a date</dt><dd>A letter for a granddaughter's eighteenth birthday opens on that day, and not before.</dd>
+    <dt>When my archive is passed on</dt><dd>Nobody sees it until then. Then your beloved ones, or the people you chose.</dd>
+  </dl>
+
+  <div class="section-gap"></div>
+
+  <section class="two-col">
+    <div>
+      <p class="eyebrow">Passing it on</p>
+      <h2>Nothing is passed on while you are still here.</h2>
+    </div>
+    <ul class="promise-list">
+      <li><strong>Choose a legacy contact,</strong> someone you trust to tell us when you have died.</li>
+      <li><strong>We wait before anything is passed on,</strong> 30 days by default. If you sign in during that time, it is cancelled.</li>
+      <li><strong>If you go quiet for a long time,</strong> we send you reminders first, and only then ask your legacy contact.</li>
+      <li><strong>"Only me" stays private,</strong> and letters with a date still wait for their day.</li>
+    </ul>
+  </section>
 
   <div class="section-gap"></div>
 
