@@ -974,3 +974,13 @@ p { margin: 0 0 1em; }
   .menu-toggle__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .account-link { padding-inline: .85rem; font-size: .82rem; }
 }
+
+/* ---------- adding to a place ---------- */
+.contribute-cta { display: flex; flex-direction: column; align-items: flex-start; gap: .9rem; }
+.contribute-other { width: 100%; margin-top: .5rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+.contribute-other summary { cursor: pointer; font-weight: 600; color: var(--primary); }
+.contribute-other[open] summary { margin-bottom: 1rem; }
+.app-sent h3 { margin-top: 0; }
+.app-sent__status { font-size: .9rem; font-weight: 600; color: var(--muted); }
+.app-sent__status--published { color: var(--primary); }
+.app-review__body { white-space: pre-line; }

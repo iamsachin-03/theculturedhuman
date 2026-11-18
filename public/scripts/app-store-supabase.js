@@ -84,6 +84,9 @@
       var meta = u.user_metadata || {};
       return { id: u.id, email: u.email, name: meta.display_name || meta.full_name || meta.name || (u.email || '').split('@')[0] };
     }
+    function contributionOut(c) {
+      return { id: c.id, placeSlug: c.place_slug, suggestedPlace: c.suggested_place, kind: c.kind, title: c.title, body: c.body, credit: c.credit, status: c.status, createdAt: c.created_at };
+    }
     function personOut(p) { return { id: p.id, owner: p.owner_id, name: p.name, email: p.email, role: p.role, userId: p.user_id }; }
     function legacyOut(l) {
       if (!l || !l.owner_id) return null;
@@ -326,6 +329,33 @@
       saveRoots: function (data) {
         return rest('roots?on_conflict=owner_id', { method: 'POST', json: { owner_id: me(), data: data }, headers: { prefer: 'resolution=merge-duplicates,return=minimal' } })
           .then(function () { return data; });
+      },
+
+      contribute: function (fields) {
+        var c = core.contribution(fields);
+        return rest('place_contributions', {
+          method: 'POST', headers: { prefer: 'return=representation' },
+          json: { place_slug: c.placeSlug, suggested_place: c.suggestedPlace, kind: c.kind, title: c.title, body: c.body, credit: c.credit },
+        }).then(function (rows) { return contributionOut(rows[0]); });
+      },
+
+      myContributions: function () {
+        return rest('place_contributions?submitted_by=eq.' + me() + '&order=created_at.desc').then(function (rows) { return rows.map(contributionOut); });
+      },
+
+      isModerator: function () { return rpc('is_moderator').then(function (r) { return r === true; }); },
+
+      pendingContributions: function () {
+        return rest('place_contributions?status=eq.pending&order=created_at').then(function (rows) { return rows.map(contributionOut); });
+      },
+
+      reviewContribution: function (id, status) {
+        if (status !== 'published' && status !== 'rejected') throw new Error('Unknown review: ' + status);
+        return rest('place_contributions?id=eq.' + id, { method: 'PATCH', json: { status: status }, headers: { prefer: 'return=representation' } })
+          .then(function (rows) {
+            if (!rows.length) throw new Error('Only moderators can review contributions.');
+            return contributionOut(rows[0]);
+          });
       },
 
       deleteAccount: function () {

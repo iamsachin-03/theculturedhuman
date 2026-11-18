@@ -94,3 +94,13 @@ test('audience labels name the people', () => {
   assert.equal(audienceLabel(entry('passed'), list), 'When passed on');
   assert.match(audienceLabel(entry('date', { audiencePeople: ['p-farah'], releaseAt: '2036-01-01' }), list), /^Farah, on 1 January 2036$/);
 });
+
+test('a contribution names a place, has a title, words and a credit, within the database limits', () => {
+  const c = core.contribution({ placeSlug: 'assam', suggestedPlace: 'ignored', kind: 'A song', title: ' Bihu ', body: 'Sung in April.', credit: 'Anita' });
+  assert.deepEqual(c, { placeSlug: 'assam', suggestedPlace: null, kind: 'A song', title: 'Bihu', body: 'Sung in April.', credit: 'Anita' });
+  assert.equal(core.contribution({ suggestedPlace: 'Jorhat', kind: 'made up', title: 't', body: 'b', credit: 'c' }).kind, core.CONTRIBUTION_KINDS[0]);
+  assert.throws(() => core.contribution({ title: 't', body: 'b', credit: 'c' }), /choose the place/);
+  assert.throws(() => core.contribution({ placeSlug: 'assam', body: 'b', credit: 'c' }), /title/);
+  assert.throws(() => core.contribution({ placeSlug: 'assam', title: 't', body: 'x'.repeat(5001), credit: 'c' }), /5,000/);
+  assert.throws(() => core.contribution({ placeSlug: 'assam', title: 't', body: 'b', credit: '' }), /credited/);
+});

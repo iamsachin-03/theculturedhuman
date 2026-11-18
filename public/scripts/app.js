@@ -136,7 +136,7 @@
   var routes = [
     [/^$/, home], [/^archive$/, archive], [/^entry\/new$/, editor], [/^entry\/([\w-]+)\/edit$/, editor],
     [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^people$/, people], [/^shared$/, shared],
-    [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings],
+    [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings], [/^contribute$/, contribute], [/^moderate$/, moderate],
   ];
 
   var rendering = 0;
@@ -172,8 +172,28 @@
   }
 
   // ---------- sign in ----------
+  // Sign-in links come back to the app's front page, so the page someone was heading for is kept here.
+  var AFTER_SIGNIN = 'tch-after-signin';
+  function rememberWanted() {
+    try {
+      if (parse().path) localStorage.setItem(AFTER_SIGNIN, location.hash);
+      else localStorage.removeItem(AFTER_SIGNIN);
+    } catch (e) {}
+  }
+  function restoreWanted() {
+    var wanted = null;
+    try {
+      wanted = localStorage.getItem(AFTER_SIGNIN);
+      localStorage.removeItem(AFTER_SIGNIN);
+    } catch (e) {}
+    if (wanted && /^#\/[\w\/?=&%.-]+$/.test(wanted) && !parse().path) history.replaceState(null, '', location.pathname + location.search + wanted);
+  }
+
   function signin() {
-    var h1 = page('Your family archive', 'Keep the stories, voices, photographs and wisdom of your family in one private place, and choose who receives each one, now or later.');
+    var adding = parse().path === 'contribute';
+    var h1 = adding
+      ? page('Add to a place', 'Sign in with your email to write it. It takes a minute, and you choose how you are credited.')
+      : page('Your family archive', 'Keep the stories, voices, photographs and wisdom of your family in one private place, and choose who receives each one, now or later.');
     var form = h('form', { class: 'app-card app-signin' });
     var email = h('input', { type: 'email', name: 'email', autocomplete: 'email', required: true });
     var name = h('input', { type: 'text', name: 'name', autocomplete: 'name' });
@@ -185,12 +205,13 @@
       h('div', { class: 'btn-row' }, button(store.mode === 'local' ? 'Open my archive' : 'Email me a sign-in link', null, 'btn', 'submit')),
     ]);
     if (store.google) {
-      add(form, h('p', { class: 'app-or' }, h('a', { class: 'btn btn--ghost', href: store.googleUrl(returnTo) }, 'Continue with Google')));
+      add(form, h('p', { class: 'app-or' }, h('a', { class: 'btn btn--ghost', href: store.googleUrl(returnTo), onclick: rememberWanted }, 'Continue with Google')));
     }
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var btn = form.querySelector('[type="submit"]');
       btn.disabled = true;
+      rememberWanted();
       store.signIn(email.value, name.value, returnTo).then(function (r) {
         if (r && r.sent) {
           form.textContent = '';
@@ -1004,6 +1025,109 @@
     return steps.reduce(function (p, s) { return p.then(s); }, Promise.resolve());
   }
 
+  // ---------- adding to a place ----------
+  var placeList = null;
+  function loadPlaces() {
+    if (placeList) return Promise.resolve(placeList);
+    return fetch('/places/places.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
+      .then(function (list) { placeList = list; return list; });
+  }
+  function placeName(list, c) {
+    var p = list.filter(function (x) { return x.slug === c.placeSlug; })[0];
+    return p ? p.name : c.suggestedPlace ? c.suggestedPlace + ' (a new place)' : c.placeSlug;
+  }
+  var REVIEW = { pending: 'Waiting to be read', published: 'Published on the place page', rejected: 'Not published' };
+
+  function contribute(_, query) {
+    return Promise.all([loadPlaces(), store.myContributions(), store.isModerator()]).then(function (r) {
+      var list = r[0];
+      var sent = r[1];
+      var chosen = list.filter(function (p) { return p.slug === query.get('place'); })[0];
+      var h1 = page(chosen ? 'Add to ' + chosen.name : 'Add to a place', 'A word with no translation, a dish, a festival as your grandparents kept it, a song, a street that has changed. Everything is read before it appears on the place page, and credited the way you choose.');
+      var form = h('form', { class: 'app-card app-form app-contribute' });
+      var place = options(h('select', { name: 'place' }),
+        [{ id: '?', label: 'Choose a place' }].concat(list.map(function (p) { return { id: p.slug, label: p.name }; }), [{ id: '', label: 'Somewhere else' }]),
+        chosen ? chosen.slug : '?');
+      var other = h('input', { name: 'suggestedPlace', maxlength: 120 });
+      var otherField = field('Which place?', other, 'A town, village or region. When a place has a few contributions, it gets its own page.');
+      function showOther() { otherField.hidden = place.value !== ''; }
+      place.addEventListener('change', showOther);
+      showOther();
+      var kind = options(h('select', { name: 'kind' }), core.CONTRIBUTION_KINDS.map(function (k) { return { id: k, label: k }; }), core.CONTRIBUTION_KINDS[0]);
+      var title = h('input', { name: 'title', required: true, maxlength: 120 });
+      var body = h('textarea', { name: 'body', rows: 8, required: true, maxlength: 5000 });
+      var credit = h('input', { name: 'credit', required: true, maxlength: 80, value: state.user.name || '' });
+      add(form, [
+        h('div', { class: 'app-form-grid' },
+          field('Place', place),
+          otherField,
+          field('What are you adding?', kind),
+          field('Title', title, 'For example the word itself, or the name of the dish.'),
+          field('Tell us about it', body, 'What it means, how your family says it, makes it or keeps it, and where you heard it.', true),
+          field('How should we credit you?', credit, 'It appears with your words, for example "Anita, whose grandmother was from Jorhat".', true)),
+        store.mode === 'local' ? h('p', { class: 'field__hint' }, 'Preview mode: this stays in this browser and nobody reads it.') : null,
+        h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, 'Send it to be read')),
+      ]);
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var btn = form.querySelector('[type="submit"]');
+        btn.disabled = true;
+        Promise.resolve().then(function () {
+          if (place.value === '?') throw new Error('Please choose the place, or pick "Somewhere else" and name it.');
+          return store.contribute({ placeSlug: place.value, suggestedPlace: other.value, kind: kind.value, title: title.value, body: body.value, credit: credit.value });
+        }).then(function () {
+          flash = 'Thank you. It will appear on the place page once it has been read.';
+          return render();
+        }).catch(fail).then(function () { btn.disabled = false; });
+      });
+      add(view, form);
+      if (sent.length) {
+        add(view, h('h2', { class: 'app-sub' }, 'What you have sent'));
+        add(view, h('div', { class: 'app-list' }, sent.map(function (c) {
+          return h('article', { class: 'app-card app-sent' },
+            h('p', { class: 'eyebrow' }, c.kind + ' · ' + placeName(list, c)),
+            h('h3', null, c.title),
+            h('p', { class: 'app-sent__status app-sent__status--' + c.status }, REVIEW[c.status] || c.status));
+        })));
+      }
+      if (r[2]) add(view, h('p', null, link('#/moderate', 'Read contributions waiting to be published', 'text-link')));
+      return h1;
+    });
+  }
+
+  function moderate() {
+    var h1 = page('Contributions to read', 'Publish what families have sent so it appears on the place page, or leave it unpublished. Check it is theirs to share and contains nothing private about someone else.');
+    return store.isModerator().then(function (yes) {
+      if (!yes) {
+        add(view, h('p', null, 'Only moderators can read contributions before they are published.'));
+        return h1;
+      }
+      return Promise.all([loadPlaces(), store.pendingContributions()]).then(function (r) {
+        if (!r[1].length) {
+          add(view, h('p', { class: 'app-empty' }, 'Nothing is waiting. Everything sent has been read.'));
+          return h1;
+        }
+        add(view, h('div', { class: 'app-list' }, r[1].map(function (c) {
+          function review(status) {
+            return function () {
+              store.reviewContribution(c.id, status).then(function () {
+                flash = status === 'published' ? '"' + c.title + '" is published.' : '"' + c.title + '" will not be published.';
+                return render();
+              }).catch(fail);
+            };
+          }
+          return h('article', { class: 'app-card app-review' },
+            h('p', { class: 'eyebrow' }, c.kind + ' · ' + placeName(r[0], c)),
+            h('h2', null, c.title),
+            h('p', { class: 'app-review__body' }, c.body),
+            h('p', { class: 'carry-card__credit' }, 'Shared by ' + c.credit + (c.createdAt ? ', ' + core.formatDate(c.createdAt) : '')),
+            h('div', { class: 'btn-row' }, button('Publish', review('published')), button('Do not publish', review('rejected'), 'btn btn--ghost')));
+        })));
+        return h1;
+      });
+    });
+  }
+
   function signedOut() {
     state.user = null;
     state.people = null;
@@ -1021,6 +1145,7 @@
       state.user = s ? s.user : null;
       state.people = null;
       if (!state.user) return;
+      restoreWanted();
       return store.touchSeen().then(function (l) { state.legacy = l; });
     }).then(function () {
       try {

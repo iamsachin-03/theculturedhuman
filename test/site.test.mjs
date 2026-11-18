@@ -150,3 +150,18 @@ test('visit counts are cookie-free, off until switched on, and never on private 
   const built = pages.filter((p) => read(p).includes('/_vercel/insights/'));
   assert.deepEqual(built, site.analytics.vercel ? pages.filter((p) => !read(p).includes('noindex')) : []);
 });
+
+test('place pages send families to the app to write, keep the enquiry form, and read published contributions', () => {
+  const places = JSON.parse(read('places/places.json'));
+  const seed = readFileSync(join(ROOT, 'backend/places.sql'), 'utf8');
+  for (const p of places) {
+    const html = read(`places/${p.slug}.html`);
+    assert.match(html, new RegExp(`href="/app\\.html#/contribute\\?place=${p.slug}"`), p.slug);
+    assert.match(html, /<details class="contribute-other">[\s\S]*<form/, p.slug);
+    assert.match(html, new RegExp(`data-shared-by-families data-place="${p.slug}" data-url="https://`), p.slug);
+    assert.match(html, /\/scripts\/places-live\.js/, p.slug);
+    assert.match(seed, new RegExp(`\\('${p.slug}', `), `backend/places.sql seeds ${p.slug}`);
+  }
+  assert.match(read('places/index.html'), /href="\/app\.html#\/contribute"/);
+  assert.doesNotMatch(read('sitemap.xml'), /places\.json|\.sql/);
+});

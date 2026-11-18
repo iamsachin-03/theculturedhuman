@@ -293,7 +293,19 @@ export function rootsMap(places) {
   return `<figure class="roots-map"><svg viewBox="0 0 ${W} ${H}" role="group" aria-label="Map of places on The Cultured Human"><g class="roots-map__grid" aria-hidden="true">${grid.join('')}</g>${points}</svg><figcaption>Each point is a place families have traced back to. Positions are approximate.</figcaption></figure>`;
 }
 
-export function placesIndexMain({ map, cards, form }) {
+/** Signing in to write it is the easy way; the enquiry form stays for people who would rather not. */
+function contributeBox(site, slug, form) {
+  if (!(site.backend && site.backend.url)) return form;
+  return `<div class="contribute-cta">
+<a class="btn" href="/app.html#/contribute${slug ? `?place=${e(slug)}` : ''}">Write it now</a>
+<p class="enquiry__note">Sign in with your email, write a few lines and choose how you are credited.</p>
+<details class="contribute-other"><summary>Rather not sign in? Send it to us instead</summary>
+${form}
+</details>
+</div>`;
+}
+
+export function placesIndexMain({ site, map, cards, form }) {
   return `<section class="page-hero">
 <div class="container">
 <p class="eyebrow">Places</p>
@@ -313,12 +325,12 @@ ${cards}
 <div class="section-gap"></div>
 <section class="enquiry-section" id="contribute" aria-labelledby="contribute-title">
 <div><p class="eyebrow">Your place is not here?</p><h2 id="contribute-title">Add it.</h2><p>Tell us the town or village, and one thing your family carries from it. When a place has a few contributions, it gets its own page.</p></div>
-${form}
+${contributeBox(site, '', form)}
 </section>
 </div>`;
 }
 
-export function placeMain({ place, hero, carries, people, form }) {
+export function placeMain({ site, place, hero, carries, people, form }) {
   const carry = (c) => {
     const from = c.storyInfo
       ? `<a class="text-link" href="${c.storyInfo.path}">From the story: ${e(c.storyInfo.title)}</a>`
@@ -347,14 +359,16 @@ export function placeMain({ place, hero, carries, people, form }) {
 <div class="carry-grid">${carries.map(carry).join('')}</div>
 <div class="section-gap"></div>
 <div class="section-head"><p class="eyebrow">Shared by families</p><h2>In their own words.</h2></div>
+<div data-shared-by-families data-place="${e(place.slug)}"${site.backend && site.backend.url ? ` data-url="${e(site.backend.url)}" data-key="${e(site.backend.anonKey)}"` : ''}>
 ${shared}
+</div>
 <div class="section-gap"></div>
 <div class="section-head"><p class="eyebrow">People on the platform</p><h2>Makers, hosts and storytellers from ${e(place.name)}.</h2></div>
 ${listed}
 <div class="section-gap"></div>
 <section class="enquiry-section" id="contribute" aria-labelledby="contribute-title">
 <div><p class="eyebrow">Add to ${e(place.name)}</p><h2 id="contribute-title">What does your family carry from here?</h2><p>A word with no translation, a dish, a festival as your grandparents kept it, a song, a street that has changed. Everything is read before it appears, and credited the way you choose.</p></div>
-${form}
+${contributeBox(site, place.slug, form)}
 </section>
 </div>`;
 }

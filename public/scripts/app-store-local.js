@@ -4,13 +4,13 @@
 (function (root) {
   var core = root.TCH.core;
   var SESSION = 'tch-local-session';
-  var STORES = ['users', 'people', 'entries', 'media', 'legacy', 'elders', 'roots'];
+  var STORES = ['users', 'people', 'entries', 'media', 'legacy', 'elders', 'roots', 'contributions'];
   var dbPromise = null;
 
   function db() {
     if (!dbPromise) {
       dbPromise = new Promise(function (resolve, reject) {
-        var req = indexedDB.open('tch-app', 2);
+        var req = indexedDB.open('tch-app', 3);
         req.onupgradeneeded = function () {
           STORES.forEach(function (name) {
             if (req.result.objectStoreNames.contains(name)) return;
@@ -342,9 +342,28 @@
       return put('roots', { owner: owner, data: data, updatedAt: now().toISOString() }).then(function () { return data; });
     },
 
+    /** Preview only: contributions stay on this device and nobody reviews them. */
+    contribute: function (fields) {
+      var owner = need();
+      var c = core.contribution(fields);
+      c.id = uid(); c.owner = owner; c.status = 'pending'; c.createdAt = now().toISOString();
+      return put('contributions', c);
+    },
+
+    myContributions: function () {
+      var owner = need();
+      return all('contributions').then(function (list) {
+        return list.filter(function (c) { return c.owner === owner; }).sort(function (a, b) { return a.createdAt < b.createdAt ? 1 : -1; });
+      });
+    },
+
+    isModerator: function () { return Promise.resolve(false); },
+    pendingContributions: function () { return Promise.resolve([]); },
+    reviewContribution: function () { return Promise.reject(new Error('Reviewing needs the real backend.')); },
+
     deleteAccount: function () {
       var owner = need();
-      return Promise.all(['entries', 'media', 'people', 'elders'].map(function (name) {
+      return Promise.all(['entries', 'media', 'people', 'elders', 'contributions'].map(function (name) {
         return all(name).then(function (list) {
           return Promise.all(list.filter(function (x) { return x.owner === owner || (name === 'people' && x.userId === owner); })
             .map(function (x) { return del(name, x.id); }));

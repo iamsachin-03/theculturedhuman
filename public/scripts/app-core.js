@@ -258,7 +258,30 @@
     return String(name || 'file').toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'file';
   }
 
+  // The same limits as place_contributions in backend/schema.sql.
+  var CONTRIBUTION_KINDS = ['A word or saying', 'A dish or recipe', 'A festival or ritual', 'A song', 'A memory of the place', 'A correction'];
+  function contribution(f) {
+    var c = {
+      placeSlug: String(f.placeSlug || '').trim() || null,
+      suggestedPlace: String(f.suggestedPlace || '').trim().slice(0, 120) || null,
+      kind: CONTRIBUTION_KINDS.indexOf(f.kind) === -1 ? CONTRIBUTION_KINDS[0] : f.kind,
+      title: String(f.title || '').trim(),
+      body: String(f.body || '').trim(),
+      credit: String(f.credit || '').trim(),
+    };
+    if (c.placeSlug) c.suggestedPlace = null;
+    if (!c.placeSlug && !c.suggestedPlace) throw new Error('Please choose the place, or name it.');
+    if (!c.title) throw new Error('Please give it a title.');
+    if (c.title.length > 120) throw new Error('Please keep the title under 120 characters.');
+    if (!c.body) throw new Error('Please write a few lines about it.');
+    if (c.body.length > 5000) throw new Error('Please keep it under 5,000 characters.');
+    if (!c.credit) throw new Error('Please say how you would like to be credited.');
+    if (c.credit.length > 80) throw new Error('Please keep the credit under 80 characters.');
+    return c;
+  }
+
   var core = {
+    CONTRIBUTION_KINDS: CONTRIBUTION_KINDS, contribution: contribution,
     KINDS: KINDS, ROLES: ROLES, AUDIENCES: AUDIENCES, QUESTIONS: QUESTIONS, find: find,
     canSee: canSee, canAdd: canAdd, canEdit: canEdit, audienceLabel: audienceLabel,
     newLegacy: newLegacy, legacyNext: legacyNext, legacySeen: legacySeen, legacyReport: legacyReport,

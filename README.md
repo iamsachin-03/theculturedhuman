@@ -105,6 +105,10 @@ Marigold (the default), Haldi, Indigo, Gulmohar and Evening. Haldi takes its tur
 
 The `firebase.json`, `.firebaserc` and `firestore.*` files belong to the earlier Firebase project and are not used by the Vercel site.
 
+## Adding to a place
+
+Each place page sends families to `/app.html#/contribute?place=<slug>` to write a word, a dish, a festival, a song or a memory and choose their credit. It waits as `pending` until a moderator publishes it at `/app.html#/moderate`; `public/scripts/places-live.js` then shows it on the place page without a rebuild. The enquiry form stays on the page, folded away, for people who would rather not sign in. The database needs `backend/places.sql`, which the build writes from `content/places/*.json` ([steps](backend/README.md#connecting-a-supabase-project)).
+
 ## Weekly question sender
 
 `api/weekly-send.mjs` can send each person's weekly question on WhatsApp for their family member, once a day from a Vercel cron job. It is off until a WhatsApp Business number, an approved template and a few environment variables are in place; [`backend/weekly/README.md`](backend/weekly/README.md) has the steps.
