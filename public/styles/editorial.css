@@ -985,6 +985,17 @@ p { margin: 0 0 1em; }
 .app-sent__status { font-size: .9rem; font-weight: 600; color: var(--muted); }
 .app-sent__status--published { color: var(--primary); }
 .app-review__body { white-space: pre-line; }
+.app-sent__status--rejected { color: var(--ink); }
+.app-sent__note { background: var(--surface-2); border-left: 3px solid var(--accent-ink); padding: .6rem .8rem; font-size: .95rem; }
+.app-sent .btn-row { margin-top: .8rem; }
+.app-consent { align-items: flex-start; margin: 1.2rem 0 .4rem; font-size: .95rem; line-height: 1.5; }
+.app-consent input { margin-top: .25rem; flex: none; }
+.app-reasons { border: 0; margin: 0 0 1rem; padding: 0; display: grid; gap: .6rem; }
+.app-reasons legend { font-weight: 600; margin-bottom: .6rem; }
+.app-reasons .app-check { align-items: flex-start; }
+.app-reports { margin: .4rem 0 1rem; padding-left: 1.2rem; font-size: .95rem; }
+.app-reason { margin-top: .6rem; }
+.app-review__word { font-size: 1.15rem; color: var(--muted); margin-top: -.4rem; }
 
 /* ---------- My Roots: one product, two halves ---------- */
 .product-nav { border-bottom: 1px solid var(--line); background: var(--surface); }

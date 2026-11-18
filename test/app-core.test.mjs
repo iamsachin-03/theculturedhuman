@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
 
 const core = createRequire(import.meta.url)('../public/scripts/app-core.js');
 const { canSee, canAdd, canEdit, legacyNext, legacySeen, legacyReport, newLegacy, question, message, whatsappLink, reminder, mediaKind, audienceLabel, QUESTIONS, KINDS } = core;
@@ -95,14 +96,32 @@ test('audience labels name the people', () => {
   assert.match(audienceLabel(entry('date', { audiencePeople: ['p-farah'], releaseAt: '2036-01-01' }), list), /^Farah, on 1 January 2036$/);
 });
 
-test('a contribution names a place, has a title, words and a credit, within the database limits', () => {
-  const c = core.contribution({ placeSlug: 'assam', suggestedPlace: 'ignored', kind: 'A song', title: ' Bihu ', body: 'Sung in April.', credit: 'Anita' });
-  assert.deepEqual(c, { placeSlug: 'assam', suggestedPlace: null, kind: 'A song', title: 'Bihu', body: 'Sung in April.', credit: 'Anita' });
-  assert.equal(core.contribution({ suggestedPlace: 'Jorhat', kind: 'made up', title: 't', body: 'b', credit: 'c' }).kind, core.CONTRIBUTION_KINDS[0]);
-  assert.throws(() => core.contribution({ title: 't', body: 'b', credit: 'c' }), /choose the place/);
-  assert.throws(() => core.contribution({ placeSlug: 'assam', body: 'b', credit: 'c' }), /title/);
-  assert.throws(() => core.contribution({ placeSlug: 'assam', title: 't', body: 'x'.repeat(5001), credit: 'c' }), /5,000/);
-  assert.throws(() => core.contribution({ placeSlug: 'assam', title: 't', body: 'b', credit: '' }), /credited/);
+test('a contribution names a place, has a title, words, a credit and consent, within the database limits', () => {
+  const ok = { placeSlug: 'assam', title: 't', body: 'b', credit: 'c', consent: true };
+  const c = core.contribution({ placeSlug: 'assam', suggestedPlace: 'ignored', kind: 'A song', title: ' Bihu ', body: 'Sung in April.', credit: 'Anita', script: 'ignored', promptWeek: 3, consent: true });
+  assert.deepEqual(c, { placeSlug: 'assam', suggestedPlace: null, kind: 'A song', title: 'Bihu', body: 'Sung in April.', credit: 'Anita', script: null, pronunciation: null, promptWeek: 3, consent: true });
+  assert.equal(core.contribution({ suggestedPlace: 'Jorhat', kind: 'made up', title: 't', body: 'b', credit: 'c', consent: true }).kind, core.CONTRIBUTION_KINDS[0]);
+  const word = core.contribution({ ...ok, kind: 'A word or saying', script: ' ਨਾਨੀ ', pronunciation: 'NAA-nee', promptWeek: 'x' });
+  assert.deepEqual([word.script, word.pronunciation, word.promptWeek], ['ਨਾਨੀ', 'NAA-nee', null]);
+  assert.throws(() => core.contribution({ ...ok, consent: false }), /yours to share/);
+  assert.throws(() => core.contribution({ ...ok, consent: 'yes' }), /yours to share/);
+  assert.throws(() => core.contribution({ ...ok, kind: 'A word or saying', script: 'x'.repeat(121) }), /own script/);
+  assert.throws(() => core.contribution({ ...ok, placeSlug: '' }), /choose the place/);
+  assert.throws(() => core.contribution({ ...ok, title: '' }), /title/);
+  assert.throws(() => core.contribution({ ...ok, body: 'x'.repeat(5001) }), /5,000/);
+  assert.throws(() => core.contribution({ ...ok, credit: '' }), /credited/);
+});
+
+test('reports need a known reason, and a note when the reason needs explaining', () => {
+  assert.deepEqual(core.report({ reason: 'spam', note: ' ' }), { reason: 'spam', note: null });
+  assert.deepEqual(core.report({ reason: 'wrong', note: 'It means uncle' }), { reason: 'wrong', note: 'It means uncle' });
+  assert.throws(() => core.report({ reason: 'wrong' }), /a little more/);
+  assert.throws(() => core.report({ reason: 'because' }), /what is wrong/);
+  const schema = readFileSync(new URL('../backend/schema.sql', import.meta.url), 'utf8');
+  const inSchema = schema.match(/reason text not null check \(reason in \(([^)]*)\)\)/)[1].match(/'([^']+)'/g).map((x) => x.slice(1, -1));
+  assert.deepEqual(core.REPORT_REASONS.map((r) => r.id), inSchema, 'the same reasons as the database');
+  assert.equal(core.reviewNote('  '), null);
+  assert.throws(() => core.reviewNote('x'.repeat(301)), /300/);
 });
 
 test('listings need a role, a place, a name and a description, and links must be https', () => {

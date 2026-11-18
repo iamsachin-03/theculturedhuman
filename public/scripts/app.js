@@ -139,7 +139,7 @@
     [/^$/, home], [/^archive$/, archive], [/^entry\/new$/, editor], [/^entry\/([\w-]+)\/edit$/, editor],
     [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^people$/, people], [/^shared$/, shared],
     [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings], [/^contribute$/, contribute], [/^moderate$/, moderate],
-    [/^offer$/, offer], [/^request$/, requestForm], [/^requests$/, requests], [/^echo$/, echo],
+    [/^offer$/, offer], [/^request$/, requestForm], [/^requests$/, requests], [/^echo$/, echo], [/^report$/, reportForm],
   ];
 
   var rendering = 0;
@@ -199,6 +199,7 @@
       request: ['Send a request', 'Sign in with your email so they can reply to you. Nothing is charged until you accept a quote.'],
       requests: ['Your requests', 'Sign in with your email to see your requests and quotes.'],
       echo: ['We have this too', 'Sign in with your email to say your family has this too.'],
+      report: ['Report this', 'Sign in with your email to report it. It stops one person sending many reports, and nobody else sees who reported.'],
     }[parse().path];
     var h1 = why
       ? page(why[0], why[1])
@@ -1041,112 +1042,250 @@
     return fetch('/places/places.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
       .then(function (list) { placeList = list; return list; });
   }
-  function loadPrompt(n) {
-    if (n === null || !/^\d+$/.test(n)) return Promise.resolve(null);
+  // ?week=W answers the question of week W since content/prompts.json "start".
+  function loadWeek(w) {
+    if (w === null || !/^\d+$/.test(w)) return Promise.resolve(null);
     return fetch('/community/prompts.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
-      .then(function (data) { return data && data.prompts[Number(n)] || null; });
+      .then(function (data) {
+        if (!data || !data.prompts.length) return null;
+        return { week: Number(w), prompt: data.prompts[Number(w) % data.prompts.length] };
+      });
   }
   function placeName(list, c) {
     var p = list.filter(function (x) { return x.slug === c.placeSlug; })[0];
     return p ? p.name : c.suggestedPlace ? c.suggestedPlace + ' (a new place)' : c.placeSlug;
   }
-  var REVIEW = { pending: 'Waiting to be read', published: 'Published on the place page', rejected: 'Not published' };
+  var REVIEW = { pending: 'Waiting to be read', published: 'Published', rejected: 'Not published' };
+  var WORD = core.CONTRIBUTION_KINDS[0];
 
   function contribute(_, query) {
-    return Promise.all([loadPlaces(), store.myContributions(), store.isModerator(), loadPrompt(query.get('prompt'))]).then(function (r) {
+    var editId = query.get('edit');
+    return Promise.all([loadPlaces(), store.myContributions(), store.isModerator(), editId ? store.contribution(editId) : null]).then(function (r) {
       var list = r[0];
       var sent = r[1];
-      var prompt = r[3];
-      var wantKind = prompt ? prompt.kind : query.get('kind');
-      if (core.CONTRIBUTION_KINDS.indexOf(wantKind) < 0) wantKind = core.CONTRIBUTION_KINDS[0];
-      var chosen = list.filter(function (p) { return p.slug === query.get('place'); })[0];
-      var h1 = page(chosen ? 'Add to ' + chosen.name : 'Add to a place', 'A word with no translation, a dish, a festival as your grandparents kept it, a song, a street that has changed. Everything is read before it appears on the place page, and credited the way you choose.');
-      if (prompt) {
-        add(view, h('div', { class: 'app-card app-prompt' },
-          h('p', { class: 'eyebrow' }, 'Answering this week\'s question'),
-          h('p', { class: 'app-prompt__text' }, prompt.text),
-          prompt.hashtag ? h('p', { class: 'field__hint' }, 'Sharing it on Instagram too? Use #' + prompt.hashtag + ' and tag @theculturedhuman.') : null));
-      }
-      var form = h('form', { class: 'app-card app-form app-contribute' });
-      var place = options(h('select', { name: 'place' }),
-        [{ id: '?', label: 'Choose a place' }].concat(list.map(function (p) { return { id: p.slug, label: p.name }; }), [{ id: '', label: 'Somewhere else' }]),
-        chosen ? chosen.slug : '?');
-      var other = h('input', { name: 'suggestedPlace', maxlength: 120 });
-      var otherField = field('Which place?', other, 'A town, village or region. When a place has a few contributions, it gets its own page.');
-      function showOther() { otherField.hidden = place.value !== ''; }
-      place.addEventListener('change', showOther);
-      showOther();
-      var kind = options(h('select', { name: 'kind' }), core.CONTRIBUTION_KINDS.map(function (k) { return { id: k, label: k }; }), wantKind);
-      var title = h('input', { name: 'title', required: true, maxlength: 120 });
-      var body = h('textarea', { name: 'body', rows: 8, required: true, maxlength: 5000 });
-      var credit = h('input', { name: 'credit', required: true, maxlength: 80, value: state.user.name || '' });
-      add(form, [
-        h('div', { class: 'app-form-grid' },
-          field('Place', place),
-          otherField,
-          field('What are you adding?', kind),
-          field('Title', title, 'For example the word itself, or the name of the dish.'),
-          field('Tell us about it', body, 'What it means, how your family says it, makes it or keeps it, and where you heard it.', true),
-          field('How should we credit you?', credit, 'It appears with your words, for example "Anita, whose grandmother was from Jorhat".', true)),
-        store.mode === 'local' ? h('p', { class: 'field__hint' }, 'Preview mode: this stays in this browser and nobody reads it.') : null,
-        h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, 'Send it to be read')),
-      ]);
-      form.addEventListener('submit', function (ev) {
-        ev.preventDefault();
-        var btn = form.querySelector('[type="submit"]');
-        btn.disabled = true;
-        Promise.resolve().then(function () {
-          if (place.value === '?') throw new Error('Please choose the place, or pick "Somewhere else" and name it.');
-          return store.contribute({ placeSlug: place.value, suggestedPlace: other.value, kind: kind.value, title: title.value, body: body.value, credit: credit.value });
-        }).then(function () {
-          flash = 'Thank you. It will appear on the place page once it has been read.';
-          return render();
-        }).catch(fail).then(function () { btn.disabled = false; });
+      var editing = r[3];
+      if (editId && !editing) throw new Error('That is not something you shared, or it has been deleted.');
+      return loadWeek(editing ? (editing.promptWeek === null ? null : String(editing.promptWeek)) : query.get('week')).then(function (week) {
+        var prompt = week && week.prompt;
+        var wantKind = editing ? editing.kind : prompt ? prompt.kind : query.get('kind');
+        if (core.CONTRIBUTION_KINDS.indexOf(wantKind) < 0) wantKind = core.CONTRIBUTION_KINDS[0];
+        var chosen = list.filter(function (p) { return p.slug === (editing ? editing.placeSlug : query.get('place')); })[0];
+        var h1 = editing
+          ? page('Change what you shared', 'Once you save it, it is read again before it appears.')
+          : page(chosen ? 'Add to ' + chosen.name : 'Add to a place', 'A word with no translation, a dish, a festival as your grandparents kept it, a song, a street that has changed. Everything is read before it appears, and credited the way you choose.');
+        if (prompt) {
+          add(view, h('div', { class: 'app-card app-prompt' },
+            h('p', { class: 'eyebrow' }, editing ? 'Your answer to the question' : 'Answering this week\'s question'),
+            h('p', { class: 'app-prompt__text' }, prompt.text),
+            prompt.hashtag && !editing ? h('p', { class: 'field__hint' }, 'Sharing it on Instagram too? Use #' + prompt.hashtag + ' and tag @theculturedhuman.') : null));
+        }
+        var form = h('form', { class: 'app-card app-form app-contribute' });
+        var place = options(h('select', { name: 'place' }),
+          [{ id: '?', label: 'Choose a place' }].concat(list.map(function (p) { return { id: p.slug, label: p.name }; }), [{ id: '', label: 'Somewhere else' }]),
+          chosen ? chosen.slug : editing ? '' : '?');
+        var other = h('input', { name: 'suggestedPlace', maxlength: 120, value: editing && editing.suggestedPlace || '' });
+        var otherField = field('Which place?', other, 'A town, village or region. When a place has a few contributions, it gets its own page.');
+        function showOther() { otherField.hidden = place.value !== ''; }
+        place.addEventListener('change', showOther);
+        showOther();
+        var kind = options(h('select', { name: 'kind' }), core.CONTRIBUTION_KINDS.map(function (k) { return { id: k, label: k }; }), wantKind);
+        var title = h('input', { name: 'title', required: true, maxlength: 120, value: editing ? editing.title : '' });
+        var script = h('input', { name: 'script', maxlength: 120, value: editing && editing.script || '' });
+        var pronunciation = h('input', { name: 'pronunciation', maxlength: 120, value: editing && editing.pronunciation || '' });
+        var scriptField = field('The word in its own script (optional)', script, 'For example সাৰথি, ಅಜ್ಜಿ or ਨਾਨੀ.');
+        var sayField = field('How it is said (optional)', pronunciation, 'Spell it the way it sounds, for example "SAH-ruh-thee".');
+        var body = h('textarea', { name: 'body', rows: 8, required: true, maxlength: 5000 });
+        body.value = editing ? editing.body : '';
+        var credit = h('input', { name: 'credit', required: true, maxlength: 80, value: editing ? editing.credit : state.user.name || '' });
+        var consent = h('input', { type: 'checkbox', name: 'consent', required: true });
+        var bodyField = field('Tell us about it', body, 'What it means, how your family says it, makes it or keeps it, and where you heard it.', true);
+        function showWord() {
+          var word = kind.value === WORD;
+          scriptField.hidden = !word;
+          sayField.hidden = !word;
+          title.previousElementSibling.textContent = word ? 'For example the word itself, written in English letters.' : 'For example the name of the dish or the song.';
+          bodyField.querySelector('.field__hint').textContent = word
+            ? 'What it means, when your family says it, and where you heard it.'
+            : 'What it is, how your family makes it or keeps it, and where you learnt it.';
+        }
+        add(form, [
+          h('div', { class: 'app-form-grid' },
+            field('Place', place),
+            otherField,
+            field('What are you adding?', kind),
+            field('Title', title, ' '),
+            scriptField,
+            sayField,
+            bodyField,
+            field('How should we credit you?', credit, 'It appears with your words, for example "Anita, whose grandmother was from Jorhat".', true)),
+          h('label', { class: 'app-check app-consent' }, consent,
+            h('span', null, 'This is mine to share: my own words or my family\'s, with nothing private about someone who has not agreed. It follows the ',
+              h('a', { href: '/community-guidelines.html', target: '_blank', rel: 'noopener' }, 'community guidelines'), '.')),
+          store.mode === 'local' ? h('p', { class: 'field__hint' }, 'Preview mode: this stays in this browser and nobody reads it.') : null,
+          h('div', { class: 'btn-row' },
+            h('button', { type: 'submit', class: 'btn' }, editing ? 'Save and send to be read' : 'Send it to be read'),
+            editing ? link('#/contribute', 'Cancel', 'btn btn--ghost') : null),
+          h('p', { class: 'field__hint' }, 'You can change or delete it later. How we use what you share: ', link('/privacy.html', 'privacy'), '.'),
+        ]);
+        kind.addEventListener('change', showWord);
+        showWord();
+        form.addEventListener('submit', function (ev) {
+          ev.preventDefault();
+          var btn = form.querySelector('[type="submit"]');
+          btn.disabled = true;
+          Promise.resolve().then(function () {
+            if (place.value === '?') throw new Error('Please choose the place, or pick "Somewhere else" and name it.');
+            var fields = {
+              placeSlug: place.value, suggestedPlace: other.value, kind: kind.value, title: title.value, body: body.value, credit: credit.value,
+              script: script.value, pronunciation: pronunciation.value, promptWeek: editing ? editing.promptWeek : week ? week.week : null, consent: consent.checked,
+            };
+            return editing ? store.updateContribution(editing.id, fields) : store.contribute(fields);
+          }).then(function () {
+            flash = editing ? 'Saved. It will be read again before it appears.' : 'Thank you. It will appear once it has been read. We will email you when it does.';
+            if (editing) { location.hash = '#/contribute'; return null; }
+            return render();
+          }).catch(fail).then(function () { btn.disabled = false; });
+        });
+        add(view, form);
+        if (sent.length && !editing) {
+          add(view, h('h2', { class: 'app-sub' }, 'What you have shared'));
+          add(view, h('div', { class: 'app-list' }, sent.map(function (c) { return sentCard(c, list); })));
+        }
+        if (r[2]) add(view, h('p', null, link('#/moderate', 'Read contributions waiting to be published', 'text-link')));
+        return h1;
       });
-      add(view, form);
-      if (sent.length) {
-        add(view, h('h2', { class: 'app-sub' }, 'What you have sent'));
-        add(view, h('div', { class: 'app-list' }, sent.map(function (c) {
-          return h('article', { class: 'app-card app-sent' },
-            h('p', { class: 'eyebrow' }, c.kind + ' · ' + placeName(list, c)),
-            h('h3', null, c.title),
-            h('p', { class: 'app-sent__status app-sent__status--' + c.status }, REVIEW[c.status] || c.status));
-        })));
-      }
-      if (r[2]) add(view, h('p', null, link('#/moderate', 'Read contributions waiting to be published', 'text-link')));
-      return h1;
     });
   }
 
+  function sentCard(c, places) {
+    function remove() {
+      if (!confirm('Delete "' + c.title + '"? It will be removed from the site and cannot be brought back.')) return;
+      store.deleteContribution(c.id).then(function () {
+        flash = '"' + c.title + '" is deleted.';
+        return render();
+      }).catch(fail);
+    }
+    return h('article', { class: 'app-card app-sent' },
+      h('p', { class: 'eyebrow' }, c.kind + ' · ' + placeName(places, c)),
+      h('h3', null, c.status === 'published' && store.mode !== 'local' ? link('/shared.html?id=' + c.id, c.title) : c.title),
+      h('p', { class: 'app-sent__status app-sent__status--' + c.status }, REVIEW[c.status] || c.status),
+      c.status === 'rejected' && c.reviewNote ? h('p', { class: 'app-sent__note' }, h('strong', null, 'Why: '), c.reviewNote) : null,
+      c.status === 'rejected' ? h('p', { class: 'field__hint' }, 'You can change it and send it again.') : null,
+      h('div', { class: 'btn-row' }, link('#/contribute?edit=' + c.id, 'Change', 'btn btn--ghost btn--small'), button('Delete', remove, 'btn btn--ghost btn--small')));
+  }
+
+  function safeBack(back, fallback) {
+    return back && /^\/(?!\/)[\w\/.#?=&-]*$/.test(back) ? back : fallback;
+  }
+
+  function reportForm(_, query) {
+    var id = query.get('c') || '';
+    var back = safeBack(query.get('back'), '/manch.html');
+    var h1 = page('Report this', 'Tell us what is wrong. A moderator reads every report, and the person who shared it is not told who reported it.');
+    var form = h('form', { class: 'app-card app-form' });
+    var list = h('fieldset', { class: 'app-reasons' }, h('legend', null, 'What is wrong?'));
+    core.REPORT_REASONS.forEach(function (r, i) {
+      add(list, h('label', { class: 'app-check' }, h('input', { type: 'radio', name: 'reason', value: r.id, required: i === 0 }), ' ' + r.label));
+    });
+    var note = h('textarea', { name: 'note', rows: 4, maxlength: 500 });
+    add(form, [
+      list,
+      field('Anything we should know (optional)', note, 'Needed for "It is wrong" and "Something else".', true),
+      h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, 'Send report'), h('a', { href: back, class: 'btn btn--ghost' }, 'Cancel')),
+    ]);
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var picked = form.querySelector('[name="reason"]:checked');
+      store.report(id, { reason: picked ? picked.value : '', note: note.value }).then(function () {
+        view.textContent = '';
+        var done = page('Thank you', 'A moderator will read it. If it breaks the community guidelines, it will be taken down.');
+        add(view, h('p', null, h('a', { href: back, class: 'btn' }, 'Go back')));
+        done.focus();
+      }).catch(fail);
+    });
+    add(view, form);
+    return h1;
+  }
+
+  function contributionReview(c, places, extra) {
+    return h('article', { class: 'app-card app-review' },
+      h('p', { class: 'eyebrow' }, c.kind + ' · ' + placeName(places, c)),
+      h('h2', null, c.title),
+      c.script || c.pronunciation ? h('p', { class: 'app-review__word' }, [c.script, c.pronunciation ? '"' + c.pronunciation + '"' : null].filter(Boolean).join(' · ')) : null,
+      h('p', { class: 'app-review__body' }, c.body),
+      h('p', { class: 'carry-card__credit' }, 'Shared by ' + c.credit + (c.createdAt ? ', ' + core.formatDate(c.createdAt) : '')),
+      extra);
+  }
+
+  // Asks why before anything is left unpublished or taken down; the person who shared it sees the reason.
+  function askReason(onDone, label) {
+    var box = h('form', { class: 'app-reason' });
+    var note = h('textarea', { rows: 2, maxlength: 300, required: true });
+    add(box, [
+      field('Why? The person who shared it will see this.', note, 'For example "It names a neighbour who has not agreed" or "Please say where you heard it".', true),
+      h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, label)),
+    ]);
+    box.addEventListener('submit', function (ev) { ev.preventDefault(); onDone(note.value); });
+    return box;
+  }
+
   function moderate() {
-    var h1 = page('To read', 'Publish what families and makers have sent so it appears on the site, or leave it unpublished. Check it is theirs to share and contains nothing private about someone else.');
+    var h1 = page('To read', 'Publish what families and makers have sent so it appears on the site, or leave it unpublished with a reason. Check it is theirs to share and contains nothing private about someone else.');
     return store.isModerator().then(function (yes) {
       if (!yes) {
         add(view, h('p', null, 'Only moderators can read contributions before they are published.'));
         return h1;
       }
-      return Promise.all([loadPlaces(), store.pendingContributions(), store.pendingListings(), store.bookingsToSettle()]).then(function (r) {
-        moderateMarket(r[0], r[2], r[3]);
+      return Promise.all([loadPlaces(), store.pendingContributions(), store.pendingListings(), store.bookingsToSettle(), store.pendingReports()]).then(function (r) {
+        var places = r[0];
+        if (r[4].length) {
+          add(view, h('h2', { class: 'app-sub' }, 'Reported'));
+          add(view, h('div', { class: 'app-list' }, r[4].map(function (item) {
+            var c = item.contribution;
+            var holder = h('div');
+            function keep() {
+              store.resolveReports(c.id).then(function () { flash = '"' + c.title + '" stays up.'; return render(); }).catch(fail);
+            }
+            function takeDown() {
+              holder.textContent = '';
+              holder.appendChild(askReason(function (note) {
+                store.reviewContribution(c.id, 'rejected', note).then(function () { return store.resolveReports(c.id); }).then(function () {
+                  flash = '"' + c.title + '" is taken down.';
+                  return render();
+                }).catch(fail);
+              }, 'Take it down'));
+              holder.querySelector('textarea').focus();
+            }
+            add(holder, h('div', { class: 'btn-row' }, button('Take it down', takeDown), button('Keep it up', keep, 'btn btn--ghost')));
+            return contributionReview(c, places, [
+              h('ul', { class: 'app-reports' }, item.reports.map(function (rep) {
+                var reason = core.REPORT_REASONS.filter(function (x) { return x.id === rep.reason; })[0];
+                return h('li', null, h('strong', null, reason ? reason.label : rep.reason), rep.note ? ': ' + rep.note : '');
+              })),
+              holder,
+            ]);
+          })));
+        }
+        moderateMarket(places, r[2], r[3]);
         if (!r[1].length) {
           add(view, h('p', { class: 'app-empty' }, 'Nothing is waiting. Everything sent has been read.'));
           return h1;
         }
         add(view, h('h2', { class: 'app-sub' }, 'Contributions'));
         add(view, h('div', { class: 'app-list' }, r[1].map(function (c) {
-          function review(status) {
-            return function () {
-              store.reviewContribution(c.id, status).then(function () {
-                flash = status === 'published' ? '"' + c.title + '" is published.' : '"' + c.title + '" will not be published.';
-                return render();
-              }).catch(fail);
-            };
+          var holder = h('div');
+          function publish() {
+            store.reviewContribution(c.id, 'published').then(function () { flash = '"' + c.title + '" is published.'; return render(); }).catch(fail);
           }
-          return h('article', { class: 'app-card app-review' },
-            h('p', { class: 'eyebrow' }, c.kind + ' · ' + placeName(r[0], c)),
-            h('h2', null, c.title),
-            h('p', { class: 'app-review__body' }, c.body),
-            h('p', { class: 'carry-card__credit' }, 'Shared by ' + c.credit + (c.createdAt ? ', ' + core.formatDate(c.createdAt) : '')),
-            h('div', { class: 'btn-row' }, button('Publish', review('published')), button('Do not publish', review('rejected'), 'btn btn--ghost')));
+          function decline() {
+            holder.textContent = '';
+            holder.appendChild(askReason(function (note) {
+              store.reviewContribution(c.id, 'rejected', note).then(function () { flash = '"' + c.title + '" will not be published.'; return render(); }).catch(fail);
+            }, 'Do not publish'));
+            holder.querySelector('textarea').focus();
+          }
+          add(holder, h('div', { class: 'btn-row' }, button('Publish', publish), button('Do not publish', decline, 'btn btn--ghost')));
+          return contributionReview(c, places, holder);
         })));
         return h1;
       });
@@ -1362,8 +1501,7 @@
 
   function echo(_, query) {
     var id = query.get('c') || '';
-    var back = query.get('back') || '/manch.html';
-    if (!/^\/(?!\/)[\w\/.#-]*$/.test(back)) back = '/manch.html';
+    var back = safeBack(query.get('back'), '/manch.html');
     var h1 = page('We have this too', null);
     return store.echo(id).then(function () {
       location.replace(back);

@@ -268,7 +268,15 @@
       title: String(f.title || '').trim(),
       body: String(f.body || '').trim(),
       credit: String(f.credit || '').trim(),
+      script: null,
+      pronunciation: null,
+      promptWeek: /^\d+$/.test(String(f.promptWeek)) ? Number(f.promptWeek) : null,
+      consent: f.consent === true,
     };
+    if (c.kind === CONTRIBUTION_KINDS[0]) {
+      c.script = String(f.script || '').trim() || null;
+      c.pronunciation = String(f.pronunciation || '').trim() || null;
+    }
     if (c.placeSlug) c.suggestedPlace = null;
     if (!c.placeSlug && !c.suggestedPlace) throw new Error('Please choose the place, or name it.');
     if (!c.title) throw new Error('Please give it a title.');
@@ -277,7 +285,33 @@
     if (c.body.length > 5000) throw new Error('Please keep it under 5,000 characters.');
     if (!c.credit) throw new Error('Please say how you would like to be credited.');
     if (c.credit.length > 80) throw new Error('Please keep the credit under 80 characters.');
+    if (c.script && c.script.length > 120) throw new Error('Please keep the word in its own script under 120 characters.');
+    if (c.pronunciation && c.pronunciation.length > 120) throw new Error('Please keep how it is said under 120 characters.');
+    if (!c.consent) throw new Error('Please confirm it is yours to share and follows the community guidelines.');
     return c;
+  }
+
+  // The same reasons as contribution_reports in backend/schema.sql.
+  var REPORT_REASONS = [
+    { id: 'private', label: 'It shares something private about a person' },
+    { id: 'hostile', label: 'It is unkind or hateful about a person or a community' },
+    { id: 'wrong', label: 'It is wrong, and I can say why' },
+    { id: 'not-theirs', label: 'It is not theirs to share, for example my own work' },
+    { id: 'spam', label: 'It is advertising or spam' },
+    { id: 'other', label: 'Something else' },
+  ];
+  function report(f) {
+    var reason = REPORT_REASONS.filter(function (x) { return x.id === f.reason; })[0];
+    if (!reason) throw new Error('Please choose what is wrong.');
+    var note = String(f.note || '').trim();
+    if (note.length > 500) throw new Error('Please keep it under 500 characters.');
+    if ((reason.id === 'other' || reason.id === 'wrong') && !note) throw new Error('Please say a little more, so we can check it.');
+    return { reason: reason.id, note: note || null };
+  }
+  function reviewNote(note) {
+    var n = String(note || '').trim();
+    if (n.length > 300) throw new Error('Please keep the reason under 300 characters.');
+    return n || null;
   }
 
   // ---------- makers, hosts and storytellers ----------
@@ -340,7 +374,7 @@
   var core = {
     LISTING_ROLES: LISTING_ROLES, listingRole: listingRole, listing: listing, bookingMessage: bookingMessage, quote: quote,
     platformFee: platformFee, formatRupees: formatRupees, BOOKING_STATUS: BOOKING_STATUS,
-    CONTRIBUTION_KINDS: CONTRIBUTION_KINDS, contribution: contribution,
+    CONTRIBUTION_KINDS: CONTRIBUTION_KINDS, contribution: contribution, REPORT_REASONS: REPORT_REASONS, report: report, reviewNote: reviewNote,
     KINDS: KINDS, ROLES: ROLES, AUDIENCES: AUDIENCES, QUESTIONS: QUESTIONS, find: find,
     canSee: canSee, canAdd: canAdd, canEdit: canEdit, audienceLabel: audienceLabel,
     newLegacy: newLegacy, legacyNext: legacyNext, legacySeen: legacySeen, legacyReport: legacyReport,

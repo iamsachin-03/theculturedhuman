@@ -85,7 +85,16 @@
       return { id: u.id, email: u.email, name: meta.display_name || meta.full_name || meta.name || (u.email || '').split('@')[0] };
     }
     function contributionOut(c) {
-      return { id: c.id, placeSlug: c.place_slug, suggestedPlace: c.suggested_place, kind: c.kind, title: c.title, body: c.body, credit: c.credit, status: c.status, createdAt: c.created_at };
+      return {
+        id: c.id, placeSlug: c.place_slug, suggestedPlace: c.suggested_place, kind: c.kind, title: c.title, body: c.body, credit: c.credit,
+        script: c.script, pronunciation: c.pronunciation, promptWeek: c.prompt_week, status: c.status, reviewNote: c.review_note, createdAt: c.created_at,
+      };
+    }
+    function contributionIn(c) {
+      return {
+        place_slug: c.placeSlug, suggested_place: c.suggestedPlace, kind: c.kind, title: c.title, body: c.body, credit: c.credit,
+        script: c.script, pronunciation: c.pronunciation, prompt_week: c.promptWeek, consent: c.consent,
+      };
     }
     function listingOut(l) {
       return { id: l.id, userId: l.user_id, role: l.role, placeSlug: l.place_slug, name: l.name, summary: l.summary, languages: l.languages || [], link: l.link, priceNote: l.price_note, status: l.status, createdAt: l.created_at };
@@ -346,8 +355,56 @@
         var c = core.contribution(fields);
         return rest('place_contributions', {
           method: 'POST', headers: { prefer: 'return=representation' },
-          json: { place_slug: c.placeSlug, suggested_place: c.suggestedPlace, kind: c.kind, title: c.title, body: c.body, credit: c.credit },
+          json: contributionIn(c),
         }).then(function (rows) { return contributionOut(rows[0]); });
+      },
+
+      contribution: function (id) {
+        return rest('place_contributions?id=eq.' + enc(id) + '&submitted_by=eq.' + me()).then(function (rows) { return rows[0] ? contributionOut(rows[0]) : null; });
+      },
+
+      updateContribution: function (id, fields) {
+        var c = core.contribution(fields);
+        return rest('place_contributions?id=eq.' + enc(id) + '&submitted_by=eq.' + me(), { method: 'PATCH', json: contributionIn(c), headers: { prefer: 'return=representation' } })
+          .then(function (rows) {
+            if (!rows.length) throw new Error('You can only change what you shared.');
+            return contributionOut(rows[0]);
+          });
+      },
+
+      deleteContribution: function (id) {
+        return rest('place_contributions?id=eq.' + enc(id) + '&submitted_by=eq.' + me(), { method: 'DELETE', headers: { prefer: 'return=representation' } })
+          .then(function (rows) { if (!rows.length) throw new Error('You can only delete what you shared.'); });
+      },
+
+      report: function (contributionId, fields) {
+        var r = core.report(fields);
+        me();
+        return rest('contribution_reports?on_conflict=contribution_id,reported_by', {
+          method: 'POST', json: { contribution_id: contributionId, reason: r.reason, note: r.note }, headers: { prefer: 'resolution=ignore-duplicates,return=minimal' },
+        }).catch(function (err) {
+          if (/row-level security/i.test(err.message)) throw new Error('This is no longer published.');
+          throw err;
+        });
+      },
+
+      /** Unresolved reports, one item per contribution, most reported first. */
+      pendingReports: function () {
+        return rest('contribution_reports?select=id,reason,note,created_at,place_contributions(*)&resolved=is.false&order=created_at').then(function (rows) {
+          var by = {};
+          var out = [];
+          rows.forEach(function (r) {
+            if (!r.place_contributions) return;
+            var id = r.place_contributions.id;
+            if (!by[id]) { by[id] = { contribution: contributionOut(r.place_contributions), reports: [] }; out.push(by[id]); }
+            by[id].reports.push({ reason: r.reason, note: r.note, createdAt: r.created_at });
+          });
+          return out.sort(function (a, b) { return b.reports.length - a.reports.length; });
+        });
+      },
+
+      resolveReports: function (contributionId) {
+        return rest('contribution_reports?contribution_id=eq.' + enc(contributionId) + '&resolved=is.false', { method: 'PATCH', json: { resolved: true }, headers: { prefer: 'return=minimal' } });
       },
 
       myContributions: function () {
@@ -360,9 +417,10 @@
         return rest('place_contributions?status=eq.pending&order=created_at').then(function (rows) { return rows.map(contributionOut); });
       },
 
-      reviewContribution: function (id, status) {
+      reviewContribution: function (id, status, note) {
         if (status !== 'published' && status !== 'rejected') throw new Error('Unknown review: ' + status);
-        return rest('place_contributions?id=eq.' + id, { method: 'PATCH', json: { status: status }, headers: { prefer: 'return=representation' } })
+        var json = { status: status, review_note: status === 'rejected' ? core.reviewNote(note) : null };
+        return rest('place_contributions?id=eq.' + enc(id), { method: 'PATCH', json: json, headers: { prefer: 'return=representation' } })
           .then(function (rows) {
             if (!rows.length) throw new Error('Only moderators can review contributions.');
             return contributionOut(rows[0]);

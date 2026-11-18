@@ -357,6 +357,33 @@
       });
     },
 
+    contribution: function (id) {
+      var owner = need();
+      return get('contributions', id).then(function (c) { return c && c.owner === owner ? c : null; });
+    },
+
+    updateContribution: function (id, fields) {
+      var owner = need();
+      var c = core.contribution(fields);
+      return get('contributions', id).then(function (old) {
+        if (!old || old.owner !== owner) throw new Error('You can only change what you shared.');
+        c.id = id; c.owner = owner; c.status = 'pending'; c.createdAt = old.createdAt;
+        return put('contributions', c);
+      });
+    },
+
+    deleteContribution: function (id) {
+      var owner = need();
+      return get('contributions', id).then(function (old) {
+        if (!old || old.owner !== owner) throw new Error('You can only delete what you shared.');
+        return del('contributions', id);
+      });
+    },
+
+    report: function () { return Promise.reject(new Error('Reporting needs the real backend.')); },
+    pendingReports: function () { return Promise.resolve([]); },
+    resolveReports: function () { return Promise.reject(new Error('Needs the real backend.')); },
+
     isModerator: function () { return Promise.resolve(false); },
     pendingContributions: function () { return Promise.resolve([]); },
     reviewContribution: function () { return Promise.reject(new Error('Reviewing needs the real backend.')); },
