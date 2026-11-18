@@ -97,7 +97,7 @@ test('a saved portrait is cleaned to known fields and capped lengths', () => {
     generations: 'nonsense',
   };
   const clean = Art.clean(messy);
-  assert.deepEqual(Object.keys(clean), ['name', 'mode', 'generations', 'me', 'sides', 'style', 'palette', 'format']);
+  assert.deepEqual(Object.keys(clean), ['name', 'mode', 'generations', 'me', 'sides', 'style', 'palette', 'format', 'lang']);
   assert.equal(clean.name.length, 80);
   assert.deepEqual(clean.me, { label: 'Me', place: 'Pune', years: '', detail: '' });
   assert.equal(clean.sides[0].length, Art.MAX_PER_SIDE);
@@ -124,6 +124,33 @@ test('an invite link carries the whole portrait and who sent it, and nothing els
   assert.ok(biggest.length < 5000, `the largest possible portrait still fits in a link (${biggest.length})`);
   for (const bad of ['', 'not-base64!', Buffer.from('{"v":2}').toString('base64url'), Buffer.from('[1,2]').toString('base64url'), Buffer.from('nope').toString('base64url')]) {
     assert.equal(Art.unpack(bad), null, bad);
+  }
+});
+
+test('the portrait can be worded in Hindi, without spacing Devanagari letters apart', () => {
+  const hi = { generations: [{ label: Art.LABELS.hi.line[0], place: 'जयपुर', years: 'अब' }, { label: Art.LABELS.hi.line[1], place: 'Ajmer' }] };
+  for (const { id } of Art.STYLES) {
+    const svg = Art.render(hi, colours, { style: id, lang: 'hi' });
+    assertWellFormed(svg, `${id}/hi`);
+    assert.match(svg, /मेरी जड़ें/, id);
+    assert.match(svg, /हर कोई कहीं से आता है · @theculturedhuman/, id);
+    assert.doesNotMatch(svg, /Where I come from|Everyone comes from/, id);
+    for (const m of svg.matchAll(/<text[^>]*letter-spacing="([^"]+)"[^>]*>(?:<tspan[^>]*>|<textPath[^>]*>)([^<]*)/g)) {
+      if (/[\u0900-\u097F]/.test(m[2])) assert.equal(m[1], '0', `${id}: ${m[2]}`);
+    }
+    const empty = Art.render({ name: 'राव परिवार', generations: [] }, colours, { style: id, lang: 'hi' });
+    assert.match(empty, /राव परिवार की जड़ें/, id);
+    assert.match(empty, /शुरू करने के लिए एक जगह जोड़ें।/, id);
+  }
+  assert.match(Art.render(hi, colours, { lang: 'xx' }), /Where I come from/);
+  assert.equal(Art.clean({ lang: 'hi' }).lang, 'hi');
+  assert.equal(Art.clean({ lang: 'fr' }).lang, 'en');
+  assert.equal(Art.unpack(Art.pack({ lang: 'hi' })).saved.lang, 'hi');
+  for (const lang of Object.keys(Art.LABELS)) {
+    const l = Art.LABELS[lang];
+    assert.equal(l.line.length, 4, lang);
+    assert.deepEqual(l.sides.map((s) => s.length), [3, 3], lang);
+    assert.ok(l.earlier && l.me && l.sideExtra.length === 2, lang);
   }
 });
 

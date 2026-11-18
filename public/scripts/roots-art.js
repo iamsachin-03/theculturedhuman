@@ -2,8 +2,8 @@
 // Pure string rendering, shared by the page (scripts/roots.js), tools/roots-example.mjs and the tests.
 // System fonts only, because the PNG download rasterises the SVG without the page's web fonts.
 (function (root) {
-  var SERIF = 'Georgia, \'Times New Roman\', serif';
-  var SANS = 'Helvetica, Arial, sans-serif';
+  var SERIF = 'Georgia, \'Times New Roman\', \'Noto Serif Devanagari\', \'Kohinoor Devanagari\', \'Nirmala UI\', serif';
+  var SANS = 'Helvetica, Arial, \'Noto Sans Devanagari\', \'Kohinoor Devanagari\', \'Nirmala UI\', sans-serif';
   var MAX_GENERATIONS = 6;
   var MAX_PER_SIDE = 4;
 
@@ -12,6 +12,31 @@
     story: { id: 'story', name: 'Story', hint: '9:16', w: 1080, h: 1920 },
     print: { id: 'print', name: 'Print', hint: 'A4 · A3', w: 1080, h: 1527 },
   };
+
+  /** The words printed on the portrait itself. Generation labels are the person's own. */
+  var LANGS = [
+    { id: 'en', name: 'English', title: 'Where I come from', titleOf: function (n) { return 'The roots of ' + n; }, footer: 'Everyone comes from somewhere', invite: 'Add a place to begin.' },
+    { id: 'hi', name: 'हिन्दी', title: 'मेरी जड़ें', titleOf: function (n) { return n + ' की जड़ें'; }, footer: 'हर कोई कहीं से आता है', invite: 'शुरू करने के लिए एक जगह जोड़ें।' },
+  ];
+
+  /** The generation labels on the form and the portrait, in each language, by position. */
+  var LABELS = {
+    en: {
+      line: ['Me', 'My parents', 'My grandparents', 'My great-grandparents'], earlier: 'Earlier ancestors',
+      me: 'Me', sides: [['My mother', 'Mother\'s parents', 'Mother\'s grandparents'], ['My father', 'Father\'s parents', 'Father\'s grandparents']],
+      sideExtra: ['Mother\'s great-grandparents', 'Father\'s great-grandparents'],
+    },
+    hi: {
+      line: ['मैं', 'मेरे माता-पिता', 'मेरे दादा-दादी या नाना-नानी', 'उनके माता-पिता'], earlier: 'और पहले के पूर्वज',
+      me: 'मैं', sides: [['मेरी माँ', 'नाना-नानी', 'परनाना-परनानी'], ['मेरे पिता', 'दादा-दादी', 'परदादा-परदादी']],
+      sideExtra: ['माँ की ओर के पूर्वज', 'पिता की ओर के पूर्वज'],
+    },
+  };
+
+  function langById(id) {
+    for (var i = 0; i < LANGS.length; i++) if (LANGS[i].id === id) return LANGS[i];
+    return LANGS[0];
+  }
 
   var STYLES = [
     { id: 'roots', name: 'Roots', hint: 'Roots that grow deeper with every generation, under a tree that fills out as you go.' },
@@ -61,7 +86,12 @@
     return lines.map(function (l) { return l.length > maxChars + 4 ? l.slice(0, maxChars) + '…' : l; });
   }
 
+  // Spacing letters apart breaks the headline that joins Devanagari letters.
+  var DEVANAGARI = /[\u0900-\u097F]/;
+  function unspaced(str, attrs) { return DEVANAGARI.test(str) ? attrs.replace(/letter-spacing="[^"]*"/, 'letter-spacing="0"') : attrs; }
+
   function text(x, y, lines, attrs, lineHeight) {
+    attrs = unspaced(lines.join(' '), attrs);
     return '<text x="' + f(x) + '" y="' + f(y) + '" ' + attrs + '>' + lines.map(function (l, i) {
       return '<tspan x="' + f(x) + '" dy="' + (i === 0 ? 0 : lineHeight) + '">' + esc(l) + '</tspan>';
     }).join('') + '</text>';
@@ -91,7 +121,10 @@
     var k = o.scale || 1;
     var width = Math.max(150, o.width);
     var kick = (g.label || '').toUpperCase() + (g.years && g.years.trim() ? ' · ' + g.years.trim() : '');
-    var kickSize = Math.max(15, Math.min(20 * k, (width / Math.max(kick.length, 1) - 2.5) / 0.66));
+    // Devanagari vowel signs take no width of their own, and it is set without letter-spacing.
+    var deva = DEVANAGARI.test(kick);
+    var kickLen = Math.max(1, deva ? kick.replace(/[\u0900-\u0903\u093A-\u094F\u0951-\u0957\u0962\u0963]/g, '').length : kick.length);
+    var kickSize = Math.max(deva ? 17 : 15, Math.min(20 * k, (width / kickLen - (deva ? 0 : 2.5)) / 0.66));
     var max = Math.max(8, Math.floor(width / (21 * k)));
     var place = wrap(g.place || '', o.crowded ? max + 2 : max, o.crowded ? 1 : 2);
     var detailMax = Math.floor(width / (12.5 * k));
@@ -99,7 +132,7 @@
     var top = y - (place.length > 1 ? 34 : 14) * k;
     var h = halo(o.halo);
     var a = 'text-anchor="' + anchor + '" ';
-    var kickFits = Math.floor(width / (kickSize * 0.66 + (kickSize > 17 ? 3 : 1.5)));
+    var kickFits = Math.floor(width / (kickSize * 0.66 + (deva ? 0 : kickSize > 17 ? 3 : 1.5)) * (kick.length / kickLen));
     var kickMax = Math.min(40, Math.max(10, kickFits));
     var kickName = (g.label || '').toUpperCase();
     var kickLines = kick.length > kickMax && g.years && g.years.trim() && kickName.length <= kickMax
@@ -563,7 +596,7 @@
   }
 
   function onArc(id, str, attrs) {
-    return '<text text-anchor="middle" ' + attrs + '><textPath href="#' + id + '" xlink:href="#' + id + '" startOffset="50%">' + esc(str) + '</textPath></text>';
+    return '<text text-anchor="middle" ' + unspaced(str, attrs) + '><textPath href="#' + id + '" xlink:href="#' + id + '" startOffset="50%">' + esc(str) + '</textPath></text>';
   }
 
   function kicker(g) { return (g.label || '').toUpperCase() + (g.years && g.years.trim() ? ' · ' + g.years.trim() : ''); }
@@ -741,7 +774,7 @@
    *   sides[1] (father's), each from the parent back. Entries without a place are skipped.
    *   Generation is { label: string, place: string, years?: string, detail?: string }.
    * @param {{ page: string, surface: string, primary: string, accent: string, accentInk: string, gold: string, ink: string, muted: string, line: string, night?: string, nightInk?: string, water?: string }} colours
-   * @param {{ style?: string, format?: 'post' | 'story', idPrefix?: string }} [opts]
+   * @param {{ style?: string, format?: 'post' | 'story' | 'print', lang?: 'en' | 'hi', idPrefix?: string }} [opts]
    */
   function render(data, colours, opts) {
     opts = opts || {};
@@ -752,7 +785,8 @@
     var ctx = { W: fmt.w, H: fmt.h, c: c, id: (opts.idPrefix || 'tch') + '-', out: [], rand: seeded(style), inset: Math.round((fmt.h - 1350) * 150 / 570) };
     var gens = places(data);
     var name = (data.name || '').trim();
-    var titleLines = wrap(name ? 'The roots of ' + name : 'Where I come from', 30, 2);
+    var words = langById(opts.lang);
+    var titleLines = wrap(name ? words.titleOf(name) : words.title, 30, 2);
     var bg = dark ? c.night : c.page;
     var ink = dark ? c.nightInk : c.primary;
     var out = ctx.out;
@@ -767,12 +801,12 @@
       ? RENDERERS_TWO_SIDED[style](ctx, data.me || { label: 'Me' }, sideList(data, 0), sideList(data, 1))
       : RENDERERS[style](ctx, gens);
     if (!gens.length) {
-      out.push(text(ctx.W / 2, inviteY || (ctx.top + ctx.bottom) / 2, ['Add a place to begin.'], 'text-anchor="middle" font-family="' + SERIF + '" font-style="italic" font-size="40" fill="' + (dark ? c.nightInk : c.muted) + '"' + halo(bg, 10), 0));
+      out.push(text(ctx.W / 2, inviteY || (ctx.top + ctx.bottom) / 2, [words.invite], 'text-anchor="middle" font-family="' + SERIF + '" font-style="italic" font-size="40" fill="' + (dark ? c.nightInk : c.muted) + '"' + halo(bg, 10), 0));
     }
     out.push('<rect x="36" y="36" width="' + (ctx.W - 72) + '" height="' + (ctx.H - 72) + '" rx="28" fill="none" stroke="' + (dark ? c.nightInk : c.line) + '" stroke-opacity="' + (dark ? 0.3 : 1) + '" stroke-width="3"/>');
     out.push(text(ctx.W / 2, y0 + 112, ['THE CULTURED HUMAN'], 'text-anchor="middle" font-family="' + SANS + '" font-size="22" font-weight="700" letter-spacing="6" fill="' + (dark ? c.gold : c.accentInk) + '"', 0));
     out.push(text(ctx.W / 2, y0 + (titleLines.length > 1 ? 168 : 186), titleLines, 'text-anchor="middle" font-family="' + SERIF + '" font-size="58" fill="' + ink + '"', 64));
-    out.push(text(ctx.W / 2, ctx.H - 82 - ctx.inset * 0.6, ['Everyone comes from somewhere · @theculturedhuman'], 'text-anchor="middle" font-family="' + SANS + '" font-size="21" letter-spacing="1" fill="' + (dark ? c.nightInk : c.muted) + '"' + (dark ? ' fill-opacity="0.75"' : ''), 0));
+    out.push(text(ctx.W / 2, ctx.H - 82 - ctx.inset * 0.6, [words.footer + ' · @theculturedhuman'], 'text-anchor="middle" font-family="' + SANS + '" font-size="21" letter-spacing="1" fill="' + (dark ? c.nightInk : c.muted) + '"' + (dark ? ' fill-opacity="0.75"' : ''), 0));
     out.push('</svg>');
     return out.join('');
   }
@@ -787,7 +821,7 @@
   /**
    * The saved form of a portrait (what the roots page keeps on the device, in the archive and in
    * invite links), with unknown fields dropped and every string capped.
-   * @returns {{ name: string, mode: 'line' | 'sides', generations: Generation[], me: Generation, sides: Generation[][], style: string, palette: string, format: string }}
+   * @returns {{ name: string, mode: 'line' | 'sides', generations: Generation[], me: Generation, sides: Generation[][], style: string, palette: string, format: string, lang: string }}
    */
   function clean(saved) {
     saved = saved && typeof saved === 'object' ? saved : {};
@@ -801,6 +835,7 @@
       style: styleById(saved.style).id,
       palette: paletteById(saved.palette).id,
       format: FORMATS[saved.format] ? saved.format : 'post',
+      lang: langById(saved.lang).id,
     };
   }
 
@@ -823,7 +858,7 @@
    */
   function pack(saved, from) {
     var s = clean(saved);
-    var o = { v: 1, name: s.name, mode: s.mode, style: s.style, palette: s.palette, format: s.format };
+    var o = { v: 1, name: s.name, mode: s.mode, style: s.style, palette: s.palette, format: s.format, lang: s.lang };
     if (s.mode === 'sides') { o.me = compactGen(s.me); o.sides = s.sides.map(function (l) { return l.map(compactGen); }); }
     else o.generations = s.generations.map(compactGen);
     if (from) o.from = str(from, 60);
@@ -856,7 +891,7 @@
 
   var api = {
     render: render, STYLES: STYLES, PALETTES: PALETTES, FORMATS: FORMATS, MAX_GENERATIONS: MAX_GENERATIONS, MAX_PER_SIDE: MAX_PER_SIDE,
-    styleById: styleById, paletteById: paletteById, places: places, clean: clean, fromSaved: fromSaved, pack: pack, unpack: unpack, siteColours: siteColours,
+    LANGS: LANGS, LABELS: LABELS, langById: langById, styleById: styleById, paletteById: paletteById, places: places, clean: clean, fromSaved: fromSaved, pack: pack, unpack: unpack, siteColours: siteColours,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.TCHRootsArt = api;

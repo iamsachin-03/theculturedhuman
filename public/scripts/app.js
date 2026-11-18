@@ -573,7 +573,7 @@
     var data = Art.fromSaved(saved);
     var label = 'Roots portrait: ' + Art.places(data).map(function (g) { return g.label + ', ' + g.place; }).join('; ') + '.';
     var box = h('div', { class: 'app-roots__art', role: 'img', 'aria-label': label, 'data-format': saved.format });
-    box.innerHTML = Art.render(data, p.c || Art.siteColours(), { style: saved.style, format: saved.format, idPrefix: 'app-roots' });
+    box.innerHTML = Art.render(data, p.c || Art.siteColours(), { style: saved.style, format: saved.format, lang: saved.lang, idPrefix: 'app-roots' });
     return box;
   }
 

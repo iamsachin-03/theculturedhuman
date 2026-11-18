@@ -74,16 +74,15 @@
   var placeLinks = document.querySelector('[data-place-links]');
   var shareBtn = form.querySelector('[data-share]');
   var STORAGE = 'tch-roots';
-  var DEFAULTS = ['Me', 'My parents', 'My grandparents', 'My great-grandparents'];
-  var SIDE_DEFAULTS = [
-    ['My mother', 'Mother\'s parents', 'Mother\'s grandparents'],
-    ['My father', 'Father\'s parents', 'Father\'s grandparents'],
-  ];
-  var SIDE_EXTRA = ['Mother\'s great-grandparents', 'Father\'s great-grandparents'];
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var counter = 0;
   var places = [];
-  var look = { style: 'roots', palette: 'site', format: 'post' };
+  var look = { style: 'roots', palette: 'site', format: 'post', lang: 'en' };
+  var langsBox = form.querySelector('[data-langs]');
+
+  function words() { return Art.LABELS[look.lang]; }
+  function lineLabel(i) { return words().line[i] || words().earlier; }
+  function sideLabel(col, i) { return words().sides[col][i] || words().sideExtra[col]; }
   var anim = { kind: 'all', start: Date.now(), gen: '' };
   var filledBefore = null;
   var lookBefore = null;
@@ -119,6 +118,9 @@
       var fm = Art.FORMATS[k];
       formatsBox.appendChild(choice('roots-format', fm.id, '<span>' + fm.name + ' <span class="field__optional">' + fm.hint + '</span></span>', 'pill-choice'));
     });
+    Art.LANGS.forEach(function (l) {
+      langsBox.appendChild(choice('roots-lang', l.id, '<span lang="' + l.id + '">' + l.name + '</span>', 'pill-choice'));
+    });
     paintSwatches();
   }
 
@@ -133,7 +135,8 @@
     look.style = Art.styleById(next.style).id;
     look.palette = Art.paletteById(next.palette).id;
     look.format = Art.FORMATS[next.format] ? next.format : 'post';
-    [['roots-style', look.style], ['roots-palette', look.palette], ['roots-format', look.format]].forEach(function (pair) {
+    look.lang = Art.langById(next.lang || look.lang).id;
+    [['roots-style', look.style], ['roots-palette', look.palette], ['roots-format', look.format], ['roots-lang', look.lang]].forEach(function (pair) {
       var input = form.querySelector('input[name="' + pair[0] + '"][value="' + pair[1] + '"]');
       if (input) input.checked = true;
     });
@@ -141,7 +144,25 @@
 
   function readLook() {
     function val(name) { var el = form.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : undefined; }
-    setLook({ style: val('roots-style'), palette: val('roots-palette'), format: val('roots-format') });
+    var before = look.lang;
+    setLook({ style: val('roots-style'), palette: val('roots-palette'), format: val('roots-format'), lang: val('roots-lang') });
+    if (look.lang !== before) relabel();
+  }
+
+  function setRowLabel(fs, label) {
+    fs.dataset.label = label;
+    fs.querySelector('legend').textContent = label;
+    var rm = fs.querySelector('.trace-gen__remove');
+    if (rm) rm.setAttribute('aria-label', 'Remove ' + label);
+  }
+
+  /** Puts every row's label into the portrait's language. */
+  function relabel() {
+    Array.prototype.forEach.call(list.children, function (fs, i) { setRowLabel(fs, lineLabel(i)); });
+    Array.prototype.forEach.call(meBox.children, function (fs) { setRowLabel(fs, words().me); });
+    sideBoxes.forEach(function (box, col) {
+      Array.prototype.forEach.call(box.children, function (fs, i) { setRowLabel(fs, sideLabel(col, i)); });
+    });
   }
 
   function generationRow(g, removable) {
@@ -153,12 +174,11 @@
       '<p class="field"><label for="tg-' + n + '-place">Where they lived</label><input id="tg-' + n + '-place" type="text" data-k="place" maxlength="40" autocomplete="off"></p>' +
       '<p class="field"><label for="tg-' + n + '-years">When <span class="field__optional">(optional)</span></label><input id="tg-' + n + '-years" type="text" data-k="years" maxlength="16" autocomplete="off"></p>' +
       '<p class="field field--wide"><label for="tg-' + n + '-detail">One detail <span class="field__optional">(optional)</span></label><input id="tg-' + n + '-detail" type="text" data-k="detail" maxlength="60" autocomplete="off"></p>';
-    fs.querySelector('legend').textContent = g.label;
-    fs.dataset.label = g.label;
+    setRowLabel(fs, g.label);
     fs.dataset.row = String(n);
     ['place', 'years', 'detail'].forEach(function (k) { fs.querySelector('[data-k="' + k + '"]').value = g[k] || ''; });
-    var placeholders = { 'Me': ['Bengaluru', 'now', 'learning to cook my mother\'s dal'], 'My parents': ['Patna', '1980s', 'met at a cousin\'s wedding'] };
-    var ph = placeholders[g.label];
+    var placeholders = [['Bengaluru', 'now', 'learning to cook my mother\'s dal'], ['Patna', '1980s', 'met at a cousin\'s wedding']];
+    var ph = placeholders[Art.LABELS.en.line.indexOf(g.label) === -1 ? Art.LABELS.hi.line.indexOf(g.label) : Art.LABELS.en.line.indexOf(g.label)];
     if (ph) ['place', 'years', 'detail'].forEach(function (k, i) { fs.querySelector('[data-k="' + k + '"]').placeholder = 'e.g. ' + ph[i]; });
     if (removable) {
       var rm = document.createElement('button');
@@ -214,6 +234,7 @@
   }
 
   function art(data, opts) {
+    opts.lang = look.lang;
     return Art.render(data, colours(opts.palette), opts);
   }
 
@@ -278,7 +299,7 @@
     return {
       name: form.querySelector('[name="family"]').value, mode: mode(), generations: rowsData(list).map(strip),
       me: strip(two.me), sides: two.sides.map(function (s) { return s.generations.map(strip); }),
-      style: look.style, palette: look.palette, format: look.format,
+      style: look.style, palette: look.palette, format: look.format, lang: look.lang,
     };
   }
 
@@ -351,18 +372,19 @@
     list.innerHTML = '';
     meBox.innerHTML = '';
     form.querySelector('[name="family"]').value = data.name || '';
-    var gens = data.generations && data.generations.length ? data.generations : DEFAULTS.map(function (l) { return { label: l }; });
-    gens.forEach(function (g, i) { list.appendChild(generationRow(g, i >= DEFAULTS.length)); });
+    setLook({ style: data.style, palette: data.palette, format: data.format, lang: data.lang });
+    var gens = data.generations && data.generations.length ? data.generations : words().line.map(function (l) { return { label: l }; });
+    gens.forEach(function (g, i) { list.appendChild(generationRow(g, i >= words().line.length)); });
     var me = data.me || {};
     if (!has(me) && has(gens[0])) me = gens[0];
     meBox.appendChild(generationRow({ label: 'Me', place: me.place, years: me.years, detail: me.detail }, false));
     sideBoxes.forEach(function (box, col) {
       box.innerHTML = '';
-      var saved = data.sides && data.sides[col] && data.sides[col].length ? data.sides[col] : SIDE_DEFAULTS[col].map(function (l) { return { label: l }; });
-      saved.forEach(function (g, i) { box.appendChild(generationRow(g, i >= SIDE_DEFAULTS[col].length)); });
+      var saved = data.sides && data.sides[col] && data.sides[col].length ? data.sides[col] : words().sides[col].map(function (l) { return { label: l }; });
+      saved.forEach(function (g, i) { box.appendChild(generationRow(g, i >= words().sides[col].length)); });
     });
     form.querySelector('input[name="roots-mode"][value="' + (data.mode === 'sides' ? 'sides' : 'line') + '"]').checked = true;
-    setLook({ style: data.style, palette: data.palette, format: data.format });
+    relabel();
     filledBefore = null;
     lookBefore = null;
     anim = { kind: 'all', start: Date.now(), gen: '' };
@@ -372,14 +394,14 @@
   buildPicker();
 
   addBtn.addEventListener('click', function () {
-    var row = generationRow({ label: 'Earlier ancestors' }, true);
+    var row = generationRow({ label: lineLabel(list.children.length) }, true);
     list.appendChild(row);
     update();
     row.querySelector('input').focus();
   });
   sideAdds.forEach(function (btn, col) {
     btn.addEventListener('click', function () {
-      var row = generationRow({ label: SIDE_EXTRA[col] }, true);
+      var row = generationRow({ label: sideLabel(col, sideBoxes[col].children.length) }, true);
       sideBoxes[col].appendChild(row);
       update();
       row.querySelector('input').focus();
