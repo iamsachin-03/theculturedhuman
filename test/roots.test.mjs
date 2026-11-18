@@ -109,6 +109,24 @@ test('a saved portrait is cleaned to known fields and capped lengths', () => {
   assert.deepEqual(Art.fromSaved({ generations: [{ place: 'Agra' }] }), { name: '', generations: [{ label: '', place: 'Agra', years: '', detail: '' }] });
 });
 
+test('an invite link carries the whole portrait and who sent it, and nothing else', () => {
+  const saved = { name: 'शर्मा परिवार', mode: 'sides', me: { label: 'Me', place: 'Jaipur' }, sides: [[{ label: 'My mother', place: 'Ajmer', years: '1960s', detail: 'taught Urdu' }], []], style: 'river', palette: 'kantha', format: 'story', generations: [{ label: 'Me', place: 'Jaipur' }] };
+  const packed = Art.pack(saved, 'Asha');
+  assert.match(packed, /^[\w-]+$/);
+  const { saved: back, from } = Art.unpack(packed);
+  assert.equal(from, 'Asha');
+  assert.deepEqual(back, { ...Art.clean(saved), generations: [] });
+  const line = Art.unpack(Art.pack({ generations: [{ label: 'Me', place: 'Pune' }] }));
+  assert.deepEqual(line.saved.generations, [{ label: 'Me', place: 'Pune', years: '', detail: '' }]);
+  assert.equal(line.from, '');
+  const full = () => ({ label: 'x'.repeat(60), place: 'y'.repeat(80), years: 'z'.repeat(40), detail: 'w'.repeat(120) });
+  const biggest = Art.pack({ name: 'n'.repeat(80), mode: 'sides', me: full(), sides: [[full(), full(), full(), full()], [full(), full(), full(), full()]] }, 'f'.repeat(60));
+  assert.ok(biggest.length < 5000, `the largest possible portrait still fits in a link (${biggest.length})`);
+  for (const bad of ['', 'not-base64!', Buffer.from('{"v":2}').toString('base64url'), Buffer.from('[1,2]').toString('base64url'), Buffer.from('nope').toString('base64url')]) {
+    assert.equal(Art.unpack(bad), null, bad);
+  }
+});
+
 test('the river runs from the oldest place down to you', () => {
   const svg = Art.render(family, colours, { style: 'river' });
   assert.ok(svg.indexOf('Kundapura') < svg.indexOf('Udupi') && svg.indexOf('Udupi') < svg.indexOf('Pune'));

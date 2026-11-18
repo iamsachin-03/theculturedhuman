@@ -804,6 +804,42 @@
     return { name: s.name, generations: s.generations };
   }
 
+  function compactGen(g) {
+    var out = {};
+    ['label', 'place', 'years', 'detail'].forEach(function (k) { if (g[k]) out[k] = g[k]; });
+    return out;
+  }
+
+  /**
+   * A portrait (and who sent it) as a URL-safe string, for invite links. The string travels in the
+   * link's #fragment, which browsers never send to a server.
+   */
+  function pack(saved, from) {
+    var s = clean(saved);
+    var o = { v: 1, name: s.name, mode: s.mode, style: s.style, palette: s.palette, format: s.format };
+    if (s.mode === 'sides') { o.me = compactGen(s.me); o.sides = s.sides.map(function (l) { return l.map(compactGen); }); }
+    else o.generations = s.generations.map(compactGen);
+    if (from) o.from = str(from, 60);
+    var bytes = new TextEncoder().encode(JSON.stringify(o));
+    var bin = '';
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  /** @returns {{ saved: ReturnType<typeof clean>, from: string } | null} null when the string is not a portrait. */
+  function unpack(text) {
+    try {
+      var bin = atob(String(text).replace(/-/g, '+').replace(/_/g, '/'));
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      var o = JSON.parse(new TextDecoder().decode(bytes));
+      if (!o || o.v !== 1) return null;
+      return { saved: clean(o), from: str(o.from, 60) };
+    } catch (e) {
+      return null;
+    }
+  }
+
   /** The site's own colours, read from its CSS (browser only). */
   function siteColours() {
     var s = getComputedStyle(document.documentElement);
@@ -813,7 +849,7 @@
 
   var api = {
     render: render, STYLES: STYLES, PALETTES: PALETTES, FORMATS: FORMATS, MAX_GENERATIONS: MAX_GENERATIONS, MAX_PER_SIDE: MAX_PER_SIDE,
-    styleById: styleById, paletteById: paletteById, places: places, clean: clean, fromSaved: fromSaved, siteColours: siteColours,
+    styleById: styleById, paletteById: paletteById, places: places, clean: clean, fromSaved: fromSaved, pack: pack, unpack: unpack, siteColours: siteColours,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.TCHRootsArt = api;

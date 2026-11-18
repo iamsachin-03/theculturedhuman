@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trace your roots — The Cultured Human</title>
-<meta name="description" content="Add the places your family has lived, generation by generation, and watch your roots grow into a portrait you can keep and share. Nothing you type leaves your browser.">
+<meta name="description" content="Add the places your family has lived, generation by generation, and watch your roots grow into a portrait you can keep and share. Nothing you type leaves your browser unless you choose to send it.">
 <meta name="theme-color" content="#FBF4E8">
 <link rel="canonical" href="https://theculturedhuman.vercel.app/trace.html">
 <meta property="og:site_name" content="The Cultured Human">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Trace your roots — The Cultured Human">
-<meta property="og:description" content="Add the places your family has lived, generation by generation, and watch your roots grow into a portrait you can keep and share. Nothing you type leaves your browser.">
+<meta property="og:description" content="Add the places your family has lived, generation by generation, and watch your roots grow into a portrait you can keep and share. Nothing you type leaves your browser unless you choose to send it.">
 <meta property="og:url" content="https://theculturedhuman.vercel.app/trace.html">
 <meta property="og:locale" content="en_IN">
 <meta property="og:image" content="https://theculturedhuman.vercel.app/assets/art/warli/warli-house-wall-1600.jpg">
@@ -56,6 +56,11 @@
 <div class="editorial-content">
   <div class="trace">
     <div class="trace__form" data-trace role="group" aria-labelledby="trace-form-title">
+      <div class="trace-invited" data-invited role="status" hidden>
+        <p class="trace-invited__title" data-invited-title></p>
+        <p>Their portrait is open below. Add the places, years and details you remember, then press <strong>Send it back</strong> at the bottom.</p>
+        <button class="btn btn--ghost btn--small" type="button" data-invited-undo hidden>Go back to my own portrait</button>
+      </div>
       <fieldset class="trace-look">
         <legend class="trace__heading">Choose how it looks</legend>
         <div class="trace-look__styles" data-styles></div>
@@ -96,6 +101,18 @@
         <button class="trace__clear" type="button" data-clear>Clear everything</button>
       </div>
       <p class="enquiry__note">Everything you type stays in this browser. Nothing is sent to us unless you choose to keep the portrait in your <a href="/archive.html">family archive</a>, where only you can see it and you can open it again on any device.</p>
+      <section class="trace-invite" aria-labelledby="trace-invite-title">
+        <h2 id="trace-invite-title" class="trace__heading" data-invite-heading>Ask a relative to fill in the gaps</h2>
+        <p data-invite-lede>Send your portrait to a parent, an aunt or a grandparent. They can add what they remember on their phone and send it back to you the same way.</p>
+        <p class="field"><label for="trace-from">Your name <span class="field__optional">(so they know who is asking)</span></label><input id="trace-from" type="text" maxlength="40" autocomplete="given-name" data-invite-from></p>
+        <div class="trace__actions">
+          <a class="btn" data-invite-whatsapp href="https://wa.me/" target="_blank" rel="noopener">Send on WhatsApp</a>
+          <button class="btn btn--ghost" type="button" data-invite-copy>Copy link</button>
+          <button class="btn btn--ghost" type="button" data-invite-share hidden>Share link</button>
+        </div>
+        <p class="trace-invite__status" data-invite-status aria-live="polite"></p>
+        <p class="enquiry__note">The link carries the portrait itself, so it never passes through us. Anyone you send it to can see these places, so send it only to family.</p>
+      </section>
     </div>
     <div class="trace__preview-wrap">
       <div class="trace__preview" data-trace-preview role="img" aria-label="Your roots portrait will appear here."></div>

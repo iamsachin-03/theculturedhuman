@@ -264,7 +264,7 @@
     if (styleHint) styleHint.textContent = Art.styleById(look.style).hint;
     addBtn.hidden = list.children.length >= Art.MAX_GENERATIONS;
     sideBoxes.forEach(function (b, i) { sideAdds[i].hidden = b.children.length >= Art.MAX_PER_SIDE; });
-    save(data.name);
+    save();
     showPlaces(data);
     clearTimeout(thumbTimer);
     thumbTimer = setTimeout(function () { drawThumbs(data); }, 160);
@@ -272,14 +272,19 @@
 
   function strip(g) { return { label: g.label, place: g.place, years: g.years, detail: g.detail }; }
 
-  function save(name) {
+  /** Everything on the form, in the saved form (TCHRootsArt.clean): both modes, whichever is showing. */
+  function snapshot() {
     var two = readSides();
-    var saved = {
-      name: name, mode: mode(), generations: rowsData(list).map(strip),
+    return {
+      name: form.querySelector('[name="family"]').value, mode: mode(), generations: rowsData(list).map(strip),
       me: strip(two.me), sides: two.sides.map(function (s) { return s.generations.map(strip); }),
       style: look.style, palette: look.palette, format: look.format,
     };
-    try { localStorage.setItem(STORAGE, JSON.stringify(saved)); } catch (e) {}
+  }
+
+  function save() {
+    try { localStorage.setItem(STORAGE, JSON.stringify(snapshot())); } catch (e) {}
+    updateInvite();
   }
 
   function drawThumbs(data) {
@@ -396,13 +401,104 @@
     });
   }
 
+  // ---------- asking a relative to fill in the gaps ----------
+  var FROM = 'tch-roots-from';
+  var BEFORE = 'tch-roots-before-invite';
+  var fromInput = form.querySelector('[data-invite-from]');
+  var waLink = form.querySelector('[data-invite-whatsapp]');
+  var inviteStatus = form.querySelector('[data-invite-status]');
+  var invitedBox = form.querySelector('[data-invited]');
+  var inviteShare = form.querySelector('[data-invite-share]');
+  var invitedBy = '';
+
+  function inviteLink() {
+    return location.origin + '/trace.html#roots=' + Art.pack(snapshot(), fromInput.value.trim());
+  }
+
+  function inviteMessage() {
+    var link = inviteLink();
+    return invitedBy
+      ? 'I added what I remember to our family roots. Have a look: ' + link
+      : 'Can you help me fill in where our family comes from? Add the places and years you remember here: ' + link;
+  }
+
+  function updateInvite() {
+    if (!waLink) return;
+    waLink.href = 'https://wa.me/?text=' + encodeURIComponent(inviteMessage());
+  }
+
+  function sent(text) {
+    inviteStatus.textContent = text;
+    setTimeout(function () { if (inviteStatus.textContent === text) inviteStatus.textContent = ''; }, 4000);
+  }
+
+  function showInvited(from, canUndo) {
+    invitedBy = from || 'Someone in your family';
+    invitedBox.hidden = false;
+    form.querySelector('[data-invited-title]').textContent = invitedBy + ' sent you their family roots.';
+    form.querySelector('[data-invited-undo]').hidden = !canUndo;
+    form.querySelector('[data-invite-heading]').textContent = 'Send it back';
+    form.querySelector('[data-invite-lede]').textContent = 'When you have added what you know, send the portrait back to ' + invitedBy + '. They will see your additions when they open the link.';
+    waLink.textContent = 'Send it back on WhatsApp';
+  }
+
+  /** Opens a portrait from an invite link, keeping this browser's own portrait to go back to. */
+  function openInvite() {
+    var m = /^#roots=([\w-]+)$/.exec(location.hash);
+    if (!m) return false;
+    var got = Art.unpack(m[1]);
+    history.replaceState(null, '', location.pathname + location.search);
+    if (!got) return false;
+    var own = null;
+    try { own = JSON.parse(localStorage.getItem(STORAGE) || 'null'); } catch (e) {}
+    var ownHasPlaces = own && Art.places(Art.fromSaved(own)).length > 0;
+    try { if (ownHasPlaces) localStorage.setItem(BEFORE, JSON.stringify(own)); } catch (e) {}
+    load(got.saved);
+    showInvited(got.from, ownHasPlaces);
+    return true;
+  }
+
+  if (fromInput) {
+    try { fromInput.value = localStorage.getItem(FROM) || ''; } catch (e) {}
+    fromInput.addEventListener('input', function () {
+      try { localStorage.setItem(FROM, fromInput.value.trim()); } catch (e) {}
+    });
+    form.querySelector('[data-invite-copy]').addEventListener('click', function () {
+      var link = inviteLink();
+      var done = function () { sent('Link copied. Paste it into a message to someone in your family.'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () { window.prompt('Copy this link:', link); });
+      else window.prompt('Copy this link:', link);
+    });
+    if (navigator.share) {
+      inviteShare.hidden = false;
+      inviteShare.addEventListener('click', function () {
+        navigator.share({ text: inviteMessage() }).catch(function () {});
+      });
+    }
+    form.querySelector('[data-invited-undo]').addEventListener('click', function () {
+      var before = null;
+      try { before = JSON.parse(localStorage.getItem(BEFORE) || 'null'); localStorage.removeItem(BEFORE); } catch (e) {}
+      if (before) load(Art.clean(before));
+      invitedBox.hidden = true;
+      invitedBy = '';
+      form.querySelector('[data-invite-heading]').textContent = 'Ask a relative to fill in the gaps';
+      form.querySelector('[data-invite-lede]').textContent = 'Send your portrait to a parent, an aunt or a grandparent. They can add what they remember on their phone and send it back to you the same way.';
+      waLink.textContent = 'Send on WhatsApp';
+      updateInvite();
+      form.querySelector('[name="family"]').focus();
+    });
+  }
+  window.addEventListener('hashchange', function () { if (openInvite()) window.scrollTo(0, 0); });
+
   function themeChanged() { paintSwatches(); if (look.palette === 'site') { update(); } }
   window.addEventListener('storage', function (e) { if (e.key === 'tch-theme') themeChanged(); });
   new MutationObserver(themeChanged).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-  var saved = {};
-  try { saved = JSON.parse(localStorage.getItem(STORAGE) || '{}') || {}; } catch (e) {}
-  load(Art.clean(saved));
+  if (!openInvite()) {
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem(STORAGE) || '{}') || {}; } catch (e) {}
+    load(Art.clean(saved));
+  }
 
   if (placeLinks && window.fetch) {
     fetch('/places/places.json').then(function (r) { return r.ok ? r.json() : []; }).then(function (list) {
