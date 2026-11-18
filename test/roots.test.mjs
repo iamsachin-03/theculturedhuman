@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const Art = require('../public/scripts/roots-art.js');
-const { describe } = require('../public/scripts/roots.js');
+const { describe, progressText } = require('../public/scripts/roots.js');
 const colours = { page: '#fff', surface: '#fff', primary: '#000', accent: '#c00', accentInk: '#a00', gold: '#fc0', ink: '#111', muted: '#555', line: '#ddd' };
 
 const family = {
@@ -89,4 +89,10 @@ test('an empty portrait invites the reader to begin, and the description says so
   for (const { id } of Art.STYLES) assert.match(Art.render({ generations: [] }, colours, { style: id }), /Add a place to begin/, id);
   assert.match(describe({ generations: [] }), /Add a place to begin/);
   assert.equal(describe({ generations: [{ label: 'Me', place: 'Kochi' }] }), 'Where I come from: Me, Kochi.');
+});
+
+test('the encouragement grows with each generation and stops changing after six', () => {
+  const lines = [0, 1, 2, 3, 4, 5, 6].map(progressText);
+  assert.equal(new Set(lines).size, 7);
+  assert.equal(progressText(9), progressText(6));
 });

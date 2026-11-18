@@ -541,6 +541,49 @@ p { margin: 0 0 1em; }
 .trace__clear { background: none; border: 0; padding: .5rem 0; color: var(--muted); font-size: .9rem; text-decoration: underline; cursor: pointer; }
 .trace__preview-wrap { position: sticky; top: calc(var(--header-h) + 1.25rem); }
 .trace__preview svg, .trace__preview-wrap img { display: block; width: 100%; height: auto; border-radius: var(--radius); box-shadow: var(--shadow); }
+.trace__preview[data-format="story"] { max-width: min(100%, calc((100vh - var(--header-h) - 6rem) * 9 / 16)); margin-inline: auto; }
+.trace__progress { margin: 1rem 0 0; text-align: center; font: italic 500 var(--step-1)/1.35 var(--serif); color: var(--muted); transition: color .4s; }
+.trace__progress.is-deep { color: var(--accent-ink); }
+
+/* Style picker: live thumbnails of the reader's own portrait in each style. */
+.trace-look { margin: 0; padding: 0; border: 0; display: grid; gap: .9rem; min-width: 0; }
+.trace-look > legend { padding: 0; margin-bottom: .9rem; }
+.trace-look__styles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .6rem; }
+.trace-look input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.style-card { position: relative; display: grid; gap: .35rem; justify-items: center; cursor: pointer; }
+.style-card__art { display: block; width: 100%; aspect-ratio: 4 / 5; border-radius: var(--radius-sm); overflow: hidden; background: var(--surface-2); border: 2px solid var(--line); transition: border-color .2s, transform .2s, box-shadow .2s; }
+.style-card__art svg { display: block; width: 100%; height: 100%; }
+.style-card__name { font-size: .85rem; font-weight: 600; color: var(--muted); }
+.style-card:hover .style-card__art { transform: translateY(-2px); }
+.style-card:has(input:checked) .style-card__art { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.style-card:has(input:checked) .style-card__name { color: var(--accent-ink); }
+.trace-look input:focus-visible + .style-card__art,
+.trace-look input:focus-visible + .swatch,
+.trace-look input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+.trace-look__hint { margin: 0; min-height: 2.6em; font-size: .92rem; color: var(--muted); }
+.trace-look__row { display: flex; flex-wrap: wrap; gap: 1rem 2rem; }
+.trace-look__group { margin: 0; padding: 0; border: 0; min-width: 0; }
+.trace-look__group legend { padding: 0; margin-bottom: .5rem; font: 600 .74rem/1.4 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-ink); }
+.trace-look__swatches, .trace-look__sizes { display: flex; flex-wrap: wrap; gap: .5rem; }
+.swatch-choice { position: relative; cursor: pointer; }
+.swatch { display: block; width: 2.2rem; height: 2.2rem; border-radius: 50%; border: 2px solid var(--line); transition: transform .2s; }
+.swatch-choice:hover .swatch { transform: scale(1.08); }
+.swatch-choice:has(input:checked) .swatch { border-color: var(--ink); box-shadow: 0 0 0 3px var(--page), 0 0 0 5px var(--accent); }
+.pill-choice { position: relative; cursor: pointer; }
+.pill-choice > span { display: inline-block; padding: .45rem .9rem; border: 1.5px solid var(--line); border-radius: 999px; font-size: .9rem; font-weight: 600; transition: border-color .2s, background .2s; }
+.pill-choice:has(input:checked) > span { border-color: var(--primary); background: var(--primary); color: var(--on-primary); }
+.pill-choice:has(input:checked) .field__optional { color: inherit; opacity: .8; }
+@media (max-width: 520px) { .trace-look__styles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Growth: lines draw in and each generation blooms when it arrives. --tch-t carries the
+   elapsed time across re-renders while typing, so the animation continues instead of restarting. */
+.trace__preview .tch-gen { transform-box: fill-box; transform-origin: center; }
+.trace__preview.is-drawing .tch-draw { stroke-dasharray: 1; animation: tch-draw 1.1s cubic-bezier(.3, .7, .3, 1) both; animation-delay: calc(var(--tch-t, 0ms) + var(--d, 0) * 120ms); }
+.trace__preview.is-drawing .tch-gen { animation: tch-bloom .7s cubic-bezier(.2, .9, .3, 1.25) both; animation-delay: calc(var(--tch-t, 0ms) + 300ms + var(--i, 0) * 140ms); }
+.trace__preview .tch-gen.is-new { animation: tch-bloom .8s cubic-bezier(.2, .9, .3, 1.25) both; animation-delay: var(--tch-t, 0ms); }
+@keyframes tch-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes tch-bloom { from { opacity: 0; transform: scale(.55); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .trace__preview .tch-draw, .trace__preview .tch-gen { animation: none !important; } }
 @media (max-width: 900px) { .trace { grid-template-columns: 1fr; } .trace__preview-wrap { position: static; order: -1; width: min(100%, 360px); margin-inline: auto; } }
 @media (max-width: 520px) { .trace-gen { grid-template-columns: 1fr; } }
 .trace-showcase img { aspect-ratio: 4 / 5; max-width: 420px; margin-inline: auto; }

@@ -1,126 +1,9 @@
-// "Trace your roots": draws a family's places as roots growing down from a tree, deepest = oldest.
-// renderRoots() is pure so tools/roots-example.mjs can reuse it; the page UI runs only where
-// [data-trace] exists. Nothing typed here leaves the browser.
+// "Trace your roots": the form, the style picker and the live portrait. The artwork itself is drawn
+// by scripts/roots-art.js. The page UI runs only where [data-trace] exists. Nothing typed here
+// leaves the browser.
 (function (root) {
-  var W = 1080;
-  var H = 1350;
-  var SERIF = 'Georgia, \'Times New Roman\', serif';
-  var SANS = 'Helvetica, Arial, sans-serif';
-
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-
-  function wrap(text, maxChars, maxLines) {
-    var words = String(text).trim().split(/\s+/).filter(Boolean);
-    var lines = [];
-    var line = '';
-    for (var i = 0; i < words.length; i++) {
-      var next = line ? line + ' ' + words[i] : words[i];
-      if (next.length > maxChars && line) {
-        lines.push(line);
-        line = words[i];
-      } else {
-        line = next;
-      }
-    }
-    if (line) lines.push(line);
-    if (lines.length > maxLines) {
-      lines = lines.slice(0, maxLines);
-      var keep = lines[maxLines - 1];
-      lines[maxLines - 1] = (keep.length < maxChars ? keep : keep.replace(/\s*\S*$/, '')) + '…';
-    }
-    return lines.map(function (l) { return l.length > maxChars + 4 ? l.slice(0, maxChars) + '…' : l; });
-  }
-
-  function text(x, y, lines, attrs, lineHeight) {
-    return '<text x="' + x + '" y="' + y + '" ' + attrs + '>' + lines.map(function (l, i) {
-      return '<tspan x="' + x + '" dy="' + (i === 0 ? 0 : lineHeight) + '">' + esc(l) + '</tspan>';
-    }).join('') + '</text>';
-  }
-
-  /**
-   * @param {{ name?: string, generations: { label: string, place: string, years?: string, detail?: string }[] }} data
-   *   generations ordered from the youngest (top) to the oldest (bottom); entries without a place are skipped
-   * @param {{ page: string, surface: string, primary: string, accent: string, accentInk: string, gold: string, ink: string, muted: string, line: string }} c
-   */
-  function renderRoots(data, c) {
-    var gens = (data.generations || []).filter(function (g) { return g.place && g.place.trim(); }).slice(0, 6);
-    var name = (data.name || '').trim();
-    var title = name ? 'The roots of ' + name : 'Where I come from';
-    var titleLines = wrap(title, 30, 2);
-    var out = [];
-    out.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '">');
-    out.push('<rect width="' + W + '" height="' + H + '" fill="' + c.page + '"/>');
-    out.push('<rect x="36" y="36" width="' + (W - 72) + '" height="' + (H - 72) + '" rx="28" fill="none" stroke="' + c.line + '" stroke-width="3"/>');
-    out.push(text(W / 2, 112, ['THE CULTURED HUMAN'], 'text-anchor="middle" font-family="' + SANS + '" font-size="22" font-weight="700" letter-spacing="6" fill="' + c.accentInk + '"', 0));
-    out.push(text(W / 2, titleLines.length > 1 ? 168 : 186, titleLines, 'text-anchor="middle" font-family="' + SERIF + '" font-size="58" fill="' + c.primary + '"', 64));
-
-    var groundY = titleLines.length > 1 ? 352 : 330;
-    var cx = W / 2;
-    // The tree: you, above ground.
-    out.push('<g>');
-    out.push('<path d="M' + (cx - 7) + ' ' + groundY + ' L' + (cx - 5) + ' ' + (groundY - 52) + ' L' + (cx + 5) + ' ' + (groundY - 52) + ' L' + (cx + 7) + ' ' + groundY + ' Z" fill="' + c.primary + '"/>');
-    [[-30, -70, 30], [28, -72, 30], [0, -98, 34], [-12, -62, 24], [16, -60, 22]].forEach(function (b) {
-      out.push('<circle cx="' + (cx + b[0]) + '" cy="' + (groundY + b[1]) + '" r="' + b[2] + '" fill="' + c.primary + '" fill-opacity="' + (b[2] > 28 ? '0.92' : '0.75') + '"/>');
-    });
-    out.push('<circle cx="' + (cx + 34) + '" cy="' + (groundY - 128) + '" r="16" fill="' + c.gold + '" fill-opacity="0.85"/>');
-    out.push('</g>');
-    out.push('<line x1="110" y1="' + groundY + '" x2="' + (W - 110) + '" y2="' + groundY + '" stroke="' + c.gold + '" stroke-width="5" stroke-linecap="round"/>');
-
-    if (!gens.length) {
-      out.push(text(cx, groundY + 260, ['Add a place to begin.'], 'text-anchor="middle" font-family="' + SERIF + '" font-style="italic" font-size="40" fill="' + c.muted + '"', 0));
-    } else {
-      var top = groundY + 130;
-      var bottom = gens.length > 4 ? H - 230 : H - 300;
-      var step = gens.length > 1 ? Math.min(300, (bottom - top) / (gens.length - 1)) : 0;
-      // Few generations sit a little lower, so the portrait doesn't look unfinished.
-      var offset = Math.max(0, bottom - top - (gens.length - 1) * step) / 3;
-      var crowded = step < 190;
-      var pts = gens.map(function (g, i) {
-        return { x: cx + (i % 2 === 0 ? -34 : 34), y: top + offset + i * step, side: i % 2 === 0 ? 1 : -1 };
-      });
-      // Main root and fine side roots.
-      var d = 'M' + cx + ' ' + groundY;
-      var prev = { x: cx, y: groundY };
-      pts.forEach(function (p) {
-        var my = (prev.y + p.y) / 2;
-        d += ' C' + prev.x + ' ' + my + ' ' + p.x + ' ' + my + ' ' + p.x + ' ' + p.y;
-        prev = p;
-      });
-      var last = pts[pts.length - 1];
-      d += ' C' + last.x + ' ' + (last.y + 40) + ' ' + (cx + 10) + ' ' + (last.y + 60) + ' ' + (cx - 4) + ' ' + (last.y + 90);
-      out.push('<path d="' + d + '" fill="none" stroke="' + c.accent + '" stroke-width="9" stroke-linecap="round"/>');
-      pts.forEach(function (p, i) {
-        var dir = -p.side;
-        var len = (120 - Math.min(i, 4) * 10) * (crowded ? 0.45 : 1);
-        out.push('<path d="M' + p.x + ' ' + (p.y - 30) + ' q' + (dir * len * 0.4) + ' 22 ' + (dir * len) + ' 60" fill="none" stroke="' + c.accent + '" stroke-width="3" stroke-opacity="0.55" stroke-linecap="round"/>');
-        out.push('<path d="M' + p.x + ' ' + (p.y + 24) + ' q' + (dir * len * 0.3) + ' 18 ' + (dir * len * 0.6) + ' 54" fill="none" stroke="' + c.accent + '" stroke-width="2" stroke-opacity="0.4" stroke-linecap="round"/>');
-      });
-      pts.forEach(function (p, i) {
-        var g = gens[i];
-        out.push('<circle cx="' + p.x + '" cy="' + p.y + '" r="17" fill="' + c.page + '" stroke="' + c.accent + '" stroke-width="6"/>');
-        out.push('<circle cx="' + p.x + '" cy="' + p.y + '" r="6" fill="' + c.gold + '"/>');
-        var right = p.side === 1;
-        var tx = right ? p.x + 58 : p.x - 58;
-        var anchor = right ? 'start' : 'end';
-        var label = (g.label || '').toUpperCase() + (g.years && g.years.trim() ? ' · ' + g.years.trim() : '');
-        var place = wrap(g.place, crowded ? 20 : 17, crowded ? 1 : 2);
-        var detail = g.detail && g.detail.trim() ? wrap(g.detail, crowded ? 34 : 27, crowded ? 1 : 2) : [];
-        var y = p.y - (place.length > 1 ? 34 : 14);
-        out.push(text(tx, y - 34, wrap(label, 30, 1), 'text-anchor="' + anchor + '" font-family="' + SANS + '" font-size="20" font-weight="700" letter-spacing="3" fill="' + c.accentInk + '"', 0));
-        out.push(text(tx, y + 12, place, 'text-anchor="' + anchor + '" font-family="' + SERIF + '" font-size="44" fill="' + c.primary + '"', 46));
-        if (detail.length) {
-          out.push(text(tx, y + 12 + place.length * 46, detail, 'text-anchor="' + anchor + '" font-family="' + SERIF + '" font-style="italic" font-size="27" fill="' + c.muted + '"', 32));
-        }
-      });
-    }
-    out.push(text(cx, H - 82, ['Everyone comes from somewhere · @theculturedhuman'], 'text-anchor="middle" font-family="' + SANS + '" font-size="21" letter-spacing="1" fill="' + c.muted + '"', 0));
-    out.push('</svg>');
-    return out.join('');
-  }
+  var isNode = typeof module !== 'undefined' && module.exports;
+  var Art = isNode ? require('./roots-art.js') : root.TCHRootsArt;
 
   function describe(data) {
     var gens = (data.generations || []).filter(function (g) { return g.place && g.place.trim(); });
@@ -142,28 +25,105 @@
     return found;
   }
 
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { renderRoots: renderRoots, describe: describe, matchPlaces: matchPlaces };
+  var PROGRESS = [
+    'Add the first place to see your portrait grow.',
+    'One place. Every family story starts somewhere.',
+    'Two generations. Who came before them?',
+    'Three generations: about seventy-five years of your family.',
+    'Four generations: about a century. Few people can name this far back.',
+    'Five generations deep. That is a rare thing to know.',
+    'Six generations. Your roots run further than most.',
+  ];
+
+  function progressText(count) { return PROGRESS[Math.min(count, PROGRESS.length - 1)]; }
+
+  if (isNode) {
+    module.exports = { describe: describe, matchPlaces: matchPlaces, progressText: progressText };
     return;
   }
 
   var form = document.querySelector('[data-trace]');
-  if (!form) return;
+  if (!form || !Art) return;
   var preview = document.querySelector('[data-trace-preview]');
+  var progress = document.querySelector('[data-trace-progress]');
   var list = form.querySelector('[data-generations]');
   var addBtn = form.querySelector('[data-add-generation]');
-  var STORAGE = 'tch-roots';
-  var MAX = 6;
-  var DEFAULTS = ['Me', 'My parents', 'My grandparents', 'My great-grandparents'];
-  var counter = 0;
+  var stylesBox = form.querySelector('[data-styles]');
+  var palettesBox = form.querySelector('[data-palettes]');
+  var formatsBox = form.querySelector('[data-formats]');
+  var styleHint = form.querySelector('[data-style-hint]');
   var placeLinks = document.querySelector('[data-place-links]');
   var shareBtn = form.querySelector('[data-share]');
+  var STORAGE = 'tch-roots';
+  var DEFAULTS = ['Me', 'My parents', 'My grandparents', 'My great-grandparents'];
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var counter = 0;
   var places = [];
+  var look = { style: 'roots', palette: 'site', format: 'post' };
+  var anim = { kind: 'all', start: Date.now(), gen: -1 };
+  var filledBefore = null;
+  var lookBefore = null;
+  var thumbTimer = 0;
 
-  function palette() {
+  function sitePalette() {
     var s = getComputedStyle(document.documentElement);
     function v(n) { return s.getPropertyValue(n).trim(); }
-    return { page: v('--page'), surface: v('--surface'), primary: v('--primary'), accent: v('--accent'), accentInk: v('--accent-ink'), gold: v('--accent-2'), ink: v('--ink'), muted: v('--muted'), line: v('--line') };
+    return { page: v('--page'), surface: v('--surface'), primary: v('--primary'), accent: v('--accent'), accentInk: v('--accent-ink'), gold: v('--accent-2'), ink: v('--ink'), muted: v('--muted'), line: v('--line'), night: v('--footer'), nightInk: v('--footer-ink'), water: v('--primary-2') };
+  }
+
+  function colours(id) {
+    var p = Art.paletteById(id || look.palette);
+    return p.c || sitePalette();
+  }
+
+  function choice(name, value, labelHtml, cls) {
+    var lab = document.createElement('label');
+    lab.className = cls;
+    var input = document.createElement('input');
+    input.type = 'radio';
+    input.name = name;
+    input.value = value;
+    lab.appendChild(input);
+    lab.insertAdjacentHTML('beforeend', labelHtml);
+    return lab;
+  }
+
+  function buildPicker() {
+    Art.STYLES.forEach(function (s) {
+      stylesBox.appendChild(choice('roots-style', s.id, '<span class="style-card__art" aria-hidden="true"></span><span class="style-card__name">' + s.name + '</span>', 'style-card'));
+    });
+    Art.PALETTES.forEach(function (p) {
+      var lab = choice('roots-palette', p.id, '<span class="swatch" aria-hidden="true"></span><span class="visually-hidden">' + p.name + '</span>', 'swatch-choice');
+      lab.title = p.name;
+      palettesBox.appendChild(lab);
+    });
+    Object.keys(Art.FORMATS).forEach(function (k) {
+      var fm = Art.FORMATS[k];
+      formatsBox.appendChild(choice('roots-format', fm.id, '<span>' + fm.name + ' <span class="field__optional">' + fm.hint + '</span></span>', 'pill-choice'));
+    });
+    paintSwatches();
+  }
+
+  function paintSwatches() {
+    Array.prototype.forEach.call(palettesBox.querySelectorAll('.swatch-choice'), function (lab) {
+      var c = colours(lab.querySelector('input').value);
+      lab.querySelector('.swatch').style.background = 'linear-gradient(135deg, ' + c.page + ' 0 34%, ' + c.primary + ' 34% 67%, ' + c.accent + ' 67%)';
+    });
+  }
+
+  function setLook(next) {
+    look.style = Art.styleById(next.style).id;
+    look.palette = Art.paletteById(next.palette).id;
+    look.format = Art.FORMATS[next.format] ? next.format : 'post';
+    [['roots-style', look.style], ['roots-palette', look.palette], ['roots-format', look.format]].forEach(function (pair) {
+      var input = form.querySelector('input[name="' + pair[0] + '"][value="' + pair[1] + '"]');
+      if (input) input.checked = true;
+    });
+  }
+
+  function readLook() {
+    function val(name) { var el = form.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : undefined; }
+    setLook({ style: val('roots-style'), palette: val('roots-palette'), format: val('roots-format') });
   }
 
   function generationRow(g, removable) {
@@ -177,6 +137,7 @@
       '<p class="field field--wide"><label for="tg-' + n + '-detail">One detail <span class="field__optional">(optional)</span></label><input id="tg-' + n + '-detail" type="text" data-k="detail" maxlength="60" autocomplete="off"></p>';
     fs.querySelector('legend').textContent = g.label;
     fs.dataset.label = g.label;
+    fs.dataset.row = String(n);
     ['place', 'years', 'detail'].forEach(function (k) { fs.querySelector('[data-k="' + k + '"]').value = g[k] || ''; });
     var placeholders = { 'Me': ['Bengaluru', 'now', 'learning to cook my mother\'s dal'], 'My parents': ['Patna', '1980s', 'met at a cousin\'s wedding'] };
     var ph = placeholders[g.label];
@@ -193,22 +154,74 @@
     return fs;
   }
 
+  function rowsData() {
+    return Array.prototype.map.call(list.querySelectorAll('.trace-gen'), function (fs) {
+      return { row: fs.dataset.row, label: fs.dataset.label, place: fs.querySelector('[data-k="place"]').value, years: fs.querySelector('[data-k="years"]').value, detail: fs.querySelector('[data-k="detail"]').value };
+    });
+  }
+
   function read() {
-    return {
-      name: form.querySelector('[name="family"]').value,
-      generations: Array.prototype.map.call(list.querySelectorAll('.trace-gen'), function (fs) {
-        return { label: fs.dataset.label, place: fs.querySelector('[data-k="place"]').value, years: fs.querySelector('[data-k="years"]').value, detail: fs.querySelector('[data-k="detail"]').value };
-      }),
-    };
+    return { name: form.querySelector('[name="family"]').value, generations: rowsData() };
+  }
+
+  function art(data, opts) {
+    return Art.render(data, colours(opts.palette), opts);
+  }
+
+  // Decide what, if anything, should animate in this render: the whole portrait when the look
+  // changes, or just the generation whose place was filled in.
+  function planAnimation(data) {
+    var filled = data.generations.filter(function (g) { return g.place && g.place.trim(); }).slice(0, Art.MAX_GENERATIONS).map(function (g) { return g.row; });
+    var key = look.style + '|' + look.format;
+    if (lookBefore !== null && key !== lookBefore) anim = { kind: 'all', start: Date.now(), gen: -1 };
+    else if (filledBefore && filled.length > filledBefore.length) {
+      for (var i = 0; i < filled.length; i++) {
+        if (filledBefore.indexOf(filled[i]) === -1) { anim = { kind: 'gen', start: Date.now(), gen: i }; break; }
+      }
+    }
+    filledBefore = filled;
+    lookBefore = key;
+    return filled.length;
+  }
+
+  function applyAnimation() {
+    preview.classList.remove('is-drawing');
+    if (reduceMotion) return;
+    var elapsed = Date.now() - anim.start;
+    preview.style.setProperty('--tch-t', -elapsed + 'ms');
+    if (anim.kind === 'all' && elapsed < 1900) preview.classList.add('is-drawing');
+    if (anim.kind === 'gen' && elapsed < 900) {
+      var g = preview.querySelector('.tch-gen[data-gen="' + anim.gen + '"]');
+      if (g) g.classList.add('is-new');
+    }
   }
 
   function update() {
+    readLook();
     var data = read();
-    preview.innerHTML = renderRoots(data, palette());
-    preview.setAttribute('aria-label', describe(data));
-    addBtn.hidden = list.children.length >= MAX;
-    try { localStorage.setItem(STORAGE, JSON.stringify(data)); } catch (e) {}
+    var count = planAnimation(data);
+    preview.dataset.format = look.format;
+    preview.innerHTML = art(data, { style: look.style, palette: look.palette, format: look.format, idPrefix: 'tp' });
+    applyAnimation();
+    preview.setAttribute('aria-label', describe(data) + ' Drawn in the ' + Art.styleById(look.style).name + ' style.');
+    if (progress) {
+      var msg = progressText(count);
+      if (progress.textContent !== msg) progress.textContent = msg;
+      progress.classList.toggle('is-deep', count >= 4);
+    }
+    if (styleHint) styleHint.textContent = Art.styleById(look.style).hint;
+    addBtn.hidden = list.children.length >= Art.MAX_GENERATIONS;
+    try { localStorage.setItem(STORAGE, JSON.stringify({ name: data.name, generations: data.generations.map(function (g) { return { label: g.label, place: g.place, years: g.years, detail: g.detail }; }), style: look.style, palette: look.palette, format: look.format })); } catch (e) {}
     showPlaces(data);
+    clearTimeout(thumbTimer);
+    thumbTimer = setTimeout(function () { drawThumbs(data); }, 160);
+  }
+
+  function drawThumbs(data) {
+    Array.prototype.forEach.call(stylesBox.querySelectorAll('.style-card'), function (card) {
+      var id = card.querySelector('input').value;
+      card.querySelector('.style-card__art').innerHTML = art(data, { style: id, palette: look.palette, format: 'post', idPrefix: 'tt' + id });
+    });
   }
 
   function showPlaces(data) {
@@ -228,13 +241,14 @@
   }
 
   function toPng(done) {
-    var svg = renderRoots(read(), palette());
+    var fm = Art.FORMATS[look.format];
+    var svg = art(read(), { style: look.style, palette: look.palette, format: look.format, idPrefix: 'dl' });
     var img = new Image();
     var url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
     img.onload = function () {
       var canvas = document.createElement('canvas');
-      canvas.width = W;
-      canvas.height = H;
+      canvas.width = fm.w;
+      canvas.height = fm.h;
       canvas.getContext('2d').drawImage(img, 0, 0);
       URL.revokeObjectURL(url);
       canvas.toBlob(done, 'image/png');
@@ -242,13 +256,21 @@
     img.src = url;
   }
 
+  function fileName() { return 'my-roots-' + look.style + (look.format === 'story' ? '-story' : '') + '.png'; }
+
   function load(data) {
     list.innerHTML = '';
     form.querySelector('[name="family"]').value = data.name || '';
     var gens = data.generations && data.generations.length ? data.generations : DEFAULTS.map(function (l) { return { label: l }; });
     gens.forEach(function (g, i) { list.appendChild(generationRow(g, i >= DEFAULTS.length)); });
+    setLook({ style: data.style, palette: data.palette, format: data.format });
+    filledBefore = null;
+    lookBefore = null;
+    anim = { kind: 'all', start: Date.now(), gen: -1 };
     update();
   }
+
+  buildPicker();
 
   addBtn.addEventListener('click', function () {
     var row = generationRow({ label: 'Earlier ancestors' }, true);
@@ -269,7 +291,7 @@
     toPng(function (blob) {
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'my-roots.png';
+      a.download = fileName();
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -284,15 +306,16 @@
     shareBtn.addEventListener('click', function () {
       toPng(function (blob) {
         navigator.share({
-          files: [new File([blob], 'my-roots.png', { type: 'image/png' })],
+          files: [new File([blob], fileName(), { type: 'image/png' })],
           text: 'Where I come from. Trace yours at ' + location.origin + '/trace.html #theculturedhuman',
         }).catch(function () {});
       });
     });
   }
 
-  window.addEventListener('storage', function (e) { if (e.key === 'tch-theme') update(); });
-  new MutationObserver(update).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  function themeChanged() { paintSwatches(); if (look.palette === 'site') { update(); } }
+  window.addEventListener('storage', function (e) { if (e.key === 'tch-theme') themeChanged(); });
+  new MutationObserver(themeChanged).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   var saved = {};
   try { saved = JSON.parse(localStorage.getItem(STORAGE) || '{}') || {}; } catch (e) {}

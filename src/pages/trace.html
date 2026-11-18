@@ -2,19 +2,28 @@
 title: Trace your roots — The Cultured Human
 description: Add the places your family has lived, generation by generation, and watch your roots grow into a portrait you can keep and share. Nothing you type leaves your browser.
 image: warli-house-wall
-script: roots
+script: roots-art roots
 ---
 <section class="page-hero">
   <div class="container">
     <p class="eyebrow">Trace your roots</p>
     <h1>The deeper you go, <em>the older the story.</em></h1>
-    <p class="lede">Add the places your family has called home, from you down to the oldest generation you know. Your roots grow as you type, into a portrait you can download and share.</p>
+    <p class="lede">Add the places your family has called home, from you down to the oldest generation you know. Your portrait grows as you type. Draw it as roots, a tree, a river, tree rings or a sky of stars, then download and share it.</p>
   </div>
 </section>
 
 <div class="editorial-content">
   <div class="trace">
     <div class="trace__form" data-trace role="group" aria-labelledby="trace-form-title">
+      <fieldset class="trace-look">
+        <legend class="trace__heading">Choose how it looks</legend>
+        <div class="trace-look__styles" data-styles></div>
+        <p class="trace-look__hint" data-style-hint></p>
+        <div class="trace-look__row">
+          <fieldset class="trace-look__group"><legend>Colours</legend><div class="trace-look__swatches" data-palettes></div></fieldset>
+          <fieldset class="trace-look__group"><legend>Size</legend><div class="trace-look__sizes" data-formats></div></fieldset>
+        </div>
+      </fieldset>
       <h2 id="trace-form-title" class="trace__heading">Your family, generation by generation</h2>
       <p class="field field--wide"><label for="trace-family">Your name or family name <span class="field__optional">(optional)</span></label><input id="trace-family" name="family" type="text" maxlength="30" autocomplete="off" placeholder="e.g. the Mishra family"></p>
       <div data-generations></div>
@@ -28,6 +37,7 @@ script: roots
     </div>
     <div class="trace__preview-wrap">
       <div class="trace__preview" data-trace-preview role="img" aria-label="Your roots portrait will appear here."></div>
+      <p class="trace__progress" data-trace-progress aria-live="polite"></p>
       <div class="trace__places" data-place-links hidden>
         <p class="eyebrow">Your places on The Cultured Human</p>
         <ul></ul>
