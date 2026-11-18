@@ -240,12 +240,13 @@ ${related.length ? `<section class="related container" aria-labelledby="related-
   return main;
 }
 
-export function journalMain({ cards }) {
+export function journalMain({ cards, themes }) {
   return `<section class="page-hero">
 <div class="container">
 <p class="eyebrow">Stories</p>
 <h1>Stories of <em>where we come from.</em></h1>
 <p class="lede">Researched, sourced and written with care: the crafts, kitchens, ideas and places that families carry with them.</p>
+<nav class="theme-links" aria-label="Story themes"><ul>${themes.map((p) => `<li><a href="${p.href}">${e(p.label)}</a></li>`).join('')}</ul></nav>
 </div>
 </section>
 <section class="section">

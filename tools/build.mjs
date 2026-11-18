@@ -193,7 +193,7 @@ emit(
     title: `Stories — ${site.name}`,
     description: 'Researched essays and explainers on Indian art, philosophy, food, craft and conscious living from The Cultured Human.',
   },
-  t.journalMain({ cards: articles.map(card) }),
+  t.journalMain({ cards: articles.map(card), themes: Object.values(site.pillars) }),
   articles[0]?.heroImage,
 );
 emit(

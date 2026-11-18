@@ -52,74 +52,20 @@
   ],
   "footer": [
     {
-      "title": "My Roots",
+      "title": "Explore",
       "links": [
         {
-          "label": "How it works",
+          "label": "My Roots",
           "href": "/roots.html"
         },
         {
-          "label": "Trace your roots",
-          "href": "/trace.html"
+          "label": "Places",
+          "href": "/places/"
         },
         {
-          "label": "Family archive",
-          "href": "/archive.html"
-        },
-        {
-          "label": "The weekly question",
-          "href": "/archive.html#weekly"
-        },
-        {
-          "label": "Open my archive",
-          "href": "/app.html"
-        },
-        {
-          "label": "Storytellers",
-          "href": "/family-stories.html"
-        },
-        {
-          "label": "The Roots Kit",
-          "href": "/roots-kit.html"
-        }
-      ]
-    },
-    {
-      "title": "Stories",
-      "links": [
-        {
-          "label": "All stories",
+          "label": "Stories",
           "href": "/journal/"
         },
-        {
-          "label": "Many cultures",
-          "href": "/culture.html"
-        },
-        {
-          "label": "Wisdom of the ages",
-          "href": "/proverbs.html"
-        },
-        {
-          "label": "Food & places",
-          "href": "/experiences.html"
-        },
-        {
-          "label": "Music & curious minds",
-          "href": "/music.html"
-        },
-        {
-          "label": "Conscious living",
-          "href": "/conscious-living.html"
-        },
-        {
-          "label": "The better self",
-          "href": "/fitness.html"
-        }
-      ]
-    },
-    {
-      "title": "On the platform",
-      "links": [
         {
           "label": "Keepsakes",
           "href": "/marketplace.html"
@@ -129,45 +75,29 @@
           "href": "/journeys.html"
         },
         {
-          "label": "Commission a piece",
-          "href": "/commission.html"
-        },
-        {
-          "label": "Gifting",
-          "href": "/gifting.html"
-        },
-        {
-          "label": "Join as a maker, host or storyteller",
-          "href": "/join.html"
-        },
-        {
-          "label": "For organisations",
-          "href": "/for-organisations.html"
+          "label": "The Commons",
+          "href": "/manch.html"
         }
       ]
     },
     {
-      "title": "Community",
+      "title": "Take part",
       "links": [
-        {
-          "label": "The Commons",
-          "href": "/manch.html"
-        },
         {
           "label": "This week's question",
           "href": "/manch.html#this-week"
         },
         {
-          "label": "One word from home",
-          "href": "/manch.html#words"
-        },
-        {
-          "label": "Places",
-          "href": "/places/"
-        },
-        {
           "label": "Add to a place",
           "href": "/app.html#/contribute"
+        },
+        {
+          "label": "Join the platform",
+          "href": "/join.html"
+        },
+        {
+          "label": "For organisations",
+          "href": "/for-organisations.html"
         }
       ]
     },
@@ -181,10 +111,6 @@
         {
           "label": "Plans",
           "href": "/plans.html"
-        },
-        {
-          "label": "Image credits",
-          "href": "/credits.html"
         },
         {
           "label": "Instagram",

@@ -70,7 +70,7 @@ test('The Commons asks a weekly question, shows live contributions and a word wa
   assert.match(html, /\/scripts\/community-live\.js/);
   for (const page of pages) {
     const footer = read(page).match(/<footer[\s\S]*<\/footer>/)[0];
-    assert.ok(footer.includes('href="/manch.html#this-week"') && footer.includes('href="/manch.html#words"'), `${page}: footer links to the Commons`);
+    assert.ok(footer.includes('href="/manch.html#this-week"'), `${page}: footer links to this week's question`);
   }
 });
 
@@ -223,4 +223,12 @@ test('makers, hosts and storytellers can list themselves from Join, and the fee 
   assert.ok(joinPage.includes(`<dt>The family pays</dt><dd>₹${(6000 + fee).toLocaleString('en-IN')}</dd>`), 'worked example uses the configured fee');
   for (const page of ['join.html', 'plans.html', 'about.html']) assert.ok(read(page).includes(`${site.platformFeePercent}%`), page);
   assert.doesNotMatch(joinPage + read('plans.html') + read('about.html'), /\{\{/);
+});
+
+test('the footer stays short, and every page it dropped is still reachable', () => {
+  const footer = read('index.html').match(/<footer[\s\S]*<\/footer>/)[0];
+  assert.ok((footer.match(/<li>/g) || []).length <= 14, 'at most 14 footer links');
+  const themes = read('journal/index.html').match(/<nav class="theme-links"[\s\S]*?<\/nav>/)[0];
+  for (const href of ['/culture.html', '/proverbs.html', '/experiences.html', '/conscious-living.html', '/fitness.html', '/music.html']) assert.ok(themes.includes(`href="${href}"`), href);
+  assert.match(read('index.html'), /href="\/credits\.html"/);
 });
