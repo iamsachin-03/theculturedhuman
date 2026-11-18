@@ -353,6 +353,18 @@ ${form}
 </div>`;
 }
 
+const rupees = (n) => `₹${n.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+/** A worked example of the fee, from the same percentage the database charges. */
+export function feeExample(price, percent) {
+  const fee = Math.round(price * percent) / 100;
+  return `<dl class="fee-example">
+<div><dt>You quote</dt><dd>${rupees(price)}</dd></div>
+<div><dt>Platform fee, paid by the family</dt><dd>${rupees(fee)}</dd></div>
+<div><dt>The family pays</dt><dd>${rupees(price + fee)}</dd></div>
+<div class="fee-example__you"><dt>You receive</dt><dd>${rupees(price)}</dd></div>
+</dl>`;
+}
+
 /** This week's Commons question. community-live.js replaces the first prompt with the current one. */
 export function thisWeek(prompts) {
   const p = prompts.prompts[0];

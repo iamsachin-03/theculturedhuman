@@ -290,6 +290,8 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
     .replace(/\{\{directory\s+(maker|host|storyteller)\}\}/g, (_, role) => directory(role))
     .replace(/\{\{place-cards\}\}/g, placeCards)
     .replace(/\{\{roots-map\}\}/g, rootsMap)
+    .replace(/\{\{fee-percent\}\}/g, String(site.platformFeePercent))
+    .replace(/\{\{fee-example\s+(\d+)\}\}/g, (_, n) => t.feeExample(Number(n), site.platformFeePercent))
     .replace(/\{\{this-week\}\}/g, () => t.thisWeek(prompts))
     .replace(/\{\{community-feed([^}]*)\}\}/g, (_, rest) => {
       const opt = attrs(rest);

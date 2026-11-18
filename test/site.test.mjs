@@ -213,3 +213,14 @@ test('the platform fee shown on the site is the one the database charges', () =>
   const rate = Number(schema.match(/create function platform_fee[\s\S]*?round\(price \* ([\d.]+)\)/)[1]);
   assert.equal(Math.round(rate * 100), site.platformFeePercent);
 });
+
+test('makers, hosts and storytellers can list themselves from Join, and the fee shown everywhere is the real one', () => {
+  const site = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8'));
+  const joinPage = read('join.html');
+  for (const role of ['maker', 'host', 'storyteller']) assert.ok(joinPage.includes(`href="/app.html#/offer?role=${role}"`), role);
+  assert.match(joinPage, /id="makers"[^]*id="hosts"[^]*id="storytellers"/);
+  const fee = (6000 * site.platformFeePercent) / 100;
+  assert.ok(joinPage.includes(`<dt>The family pays</dt><dd>₹${(6000 + fee).toLocaleString('en-IN')}</dd>`), 'worked example uses the configured fee');
+  for (const page of ['join.html', 'plans.html', 'about.html']) assert.ok(read(page).includes(`${site.platformFeePercent}%`), page);
+  assert.doesNotMatch(joinPage + read('plans.html') + read('about.html'), /\{\{/);
+});
