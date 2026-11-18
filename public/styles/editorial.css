@@ -549,7 +549,7 @@ p { margin: 0 0 1em; }
 .trace-look { margin: 0; padding: 0; border: 0; display: grid; gap: .9rem; min-width: 0; }
 .trace-look > legend { padding: 0; margin-bottom: .9rem; }
 .trace-look__styles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .6rem; }
-.trace-look input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.trace-look input[type="radio"], .trace-mode input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
 .style-card { position: relative; display: grid; gap: .35rem; justify-items: center; cursor: pointer; }
 .style-card__art { display: block; width: 100%; aspect-ratio: 4 / 5; border-radius: var(--radius-sm); overflow: hidden; background: var(--surface-2); border: 2px solid var(--line); transition: border-color .2s, transform .2s, box-shadow .2s; }
 .style-card__art svg { display: block; width: 100%; height: 100%; }
@@ -559,7 +559,8 @@ p { margin: 0 0 1em; }
 .style-card:has(input:checked) .style-card__name { color: var(--accent-ink); }
 .trace-look input:focus-visible + .style-card__art,
 .trace-look input:focus-visible + .swatch,
-.trace-look input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+.trace-look input:focus-visible + span,
+.trace-mode input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
 .trace-look__hint { margin: 0; min-height: 2.6em; font-size: .92rem; color: var(--muted); }
 .trace-look__row { display: flex; flex-wrap: wrap; gap: 1rem 2rem; }
 .trace-look__group { margin: 0; padding: 0; border: 0; min-width: 0; }
@@ -573,6 +574,12 @@ p { margin: 0 0 1em; }
 .pill-choice > span { display: inline-block; padding: .45rem .9rem; border: 1.5px solid var(--line); border-radius: 999px; font-size: .9rem; font-weight: 600; transition: border-color .2s, background .2s; }
 .pill-choice:has(input:checked) > span { border-color: var(--primary); background: var(--primary); color: var(--on-primary); }
 .pill-choice:has(input:checked) .field__optional { color: inherit; opacity: .8; }
+.trace-mode { margin: 0; padding: 0; border: 0; display: flex; flex-wrap: wrap; gap: .5rem; min-width: 0; }
+.trace-mode legend { padding: 0; margin-bottom: .5rem; font: 600 .74rem/1.4 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-ink); }
+.trace-sides { display: grid; gap: 1.1rem; }
+.trace-side { margin: 0; padding: 1rem; border: 1.5px dashed var(--line); border-radius: var(--radius); display: grid; gap: .9rem; min-width: 0; }
+.trace-side > legend { padding: 0 .5rem; font: 600 var(--step-1)/1.3 var(--serif); color: var(--primary); }
+.trace-side .trace-gen + .trace-gen { margin-top: .9rem; }
 @media (max-width: 520px) { .trace-look__styles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 /* Growth: lines draw in and each generation blooms when it arrives. --tch-t carries the

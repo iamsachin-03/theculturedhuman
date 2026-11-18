@@ -67,8 +67,28 @@
       </fieldset>
       <h2 id="trace-form-title" class="trace__heading">Your family, generation by generation</h2>
       <p class="field field--wide"><label for="trace-family">Your name or family name <span class="field__optional">(optional)</span></label><input id="trace-family" name="family" type="text" maxlength="30" autocomplete="off" placeholder="e.g. the Mishra family"></p>
-      <div data-generations></div>
-      <button class="btn btn--ghost trace__add" type="button" data-add-generation>Add an earlier generation</button>
+      <fieldset class="trace-mode">
+        <legend>What to trace</legend>
+        <label class="pill-choice"><input type="radio" name="roots-mode" value="line" checked><span>One line, back from me</span></label>
+        <label class="pill-choice"><input type="radio" name="roots-mode" value="sides"><span>My mother's and father's sides</span></label>
+      </fieldset>
+      <div class="trace-line" data-line>
+        <div data-generations></div>
+        <button class="btn btn--ghost trace__add" type="button" data-add-generation>Add an earlier generation</button>
+      </div>
+      <div class="trace-sides" data-sides hidden>
+        <div data-me></div>
+        <fieldset class="trace-side">
+          <legend>Your mother's side</legend>
+          <div data-side="0"></div>
+          <button class="btn btn--ghost trace__add" type="button" data-add-side="0">Add great-grandparents</button>
+        </fieldset>
+        <fieldset class="trace-side">
+          <legend>Your father's side</legend>
+          <div data-side="1"></div>
+          <button class="btn btn--ghost trace__add" type="button" data-add-side="1">Add great-grandparents</button>
+        </fieldset>
+      </div>
       <div class="trace__actions">
         <button class="btn" type="button" data-download>Download image</button>
         <button class="btn btn--ghost" type="button" data-share hidden>Share</button>

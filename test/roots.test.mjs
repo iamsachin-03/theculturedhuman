@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const Art = require('../public/scripts/roots-art.js');
-const { describe, progressText } = require('../public/scripts/roots.js');
+const { describe, progressText, depth } = require('../public/scripts/roots.js');
 const colours = { page: '#fff', surface: '#fff', primary: '#000', accent: '#c00', accentInk: '#a00', gold: '#fc0', ink: '#111', muted: '#555', line: '#ddd' };
 
 const family = {
@@ -50,6 +50,43 @@ test('every style and size draws every place in well-formed SVG', () => {
       }
     }
   }
+});
+
+const bothSides = {
+  me: { label: 'Me', place: 'Bengaluru' },
+  sides: [
+    { generations: [{ label: 'My mother', place: 'Kolkata' }, { label: "Mother's parents", place: 'Dhaka', years: '1930s' }] },
+    { generations: [{ label: 'My father', place: 'Patna' }, { label: "Father's parents", place: '' }, { label: "Father's grandparents", place: 'Darbhanga' }] },
+  ],
+};
+
+test('every style draws both sides of the family, each place once, in well-formed SVG', () => {
+  for (const { id } of Art.STYLES) {
+    for (const format of Object.keys(Art.FORMATS)) {
+      const svg = Art.render(bothSides, colours, { style: id, format });
+      assertWellFormed(svg, `${id}/${format}/sides`);
+      for (const place of ['Bengaluru', 'Kolkata', 'Dhaka', 'Patna', 'Darbhanga']) assert.equal(svg.split(`>${place}<`).length, 2, `${id}/${format}: ${place}`);
+      assert.match(svg, /MOTHER&#39;S PARENTS · 1930s/, id);
+      assert.doesNotMatch(svg, /Add a place to begin/, id);
+    }
+    const lonely = Art.render({ me: { label: 'Me', place: '' }, sides: [{ generations: [] }, { generations: [] }] }, colours, { style: id });
+    assert.match(lonely, /Add a place to begin/, id);
+    assertWellFormed(lonely, `${id}/empty sides`);
+  }
+});
+
+test('each side is capped at four generations', () => {
+  const many = Array.from({ length: 6 }, (_, i) => ({ label: `G${i}`, place: `Place${i}` }));
+  const places = Art.places({ me: { place: 'Home' }, sides: [{ generations: many }, { generations: [] }] }).map((g) => g.place);
+  assert.deepEqual(places, ['Home', 'Place0', 'Place1', 'Place2', 'Place3']);
+});
+
+test('depth is how far back the deepest place goes, counting gaps and both sides as one', () => {
+  assert.equal(depth(bothSides), 4);
+  assert.equal(depth({ me: { place: 'Pune' }, sides: [{ generations: [] }, { generations: [] }] }), 1);
+  assert.equal(depth(family), 4);
+  assert.equal(depth({ generations: [{ place: '' }] }), 0);
+  assert.match(describe(bothSides), /^Where I come from: Me, Bengaluru; My mother, Kolkata; Mother's parents, Dhaka \(1930s\); My father, Patna; Father's grandparents, Darbhanga\.$/);
 });
 
 test('the river runs from the oldest place down to you', () => {

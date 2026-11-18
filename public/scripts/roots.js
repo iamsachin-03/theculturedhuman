@@ -5,8 +5,10 @@
   var isNode = typeof module !== 'undefined' && module.exports;
   var Art = isNode ? require('./roots-art.js') : root.TCHRootsArt;
 
+  function has(g) { return g && g.place && g.place.trim(); }
+
   function describe(data) {
-    var gens = (data.generations || []).filter(function (g) { return g.place && g.place.trim(); });
+    var gens = Art.places(data);
     if (!gens.length) return 'An empty roots portrait. Add a place to begin.';
     return (data.name ? 'The roots of ' + data.name + ': ' : 'Where I come from: ') + gens.map(function (g) {
       return g.label + ', ' + g.place + (g.years ? ' (' + g.years + ')' : '') + (g.detail ? ', ' + g.detail : '');
@@ -37,8 +39,20 @@
 
   function progressText(count) { return PROGRESS[Math.min(count, PROGRESS.length - 1)]; }
 
+  /** How many generations back the deepest filled-in place goes; gaps still count, and both sides are one generation each. */
+  function deepest(list) {
+    for (var i = list.length - 1; i >= 0; i--) if (has(list[i])) return i + 1;
+    return 0;
+  }
+
+  function depth(data) {
+    if (!data.sides) return deepest(data.generations || []);
+    var back = Math.max(deepest(data.sides[0].generations), deepest(data.sides[1].generations));
+    return back ? back + 1 : (has(data.me) ? 1 : 0);
+  }
+
   if (isNode) {
-    module.exports = { describe: describe, matchPlaces: matchPlaces, progressText: progressText };
+    module.exports = { describe: describe, matchPlaces: matchPlaces, progressText: progressText, depth: depth };
     return;
   }
 
@@ -48,6 +62,11 @@
   var progress = document.querySelector('[data-trace-progress]');
   var list = form.querySelector('[data-generations]');
   var addBtn = form.querySelector('[data-add-generation]');
+  var lineBox = form.querySelector('[data-line]');
+  var sidesBox = form.querySelector('[data-sides]');
+  var meBox = form.querySelector('[data-me]');
+  var sideBoxes = [form.querySelector('[data-side="0"]'), form.querySelector('[data-side="1"]')];
+  var sideAdds = [form.querySelector('[data-add-side="0"]'), form.querySelector('[data-add-side="1"]')];
   var stylesBox = form.querySelector('[data-styles]');
   var palettesBox = form.querySelector('[data-palettes]');
   var formatsBox = form.querySelector('[data-formats]');
@@ -56,11 +75,16 @@
   var shareBtn = form.querySelector('[data-share]');
   var STORAGE = 'tch-roots';
   var DEFAULTS = ['Me', 'My parents', 'My grandparents', 'My great-grandparents'];
+  var SIDE_DEFAULTS = [
+    ['My mother', 'Mother\'s parents', 'Mother\'s grandparents'],
+    ['My father', 'Father\'s parents', 'Father\'s grandparents'],
+  ];
+  var SIDE_EXTRA = ['Mother\'s great-grandparents', 'Father\'s great-grandparents'];
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var counter = 0;
   var places = [];
   var look = { style: 'roots', palette: 'site', format: 'post' };
-  var anim = { kind: 'all', start: Date.now(), gen: -1 };
+  var anim = { kind: 'all', start: Date.now(), gen: '' };
   var filledBefore = null;
   var lookBefore = null;
   var thumbTimer = 0;
@@ -148,20 +172,51 @@
       rm.className = 'trace-gen__remove';
       rm.textContent = 'Remove';
       rm.setAttribute('aria-label', 'Remove ' + g.label);
-      rm.addEventListener('click', function () { fs.remove(); update(); addBtn.focus(); });
+      rm.addEventListener('click', function () {
+        var adder = fs.parentNode.parentNode.querySelector('.trace__add');
+        fs.remove();
+        update();
+        adder.focus();
+      });
       fs.appendChild(rm);
     }
     return fs;
   }
 
-  function rowsData() {
-    return Array.prototype.map.call(list.querySelectorAll('.trace-gen'), function (fs) {
+  function rowsData(box) {
+    return Array.prototype.map.call(box.querySelectorAll('.trace-gen'), function (fs) {
       return { row: fs.dataset.row, label: fs.dataset.label, place: fs.querySelector('[data-k="place"]').value, years: fs.querySelector('[data-k="years"]').value, detail: fs.querySelector('[data-k="detail"]').value };
     });
   }
 
+  function mode() {
+    var el = form.querySelector('input[name="roots-mode"]:checked');
+    return el && el.value === 'sides' ? 'sides' : 'line';
+  }
+
+  function readSides() {
+    return { me: rowsData(meBox)[0], sides: sideBoxes.map(function (b) { return { generations: rowsData(b) }; }) };
+  }
+
   function read() {
-    return { name: form.querySelector('[name="family"]').value, generations: rowsData() };
+    var name = form.querySelector('[name="family"]').value;
+    if (mode() === 'sides') {
+      var two = readSides();
+      return { name: name, me: two.me, sides: two.sides };
+    }
+    return { name: name, generations: rowsData(list) };
+  }
+
+  /** The generations with a place, each with the key its group carries in the SVG (data-gen). */
+  function filledKeys(data) {
+    if (!data.sides) {
+      return data.generations.filter(has).slice(0, Art.MAX_GENERATIONS).map(function (g, i) { return { row: g.row, key: String(i) }; });
+    }
+    var out = has(data.me) ? [{ row: data.me.row, key: 'me' }] : [];
+    data.sides.forEach(function (side, col) {
+      side.generations.filter(has).slice(0, Art.MAX_PER_SIDE).forEach(function (g, i) { out.push({ row: g.row, key: (col ? 'b' : 'a') + i }); });
+    });
+    return out;
   }
 
   function art(data, opts) {
@@ -171,17 +226,17 @@
   // Decide what, if anything, should animate in this render: the whole portrait when the look
   // changes, or just the generation whose place was filled in.
   function planAnimation(data) {
-    var filled = data.generations.filter(function (g) { return g.place && g.place.trim(); }).slice(0, Art.MAX_GENERATIONS).map(function (g) { return g.row; });
-    var key = look.style + '|' + look.format;
-    if (lookBefore !== null && key !== lookBefore) anim = { kind: 'all', start: Date.now(), gen: -1 };
-    else if (filledBefore && filled.length > filledBefore.length) {
+    var filled = filledKeys(data);
+    var rowsNow = filled.map(function (f) { return f.row; });
+    var key = look.style + '|' + look.format + '|' + mode();
+    if (lookBefore !== null && key !== lookBefore) anim = { kind: 'all', start: Date.now(), gen: '' };
+    else if (filledBefore && rowsNow.length > filledBefore.length) {
       for (var i = 0; i < filled.length; i++) {
-        if (filledBefore.indexOf(filled[i]) === -1) { anim = { kind: 'gen', start: Date.now(), gen: i }; break; }
+        if (filledBefore.indexOf(filled[i].row) === -1) { anim = { kind: 'gen', start: Date.now(), gen: filled[i].key }; break; }
       }
     }
-    filledBefore = filled;
+    filledBefore = rowsNow;
     lookBefore = key;
-    return filled.length;
   }
 
   function applyAnimation() {
@@ -199,7 +254,10 @@
   function update() {
     readLook();
     var data = read();
-    var count = planAnimation(data);
+    var count = depth(data);
+    planAnimation(data);
+    lineBox.hidden = mode() !== 'line';
+    sidesBox.hidden = mode() !== 'sides';
     preview.dataset.format = look.format;
     preview.innerHTML = art(data, { style: look.style, palette: look.palette, format: look.format, idPrefix: 'tp' });
     applyAnimation();
@@ -211,10 +269,23 @@
     }
     if (styleHint) styleHint.textContent = Art.styleById(look.style).hint;
     addBtn.hidden = list.children.length >= Art.MAX_GENERATIONS;
-    try { localStorage.setItem(STORAGE, JSON.stringify({ name: data.name, generations: data.generations.map(function (g) { return { label: g.label, place: g.place, years: g.years, detail: g.detail }; }), style: look.style, palette: look.palette, format: look.format })); } catch (e) {}
+    sideBoxes.forEach(function (b, i) { sideAdds[i].hidden = b.children.length >= Art.MAX_PER_SIDE; });
+    save(data.name);
     showPlaces(data);
     clearTimeout(thumbTimer);
     thumbTimer = setTimeout(function () { drawThumbs(data); }, 160);
+  }
+
+  function strip(g) { return { label: g.label, place: g.place, years: g.years, detail: g.detail }; }
+
+  function save(name) {
+    var two = readSides();
+    var saved = {
+      name: name, mode: mode(), generations: rowsData(list).map(strip),
+      me: strip(two.me), sides: two.sides.map(function (s) { return s.generations.map(strip); }),
+      style: look.style, palette: look.palette, format: look.format,
+    };
+    try { localStorage.setItem(STORAGE, JSON.stringify(saved)); } catch (e) {}
   }
 
   function drawThumbs(data) {
@@ -226,7 +297,7 @@
 
   function showPlaces(data) {
     if (!placeLinks) return;
-    var found = matchPlaces(data.generations.map(function (g) { return g.place; }), places);
+    var found = matchPlaces(Art.places(data).map(function (g) { return g.place; }), places);
     placeLinks.hidden = !found.length;
     var ul = placeLinks.querySelector('ul');
     ul.innerHTML = '';
@@ -260,13 +331,23 @@
 
   function load(data) {
     list.innerHTML = '';
+    meBox.innerHTML = '';
     form.querySelector('[name="family"]').value = data.name || '';
     var gens = data.generations && data.generations.length ? data.generations : DEFAULTS.map(function (l) { return { label: l }; });
     gens.forEach(function (g, i) { list.appendChild(generationRow(g, i >= DEFAULTS.length)); });
+    var me = data.me || {};
+    if (!has(me) && has(gens[0])) me = gens[0];
+    meBox.appendChild(generationRow({ label: 'Me', place: me.place, years: me.years, detail: me.detail }, false));
+    sideBoxes.forEach(function (box, col) {
+      box.innerHTML = '';
+      var saved = data.sides && data.sides[col] && data.sides[col].length ? data.sides[col] : SIDE_DEFAULTS[col].map(function (l) { return { label: l }; });
+      saved.forEach(function (g, i) { box.appendChild(generationRow(g, i >= SIDE_DEFAULTS[col].length)); });
+    });
+    form.querySelector('input[name="roots-mode"][value="' + (data.mode === 'sides' ? 'sides' : 'line') + '"]').checked = true;
     setLook({ style: data.style, palette: data.palette, format: data.format });
     filledBefore = null;
     lookBefore = null;
-    anim = { kind: 'all', start: Date.now(), gen: -1 };
+    anim = { kind: 'all', start: Date.now(), gen: '' };
     update();
   }
 
@@ -277,6 +358,14 @@
     list.appendChild(row);
     update();
     row.querySelector('input').focus();
+  });
+  sideAdds.forEach(function (btn, col) {
+    btn.addEventListener('click', function () {
+      var row = generationRow({ label: SIDE_EXTRA[col] }, true);
+      sideBoxes[col].appendChild(row);
+      update();
+      row.querySelector('input').focus();
+    });
   });
   form.addEventListener('input', update);
 
