@@ -925,6 +925,10 @@ p { margin: 0 0 1em; }
 .app-audience .field { padding-left: 1.8rem; max-width: 22rem; }
 .app-check { display: inline-flex; align-items: center; gap: .4rem; cursor: pointer; }
 .app-check input { accent-color: var(--primary); width: 1.05rem; height: 1.05rem; }
+.app-auto { margin: 1rem 0; padding: .9rem 1rem; border-radius: var(--radius-sm); background: rgb(255 255 255 / .08); }
+.app-auto .app-check { align-items: flex-start; }
+.app-auto .app-check input { margin-top: .2rem; flex: none; }
+.app-auto .field__hint { margin: .4rem 0 0; color: inherit; opacity: .85; }
 .app-upload { position: relative; cursor: pointer; }
 .app-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
 .app-upload:focus-within { outline: 2px solid var(--accent-2); outline-offset: 2px; }

@@ -55,6 +55,8 @@ for i in $(seq 1 60); do curl -sf http://127.0.0.1:9999/health >/dev/null && bre
 
 $PSQL -q -v ON_ERROR_STOP=1 -d "$DB" -f ../schema.sql >/dev/null
 $PSQL -q -d "$DB" -c "grant execute on all functions in schema auth to anon, authenticated" >/dev/null
+# Supabase grants the service role (server-side jobs such as the weekly sender) everything in public.
+$PSQL -q -d "$DB" -c "grant usage on schema public to service_role" -c "grant all on all tables in schema public to service_role" -c "grant execute on all functions in schema public to service_role" >/dev/null
 
 cat > /tmp/tch-postgrest.conf <<CONF
 db-uri = "postgres://authenticator:$PW@127.0.0.1:5432/$DB"

@@ -675,6 +675,7 @@
       h('pre', { class: 'app-message' }, text),
       elder.askedAt ? h('p', { class: 'field__hint' }, 'Asked on ' + core.formatDate(elder.askedAt) + '.') : null,
       actions,
+      autoSendToggle(elder),
       h('div', { class: 'btn-row' },
         button('They answered, next question', function () { store.saveElder({ id: elder.id, idx: elder.idx + 1, answered: elder.answered + 1, askedAt: null }).then(function () { render(); }).catch(fail); }, 'btn btn--ghost btn--small'),
         button('Skip this one', function () { store.saveElder({ id: elder.id, idx: elder.idx + 1, askedAt: null }).then(function () { render(); }).catch(fail); }, 'btn btn--ghost btn--small'),
@@ -690,6 +691,23 @@
     return card;
   }
 
+  /** Only offered once the site's WhatsApp sender is set up (site.json backend.weeklyAuto). */
+  function autoSendToggle(elder) {
+    if (!cfg.weeklyAuto || store.mode !== 'supabase' || !elder.phone) return null;
+    var box = h('input', { type: 'checkbox', checked: !!elder.autoSend, onchange: function () {
+      store.saveElder({ id: elder.id, autoSend: box.checked }).then(function () {
+        flash = box.checked ? 'The question will be sent for you every ' + DAYS[elder.day] + ' morning.' : 'You will send the question yourself again.';
+        render();
+      }).catch(fail);
+    } });
+    return h('div', { class: 'app-auto' },
+      h('label', { class: 'app-check' }, box, ' Send it for me every ' + DAYS[elder.day] + ' morning. ' + elder.name + ' has agreed to get it from The Cultured Human\'s WhatsApp number.'),
+      h('p', { class: 'field__hint' }, elder.autoSend
+        ? 'Each new question goes out on its day, once you mark the last one answered or skipped. The message asks ' + elder.name + ' to send the answer to you, not to us.'
+        : 'Until then, send it yourself with the button above.'),
+    );
+  }
+
   function elderForm(open) {
     var form = h('form', { class: 'app-card' });
     var name = h('input', { name: 'name', required: true, maxlength: '40' });
@@ -701,7 +719,9 @@
       h('h2', null, open ? 'Who would you like to ask?' : 'Ask someone else too'),
       h('div', { class: 'app-form-grid' },
         field('Their name', name), field('Who are they to you? (optional)', relation),
-        field('Their WhatsApp number (optional)', phone, 'With the country code. It stays in your archive and is only used to open WhatsApp on your phone.'),
+        field('Their WhatsApp number (optional)', phone, cfg.weeklyAuto && store.mode === 'supabase'
+          ? 'With the country code. It stays in your archive. It opens WhatsApp on your phone, or, if you switch on sending for you, the question is sent to it.'
+          : 'With the country code. It stays in your archive and is only used to open WhatsApp on your phone.'),
         field('Which day?', day), field('Sign the message as', signAs),
       ),
       h('div', { class: 'btn-row' }, button('Start the weekly question', null, 'btn', 'submit')),

@@ -105,6 +105,10 @@ Marigold (the default), Haldi, Indigo, Gulmohar and Evening. Haldi takes its tur
 
 The `firebase.json`, `.firebaserc` and `firestore.*` files belong to the earlier Firebase project and are not used by the Vercel site.
 
+## Weekly question sender
+
+`api/weekly-send.mjs` can send each person's weekly question on WhatsApp for their family member, once a day from a Vercel cron job. It is off until a WhatsApp Business number, an approved template and a few environment variables are in place; [`backend/weekly/README.md`](backend/weekly/README.md) has the steps.
+
 ## Visit counts
 
 The site can count visits with [Vercel Web Analytics](https://vercel.com/docs/analytics), which uses no cookies and stores no personal data, so no consent banner is needed. It is off until both are done:

@@ -101,6 +101,8 @@ create table weekly_elders (
   answered int not null default 0,
   asked_at timestamptz,
   sign_as text,
+  -- The owner says this person agreed to get the question from the site's WhatsApp number.
+  auto_send boolean not null default false,
   created_at timestamptz not null default now()
 );
 
