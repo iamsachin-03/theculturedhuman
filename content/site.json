@@ -1,8 +1,8 @@
 {
   "name": "The Cultured Human",
   "url": "https://theculturedhuman.vercel.app",
-  "tagline": "Wisdom. Culture. Conscious Living.",
-  "supportingLine": "Think deeper. Live better. Stay curious.",
+  "tagline": "Everyone comes from somewhere.",
+  "supportingLine": "Stories, keepsakes and journeys that bring you closer to your roots.",
   "locale": "en_IN",
   "defaultImage": "madhubani-kohbar-arti-kumari",
   "instagram": "https://www.instagram.com/theculturedhuman/",
@@ -18,31 +18,27 @@
       "href": "/"
     },
     {
-      "label": "Explore",
+      "label": "Your Roots",
+      "href": "/roots.html"
+    },
+    {
+      "label": "Trace Your Roots",
+      "href": "/trace.html"
+    },
+    {
+      "label": "Stories",
       "href": "/journal/"
     },
     {
-      "label": "Indian Culture",
-      "href": "/culture.html"
+      "label": "Family Stories",
+      "href": "/family-stories.html"
     },
     {
-      "label": "Wisdom",
-      "href": "/proverbs.html"
+      "label": "Journeys",
+      "href": "/journeys.html"
     },
     {
-      "label": "Food & Travel",
-      "href": "/experiences.html"
-    },
-    {
-      "label": "Conscious Living",
-      "href": "/conscious-living.html"
-    },
-    {
-      "label": "Better Self",
-      "href": "/fitness.html"
-    },
-    {
-      "label": "Bazaar",
+      "label": "Keepsakes",
       "href": "/marketplace.html"
     },
     {
@@ -52,48 +48,60 @@
   ],
   "footer": [
     {
-      "title": "Explore",
+      "title": "Your roots",
       "links": [
         {
-          "label": "The Journal",
-          "href": "/journal/"
+          "label": "Begin here",
+          "href": "/roots.html"
         },
         {
-          "label": "India, Many Cultures",
-          "href": "/culture.html"
+          "label": "Trace your roots",
+          "href": "/trace.html"
         },
         {
-          "label": "Wisdom of the Ages",
-          "href": "/proverbs.html"
+          "label": "Family stories",
+          "href": "/family-stories.html"
         },
         {
-          "label": "Food, Places & Journeys",
-          "href": "/experiences.html"
+          "label": "The Roots Kit",
+          "href": "/roots-kit.html"
         },
         {
-          "label": "Music, Arts & Curious Minds",
-          "href": "/music.html"
+          "label": "Journeys",
+          "href": "/journeys.html"
         }
       ]
     },
     {
-      "title": "Live & discover",
+      "title": "Stories",
       "links": [
         {
-          "label": "Conscious Living",
+          "label": "All stories",
+          "href": "/journal/"
+        },
+        {
+          "label": "Many cultures",
+          "href": "/culture.html"
+        },
+        {
+          "label": "Wisdom of the ages",
+          "href": "/proverbs.html"
+        },
+        {
+          "label": "Food & places",
+          "href": "/experiences.html"
+        },
+        {
+          "label": "Music & curious minds",
+          "href": "/music.html"
+        },
+        {
+          "label": "Conscious living",
           "href": "/conscious-living.html"
         },
         {
-          "label": "The Better Self",
+          "label": "The better self",
           "href": "/fitness.html"
-        },
-        {
-          "label": "The Bazaar",
-          "href": "/marketplace.html"
-        },
-        {
-          "label": "The Commons",
-          "href": "/manch.html"
         }
       ]
     },
@@ -101,8 +109,8 @@
       "title": "Work with us",
       "links": [
         {
-          "label": "For organisations",
-          "href": "/for-organisations.html"
+          "label": "Keepsakes",
+          "href": "/marketplace.html"
         },
         {
           "label": "Commission a piece",
@@ -113,12 +121,8 @@
           "href": "/gifting.html"
         },
         {
-          "label": "Journeys",
-          "href": "/journeys.html"
-        },
-        {
-          "label": "Family stories",
-          "href": "/family-stories.html"
+          "label": "For organisations",
+          "href": "/for-organisations.html"
         }
       ]
     },
@@ -128,6 +132,10 @@
         {
           "label": "Our story",
           "href": "/about.html"
+        },
+        {
+          "label": "The Commons",
+          "href": "/manch.html"
         },
         {
           "label": "Image credits",

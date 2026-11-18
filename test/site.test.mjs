@@ -32,12 +32,12 @@ test('every page has the shared head, header, footer and theme script before pai
   }
 });
 
-test('the navigation has the nine sections and marks the current page', () => {
-  const html = read('culture.html');
+test('the navigation is built around roots and marks the current page', () => {
+  const html = read('marketplace.html');
   const nav = html.match(/<nav class="primary-nav"[\s\S]*?<\/nav>/)[0];
   const labels = [...nav.matchAll(/<a [^>]*>([^<]+)<\/a>/g)].map((m) => m[1].replace('&amp;', '&'));
-  assert.deepEqual(labels, ['Home', 'Explore', 'Indian Culture', 'Wisdom', 'Food & Travel', 'Conscious Living', 'Better Self', 'Bazaar', 'The Commons']);
-  assert.match(nav, /<a href="\/culture.html" aria-current="page">/);
+  assert.deepEqual(labels, ['Home', 'Your Roots', 'Trace Your Roots', 'Stories', 'Family Stories', 'Journeys', 'Keepsakes', 'The Commons']);
+  assert.match(nav, /<a href="\/marketplace.html" aria-current="page">/);
   assert.equal((nav.match(/aria-current/g) || []).length, 1);
 });
 

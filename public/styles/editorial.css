@@ -525,6 +525,28 @@ p { margin: 0 0 1em; }
 .enquiry__status .btn-row { margin-top: .75rem; }
 @media (max-width: 600px) { .enquiry__grid { grid-template-columns: 1fr; } }
 
+/* Trace your roots. */
+.trace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; }
+.trace__form { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.25rem, 3vw, 2rem); display: grid; gap: 1.1rem; }
+.trace__heading { font-size: var(--step-2); margin: 0; }
+.trace-gen { position: relative; margin: 0; padding: 1rem 1.1rem 1.1rem; border: 1px solid var(--line); border-radius: var(--radius-sm); display: grid; grid-template-columns: 1.4fr 1fr; gap: .8rem 1rem; }
+.trace-gen + .trace-gen { margin-top: .9rem; }
+.trace-gen legend { padding: 0 .4rem; font: 600 .74rem/1.4 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--accent-ink); }
+.trace-gen__remove { position: absolute; top: -.7rem; right: .8rem; padding: .1rem .5rem; font-size: .8rem; color: var(--accent-ink); background: var(--surface); border: 0; cursor: pointer; text-decoration: underline; }
+.trace__add { justify-self: start; }
+.trace__actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.25rem; }
+.trace__clear { background: none; border: 0; padding: .5rem 0; color: var(--muted); font-size: .9rem; text-decoration: underline; cursor: pointer; }
+.trace__preview-wrap { position: sticky; top: calc(var(--header-h) + 1.25rem); }
+.trace__preview svg, .trace__preview-wrap img { display: block; width: 100%; height: auto; border-radius: var(--radius); box-shadow: var(--shadow); }
+@media (max-width: 900px) { .trace { grid-template-columns: 1fr; } .trace__preview-wrap { position: static; order: -1; width: min(100%, 360px); margin-inline: auto; } }
+@media (max-width: 520px) { .trace-gen { grid-template-columns: 1fr; } }
+.trace-showcase img { aspect-ratio: 4 / 5; max-width: 420px; margin-inline: auto; }
+.trace-showcase figcaption { text-align: center; }
+.ask-list { margin: 0; padding-left: 1.6rem; display: grid; gap: .7rem; }
+.ask-list li { font: 500 var(--step-1)/1.35 var(--serif); color: var(--ink); }
+.ask-list li::marker { color: var(--accent-ink); font-family: var(--sans); font-size: .85em; }
+.feature .callout { margin-top: 1.5rem; }
+
 /* ── 8. Curious Minds quiz ───────────────────────────────────────────────── */
 
 .quiz { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.5rem, 4vw, 2.75rem); box-shadow: var(--shadow); }

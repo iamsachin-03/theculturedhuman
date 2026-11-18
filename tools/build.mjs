@@ -153,7 +153,7 @@ for (const article of articles) {
 emit(
   {
     path: '/journal/',
-    title: `The Journal — ${site.name}`,
+    title: `Stories — ${site.name}`,
     description: 'Researched essays and explainers on Indian art, philosophy, food, craft and conscious living from The Cultured Human.',
   },
   t.journalMain({ cards: articles.map(card) }),
@@ -197,7 +197,7 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
   if (/\{\{/.test(main)) problems.push(`${where}: unrecognised {{…}} placeholder`);
 
   emit(
-    { path, title: data.title, description: data.description, noindex: data.noindex === 'true' },
+    { path, title: data.title, description: data.description, noindex: data.noindex === 'true', script: data.script },
     main,
     data.image,
   );

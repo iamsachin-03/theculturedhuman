@@ -1,6 +1,6 @@
 # The Cultured Human
 
-**Wisdom. Culture. Conscious Living.** An independent Indian cultural journal, discovery platform and future curated marketplace.
+**Everyone comes from somewhere.** The Cultured Human helps people reconnect with their roots: tracing where their family comes from, keeping their elders' stories, and discovering the languages, recipes, rituals and places families carry. It begins in India and welcomes everyone.
 
 Live site: <https://theculturedhuman.vercel.app> · Instagram: [@theculturedhuman](https://www.instagram.com/theculturedhuman/)
 
@@ -32,6 +32,8 @@ Node 18 or newer is all you need. There is nothing to `npm install`.
 | `public/scripts/site.js` | Theme picker, mobile menu, quiz and enquiry forms. |
 | `public/brand/` | The logo badge at several sizes, the favicon and the phone home-screen icon. `public/site.webmanifest` points to them. |
 | `tools/build.mjs` | Builds every page, the journal index, image credits, `sitemap.xml` and `robots.txt`, and checks links and images. |
+| `public/scripts/roots.js` | The "Trace your roots" tool: draws a family's places as a downloadable portrait. Everything stays in the reader's browser. |
+| `tools/roots-example.mjs` | Regenerates `public/brand/roots-example.svg`, the sample portrait shown on the homepage. Run it after changing `roots.js`. |
 | `tools/add-commons-asset.mjs` | Downloads a Wikimedia Commons image at two sizes and records its licence in the register. |
 | `legacy/bihar-angan/` | Unused code from an earlier project, kept for reference. Not deployed. |
 
@@ -63,6 +65,7 @@ Only use images whose licence allows reuse, and keep their credit. The build ref
 - `{{latest-articles 3}}` inserts cards for the newest articles.
 - `{{offer-cards commission gifting}}` inserts cards for offers from `content/offers.json`.
 - `{{enquiry commission}}` inserts that offer's enquiry form.
+- `script: roots` in a page's front matter loads `public/scripts/roots.js` on that page only.
 
 In an article, `offers: [commission, journeys]` in the front matter adds a "Bring this home" block after the sources.
 

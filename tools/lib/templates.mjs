@@ -168,7 +168,7 @@ function formatDate(iso) {
 }
 
 /**
- * @param {{ site: any, page: { path: string, title: string, description: string, type?: string, jsonLd?: object, noindex?: boolean }, image?: any, main: string }} args
+ * @param {{ site: any, page: { path: string, title: string, description: string, type?: string, jsonLd?: object, noindex?: boolean, script?: string }, image?: any, main: string }} args
  */
 export function layout({ site, page, image, main }) {
   return `<!doctype html>
@@ -186,7 +186,8 @@ ${headerBlock({ site, page })}
 ${main.trim()}
 </main>
 ${footerBlock({ site })}
-</body>
+${page.script ? `<script src="/scripts/${page.script}.js" defer></script>
+` : ''}</body>
 </html>
 `;
 }
@@ -215,9 +216,9 @@ ${related.length ? `<section class="related container" aria-labelledby="related-
 export function journalMain({ cards }) {
   return `<section class="page-hero">
 <div class="container">
-<p class="eyebrow">The Journal</p>
-<h1>Stories that bring us <em>closer to culture.</em></h1>
-<p class="lede">Researched, sourced and written with care — essays and explainers on Indian art, ideas, food and everyday life.</p>
+<p class="eyebrow">Stories</p>
+<h1>Stories of <em>where we come from.</em></h1>
+<p class="lede">Researched, sourced and written with care: the crafts, kitchens, ideas and places that families carry with them.</p>
 </div>
 </section>
 <section class="section">
