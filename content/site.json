@@ -1,0 +1,203 @@
+{
+  "name": "The Cultured Human",
+  "url": "https://theculturedhuman.vercel.app",
+  "tagline": "Everyone comes from somewhere.",
+  "supportingLine": "Trace where your family comes from, keep what they know, and pass it on.",
+  "locale": "en_IN",
+  "defaultImage": "madhubani-kohbar-arti-kumari",
+  "instagram": "https://www.instagram.com/theculturedhuman/",
+  "instagramHandle": "@theculturedhuman",
+  "instagramDm": "https://ig.me/m/theculturedhuman",
+  "enquiries": {
+    "endpoint": "",
+    "email": ""
+  },
+  "nav": [
+    {
+      "label": "Trace Your Roots",
+      "href": "/trace.html"
+    },
+    {
+      "label": "Family Archive",
+      "href": "/archive.html"
+    },
+    {
+      "label": "Places",
+      "href": "/places/"
+    },
+    {
+      "label": "Stories",
+      "href": "/journal/"
+    },
+    {
+      "label": "Keepsakes",
+      "href": "/marketplace.html"
+    },
+    {
+      "label": "Journeys",
+      "href": "/journeys.html"
+    },
+    {
+      "label": "The Commons",
+      "href": "/manch.html"
+    },
+    {
+      "label": "Plans",
+      "href": "/plans.html"
+    }
+  ],
+  "footer": [
+    {
+      "title": "Your roots",
+      "links": [
+        {
+          "label": "My archive",
+          "href": "/app.html"
+        },
+        {
+          "label": "Begin here",
+          "href": "/roots.html"
+        },
+        {
+          "label": "Trace your roots",
+          "href": "/trace.html"
+        },
+        {
+          "label": "Family archive",
+          "href": "/archive.html"
+        },
+        {
+          "label": "Places",
+          "href": "/places/"
+        },
+        {
+          "label": "Storytellers",
+          "href": "/family-stories.html"
+        },
+        {
+          "label": "The Roots Kit",
+          "href": "/roots-kit.html"
+        }
+      ]
+    },
+    {
+      "title": "Stories",
+      "links": [
+        {
+          "label": "All stories",
+          "href": "/journal/"
+        },
+        {
+          "label": "Many cultures",
+          "href": "/culture.html"
+        },
+        {
+          "label": "Wisdom of the ages",
+          "href": "/proverbs.html"
+        },
+        {
+          "label": "Food & places",
+          "href": "/experiences.html"
+        },
+        {
+          "label": "Music & curious minds",
+          "href": "/music.html"
+        },
+        {
+          "label": "Conscious living",
+          "href": "/conscious-living.html"
+        },
+        {
+          "label": "The better self",
+          "href": "/fitness.html"
+        }
+      ]
+    },
+    {
+      "title": "On the platform",
+      "links": [
+        {
+          "label": "Keepsakes",
+          "href": "/marketplace.html"
+        },
+        {
+          "label": "Journeys",
+          "href": "/journeys.html"
+        },
+        {
+          "label": "Commission a piece",
+          "href": "/commission.html"
+        },
+        {
+          "label": "Gifting",
+          "href": "/gifting.html"
+        },
+        {
+          "label": "Join as a maker, host or storyteller",
+          "href": "/join.html"
+        },
+        {
+          "label": "For organisations",
+          "href": "/for-organisations.html"
+        }
+      ]
+    },
+    {
+      "title": "About",
+      "links": [
+        {
+          "label": "Our story",
+          "href": "/about.html"
+        },
+        {
+          "label": "Plans",
+          "href": "/plans.html"
+        },
+        {
+          "label": "The Commons",
+          "href": "/manch.html"
+        },
+        {
+          "label": "Image credits",
+          "href": "/credits.html"
+        },
+        {
+          "label": "Instagram",
+          "href": "https://www.instagram.com/theculturedhuman/"
+        }
+      ]
+    }
+  ],
+  "pillars": {
+    "culture": {
+      "label": "India, Many Cultures",
+      "href": "/culture.html"
+    },
+    "wisdom": {
+      "label": "Wisdom of the Ages",
+      "href": "/proverbs.html"
+    },
+    "food-travel": {
+      "label": "Food, Places & Journeys",
+      "href": "/experiences.html"
+    },
+    "conscious-living": {
+      "label": "Conscious Living",
+      "href": "/conscious-living.html"
+    },
+    "better-self": {
+      "label": "The Better Self",
+      "href": "/fitness.html"
+    },
+    "curious-minds": {
+      "label": "Music, Arts & Curious Minds",
+      "href": "/music.html"
+    }
+  },
+  "backend": {
+    "provider": "supabase",
+    "url": "https://biaogexcislxxzxiifib.supabase.co",
+    "anonKey": "sb_publishable_LOnHHRxeeeUMbVcWWhvPtw_X-0gGSnT",
+    "google": false
+  }
+}

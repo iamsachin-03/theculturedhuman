@@ -1,0 +1,27 @@
+{
+  "name": "Assam",
+  "region": "North-east India",
+  "lat": 26.2,
+  "lng": 92.4,
+  "image": "assamese-thali",
+  "intro": "In the valley of the Brahmaputra, the river shapes the plate.",
+  "aliases": [
+    "assam",
+    "guwahati",
+    "jorhat",
+    "dibrugarh",
+    "tezpur",
+    "silchar",
+    "nagaon",
+    "sivasagar"
+  ],
+  "carries": [
+    {
+      "kind": "Food",
+      "title": "The Assamese thali",
+      "text": "Rice at the centre, surrounded by small bowls of dal, greens, vegetables and fish.",
+      "story": "regional-food-cultures"
+    }
+  ],
+  "contributions": []
+}

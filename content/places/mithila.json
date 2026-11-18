@@ -1,0 +1,41 @@
+{
+  "name": "Mithila",
+  "region": "North Bihar, India, and the Tarai of Nepal",
+  "lat": 26.35,
+  "lng": 86.07,
+  "image": "madhubani-station-murals",
+  "intro": "Mithila is the old name for the plains of north Bihar and the neighbouring Tarai of Nepal. Families from here carry one of the best-known painting traditions in the world, made for generations by women for their own homes.",
+  "aliases": [
+    "mithila",
+    "madhubani",
+    "darbhanga",
+    "samastipur",
+    "sitamarhi",
+    "supaul",
+    "saharsa",
+    "jitwarpur",
+    "ranti",
+    "janakpur"
+  ],
+  "carries": [
+    {
+      "kind": "Art",
+      "title": "The kohbar wall",
+      "text": "Before a wedding, women of the household painted the kohbar ghar, the room where the couple would spend their first nights, with lotuses for the bride, bamboo for the groom, and fish, snakes and turtles for a large family. Married women also drew aripan, auspicious designs, on the floor.",
+      "story": "madhubani-painting"
+    },
+    {
+      "kind": "Art",
+      "title": "From walls to paper",
+      "text": "During the drought of the mid-1960s, women in villages such as Jitwarpur and Ranti agreed to recreate their wall paintings on paper. Painting, once unpaid household work, became an income, and the painters became known by name.",
+      "story": "madhubani-painting"
+    },
+    {
+      "kind": "Food",
+      "title": "Mithila makhana",
+      "text": "Fox nut, harvested from ponds across north Bihar, was registered as a Geographical Indication in 2022.",
+      "story": "regional-food-cultures"
+    }
+  ],
+  "contributions": []
+}

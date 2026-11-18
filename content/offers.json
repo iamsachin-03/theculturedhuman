@@ -1,0 +1,228 @@
+[
+  {
+    "id": "family-stories",
+    "label": "Storytellers",
+    "title": "Book a storyteller",
+    "summary": "Rather not record an elder yourself? Book a trained storyteller from the platform to sit with them, record their stories and help turn them into a book.",
+    "href": "/family-stories.html",
+    "image": "gita-palm-leaf-malayalam",
+    "action": "Request a storyteller",
+    "form": {
+      "choiceLabel": "Is this a gift?",
+      "choices": [
+        "Yes, for a birthday or anniversary",
+        "No, it is for our own family",
+        "Not sure yet"
+      ],
+      "messageLabel": "Tell us about the person whose stories you would like to keep",
+      "messageHint": "Who they are to you, where they live, the languages they speak and any date you have in mind. We will match you with a storyteller who speaks their language."
+    }
+  },
+  {
+    "id": "roots-kit",
+    "label": "The Roots Kit",
+    "title": "Ask, record, keep",
+    "summary": "Guided question cards, recording tips and a family-book template, so you can capture your elders' stories yourself, wherever you live.",
+    "href": "/roots-kit.html",
+    "image": "warli-house-wall",
+    "action": "Join the waitlist",
+    "form": {
+      "choiceLabel": "Which version would you use?",
+      "choices": [
+        "Printed cards posted to me",
+        "A printable digital kit",
+        "Both"
+      ],
+      "messageLabel": "Who would you use it with?",
+      "messageHint": "For example: my grandmother in Darbhanga, over video calls from London.",
+      "messageOptional": true
+    }
+  },
+  {
+    "id": "journeys",
+    "label": "Journeys",
+    "title": "Roots journeys with local hosts",
+    "summary": "Go back to where your family began with a host who knows the place, or spend a few days with a tradition and the people who keep it.",
+    "href": "/journeys.html",
+    "image": "rani-ki-vav",
+    "action": "Register interest",
+    "form": {
+      "choiceLabel": "Which journey interests you most?",
+      "choices": [
+        "A journey to my own family's place",
+        "Mithila: painting at home",
+        "Stepwells of Gujarat and Rajasthan",
+        "Kerala at the table",
+        "Somewhere else"
+      ],
+      "messageLabel": "Tell us about the place",
+      "messageHint": "If it is your family's place, tell us where it is and what you know about it. We will introduce you to a host there as hosts join."
+    }
+  },
+  {
+    "id": "commission",
+    "label": "Commission a piece",
+    "title": "Commission original work",
+    "summary": "A painting of your family's home town, your family name in a folk art style, a gift for a wedding. Made by a named artist, who sets the price.",
+    "href": "/commission.html",
+    "image": "madhubani-kohbar-arti-kumari",
+    "action": "Start a commission",
+    "form": {
+      "choiceLabel": "What would you like made?",
+      "choices": [
+        "A painting of a family place",
+        "Our family name in a folk art style",
+        "A wedding or milestone gift",
+        "Something else"
+      ],
+      "messageLabel": "Tell us about the piece and the story behind it",
+      "messageHint": "The occasion, the size or the space it is for, a rough budget and when you need it."
+    }
+  },
+  {
+    "id": "gifting",
+    "label": "Gifting",
+    "title": "Gifts with a story",
+    "summary": "Festive and corporate gift boxes from named makers, each with a card that tells their story. Made to pre-order, never mass-stocked.",
+    "href": "/gifting.html",
+    "image": "bankura-horses",
+    "action": "Ask about gifting",
+    "form": {
+      "organisation": true,
+      "organisationOptional": true,
+      "choiceLabel": "What is the occasion?",
+      "choices": [
+        "Diwali",
+        "Raksha Bandhan",
+        "A wedding",
+        "Company gifting",
+        "Something else"
+      ],
+      "messageLabel": "Tell us what you are looking for",
+      "messageHint": "How many gifts, a budget per gift, and the date they need to arrive."
+    }
+  },
+  {
+    "id": "drops",
+    "label": "Coming drops",
+    "title": "Small seasonal drops",
+    "summary": "A few makers at a time, a limited number of pieces and the full story behind each one. Join the list to hear first.",
+    "href": "/marketplace.html#drops",
+    "image": "pattachitra-painting",
+    "action": "Hear about the first drop",
+    "form": {
+      "choiceLabel": "What would you most like to see?",
+      "choices": [
+        "Art and craft",
+        "Home and living",
+        "Books and ideas"
+      ],
+      "messageLabel": "Anything you would love us to find?",
+      "messageHint": "A craft, a region or a maker you admire.",
+      "messageOptional": true
+    }
+  },
+  {
+    "id": "organisations",
+    "label": "For organisations",
+    "title": "Culture sessions for teams",
+    "summary": "Painting hours with named artists, regional food stories and short introductions to Indian thought, for offsites, festival weeks and onboarding.",
+    "href": "/for-organisations.html",
+    "image": "madhubani-artist-dilli-haat",
+    "action": "Plan a session",
+    "form": {
+      "organisation": true,
+      "choiceLabel": "What are you interested in?",
+      "choices": [
+        "A family-history project for a school",
+        "A programme for a diaspora or community group",
+        "A roots session or heritage month at work",
+        "Festive or corporate gifting",
+        "Something else"
+      ],
+      "messageLabel": "Tell us about your group and what you have in mind",
+      "messageHint": "Roughly how many people, online or in person, the city, and any dates."
+    }
+  },
+  {
+    "id": "makers",
+    "label": "Join as a maker",
+    "form": {
+      "choiceLabel": "What do you make?",
+      "choices": [
+        "Painting or illustration",
+        "Textiles and embroidery",
+        "Pottery, wood or metal",
+        "Food",
+        "Books and writing",
+        "Something else"
+      ],
+      "messageLabel": "Tell us about your work",
+      "messageHint": "Your craft, where you work, how long you have practised, and a link to photographs of your work if you have one."
+    }
+  },
+  {
+    "id": "hosts",
+    "label": "Join as a host",
+    "form": {
+      "choiceLabel": "What could you host?",
+      "choices": [
+        "Walks and visits in my town or village",
+        "Helping families find an old house, temple or street",
+        "A day with a tradition I practise",
+        "A homestay",
+        "Something else"
+      ],
+      "messageLabel": "Tell us about your place and yourself",
+      "messageHint": "Where you live, the languages you speak, and what a family visiting with you would experience."
+    }
+  },
+  {
+    "id": "storytellers",
+    "label": "Become a storyteller",
+    "form": {
+      "choiceLabel": "Which describes you?",
+      "choices": [
+        "Oral historian or researcher",
+        "Journalist or writer",
+        "Audio or video producer",
+        "Community elder or volunteer",
+        "Something else"
+      ],
+      "messageLabel": "Tell us about your experience",
+      "messageHint": "The languages you can record in, where you are based, and any recordings or writing we could listen to or read."
+    }
+  },
+  {
+    "id": "contribute",
+    "label": "Add to a place",
+    "form": {
+      "choiceLabel": "What are you adding?",
+      "choices": [
+        "A word or saying",
+        "A dish or recipe",
+        "A festival or ritual",
+        "A song",
+        "A memory of the place",
+        "A correction"
+      ],
+      "messageLabel": "Tell us about it",
+      "messageHint": "What it is, what it means in your family, and how you would like to be credited (first name and place, initials, or anonymous). We read everything before it appears."
+    }
+  },
+  {
+    "id": "family-plan",
+    "label": "Family plan",
+    "form": {
+      "choiceLabel": "What would you use first?",
+      "choices": [
+        "Room for years of video",
+        "The weekly question sent for me",
+        "Printing a family book",
+        "All of these"
+      ],
+      "messageLabel": "Anything you would like the Family plan to do?",
+      "messageOptional": true
+    }
+  }
+]
