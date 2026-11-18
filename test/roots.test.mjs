@@ -89,6 +89,26 @@ test('depth is how far back the deepest place goes, counting gaps and both sides
   assert.match(describe(bothSides), /^Where I come from: Me, Bengaluru; My mother, Kolkata; Mother's parents, Dhaka \(1930s\); My father, Patna; Father's grandparents, Darbhanga\.$/);
 });
 
+test('a saved portrait is cleaned to known fields and capped lengths', () => {
+  const messy = {
+    name: 'x'.repeat(200), mode: 'sides', extra: '<script>', style: 'nope', palette: 'indigo', format: 'billboard',
+    me: { label: 'Me', place: 'Pune', secret: 1 },
+    sides: [Array.from({ length: 9 }, () => ({ place: 'Goa' })), 'not a list'],
+    generations: 'nonsense',
+  };
+  const clean = Art.clean(messy);
+  assert.deepEqual(Object.keys(clean), ['name', 'mode', 'generations', 'me', 'sides', 'style', 'palette', 'format']);
+  assert.equal(clean.name.length, 80);
+  assert.deepEqual(clean.me, { label: 'Me', place: 'Pune', years: '', detail: '' });
+  assert.equal(clean.sides[0].length, Art.MAX_PER_SIDE);
+  assert.deepEqual(clean.sides[1], []);
+  assert.deepEqual(clean.generations, []);
+  assert.deepEqual([clean.style, clean.palette, clean.format], ['roots', 'indigo', 'post']);
+  assert.deepEqual(Art.clean(null).mode, 'line');
+  assert.deepEqual(Art.fromSaved(messy).sides.map((s) => s.generations.length), [4, 0]);
+  assert.deepEqual(Art.fromSaved({ generations: [{ place: 'Agra' }] }), { name: '', generations: [{ label: '', place: 'Agra', years: '', detail: '' }] });
+});
+
 test('the river runs from the oldest place down to you', () => {
   const svg = Art.render(family, colours, { style: 'river' });
   assert.ok(svg.indexOf('Kundapura') < svg.indexOf('Udupi') && svg.indexOf('Udupi') < svg.indexOf('Pune'));

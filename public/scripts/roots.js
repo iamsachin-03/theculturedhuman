@@ -89,15 +89,9 @@
   var lookBefore = null;
   var thumbTimer = 0;
 
-  function sitePalette() {
-    var s = getComputedStyle(document.documentElement);
-    function v(n) { return s.getPropertyValue(n).trim(); }
-    return { page: v('--page'), surface: v('--surface'), primary: v('--primary'), accent: v('--accent'), accentInk: v('--accent-ink'), gold: v('--accent-2'), ink: v('--ink'), muted: v('--muted'), line: v('--line'), night: v('--footer'), nightInk: v('--footer-ink'), water: v('--primary-2') };
-  }
-
   function colours(id) {
     var p = Art.paletteById(id || look.palette);
-    return p.c || sitePalette();
+    return p.c || Art.siteColours();
   }
 
   function choice(name, value, labelHtml, cls) {
@@ -371,7 +365,7 @@
 
   form.querySelector('[data-clear]').addEventListener('click', function () {
     try { localStorage.removeItem(STORAGE); } catch (e) {}
-    load({});
+    load(Art.clean({}));
     form.querySelector('[name="family"]').focus();
   });
 
@@ -408,7 +402,7 @@
 
   var saved = {};
   try { saved = JSON.parse(localStorage.getItem(STORAGE) || '{}') || {}; } catch (e) {}
-  load(saved);
+  load(Art.clean(saved));
 
   if (placeLinks && window.fetch) {
     fetch('/places/places.json').then(function (r) { return r.ok ? r.json() : []; }).then(function (list) {

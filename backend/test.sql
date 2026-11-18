@@ -176,6 +176,19 @@ select check_that((select status from bookings) = 'accepted', 'the maker quotes 
 select as_user('00000000-0000-0000-0000-00000000000b');
 select check_that((select count(*) from bookings) = 0, 'other people cannot see a booking');
 
+-- A roots portrait is the owner's alone.
+select as_user('00000000-0000-0000-0000-00000000000a', 'asha@example.com');
+insert into roots (data) values ('{"mode": "line", "generations": [{"place": "Pune"}]}');
+insert into roots (data) values ('{"mode": "sides"}') on conflict (owner_id) do update set data = excluded.data;
+select check_that((select data->>'mode' from roots) = 'sides', 'an owner keeps and replaces their roots portrait');
+select as_user('00000000-0000-0000-0000-00000000000b');
+select check_that((select count(*) from roots) = 0, 'nobody else can see a roots portrait');
+update roots set data = '{}' where owner_id = '00000000-0000-0000-0000-00000000000a';
+select check_that(fails($$insert into roots (owner_id, data) values ('00000000-0000-0000-0000-00000000000a', '{}')$$), 'nobody can write into someone else''s roots');
+reset role;
+select check_that((select data->>'mode' from roots where owner_id = '00000000-0000-0000-0000-00000000000a') = 'sides', 'and nobody else can change it');
+set role authenticated;
+
 -- Leaving takes the whole archive with it.
 select as_user('00000000-0000-0000-0000-000000000012', 'quiet@example.com');
 insert into entries (kind, title, audience) values ('story', 'A quiet story', 'private');

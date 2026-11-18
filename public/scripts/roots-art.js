@@ -770,7 +770,51 @@
     return out.join('');
   }
 
-  var api = { render: render, STYLES: STYLES, PALETTES: PALETTES, FORMATS: FORMATS, MAX_GENERATIONS: MAX_GENERATIONS, MAX_PER_SIDE: MAX_PER_SIDE, styleById: styleById, paletteById: paletteById, places: places };
+  function str(v, max) { return typeof v === 'string' ? v.slice(0, max) : ''; }
+  function cleanGen(g) {
+    g = g && typeof g === 'object' ? g : {};
+    return { label: str(g.label, 60), place: str(g.place, 80), years: str(g.years, 40), detail: str(g.detail, 120) };
+  }
+  function cleanList(list, max) { return Array.isArray(list) ? list.slice(0, max).map(cleanGen) : []; }
+
+  /**
+   * The saved form of a portrait (what the roots page keeps on the device, in the archive and in
+   * invite links), with unknown fields dropped and every string capped.
+   * @returns {{ name: string, mode: 'line' | 'sides', generations: Generation[], me: Generation, sides: Generation[][], style: string, palette: string, format: string }}
+   */
+  function clean(saved) {
+    saved = saved && typeof saved === 'object' ? saved : {};
+    var sides = Array.isArray(saved.sides) ? saved.sides : [];
+    return {
+      name: str(saved.name, 80),
+      mode: saved.mode === 'sides' ? 'sides' : 'line',
+      generations: cleanList(saved.generations, MAX_GENERATIONS),
+      me: cleanGen(saved.me),
+      sides: [cleanList(sides[0], MAX_PER_SIDE), cleanList(sides[1], MAX_PER_SIDE)],
+      style: styleById(saved.style).id,
+      palette: paletteById(saved.palette).id,
+      format: FORMATS[saved.format] ? saved.format : 'post',
+    };
+  }
+
+  /** The render data for a saved portrait, in whichever mode it was saved. */
+  function fromSaved(saved) {
+    var s = clean(saved);
+    if (s.mode === 'sides') return { name: s.name, me: s.me, sides: [{ generations: s.sides[0] }, { generations: s.sides[1] }] };
+    return { name: s.name, generations: s.generations };
+  }
+
+  /** The site's own colours, read from its CSS (browser only). */
+  function siteColours() {
+    var s = getComputedStyle(document.documentElement);
+    function v(n) { return s.getPropertyValue(n).trim(); }
+    return { page: v('--page'), surface: v('--surface'), primary: v('--primary'), accent: v('--accent'), accentInk: v('--accent-ink'), gold: v('--accent-2'), ink: v('--ink'), muted: v('--muted'), line: v('--line'), night: v('--footer'), nightInk: v('--footer-ink'), water: v('--primary-2') };
+  }
+
+  var api = {
+    render: render, STYLES: STYLES, PALETTES: PALETTES, FORMATS: FORMATS, MAX_GENERATIONS: MAX_GENERATIONS, MAX_PER_SIDE: MAX_PER_SIDE,
+    styleById: styleById, paletteById: paletteById, places: places, clean: clean, fromSaved: fromSaved, siteColours: siteColours,
+  };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.TCHRootsArt = api;
 })(this);

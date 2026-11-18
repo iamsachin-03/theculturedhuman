@@ -5,7 +5,7 @@ The family archive app at `/app.html` stores each person's archive in a [Supabas
 | File | What it is |
 | --- | --- |
 | `schema.sql` | Tables, row-level security rules, the functions behind sharing and passing an archive on, and the storage bucket rules |
-| `test.sql` | 49 checks of the access rules: strangers, family, beloved ones, letters with dates, legacy contacts, silence, deleting an account, moderation and bookings |
+| `test.sql` | 53 checks of the access rules: strangers, family, beloved ones, letters with dates, legacy contacts, silence, deleting an account, moderation and bookings |
 | `test.sh` | Runs `test.sql` against a throwaway local database |
 | `dev/start.sh`, `dev/dev-server.mjs` | A local stand-in for a Supabase project, for development and tests only |
 

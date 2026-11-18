@@ -4,16 +4,17 @@
 (function (root) {
   var core = root.TCH.core;
   var SESSION = 'tch-local-session';
-  var STORES = ['users', 'people', 'entries', 'media', 'legacy', 'elders'];
+  var STORES = ['users', 'people', 'entries', 'media', 'legacy', 'elders', 'roots'];
   var dbPromise = null;
 
   function db() {
     if (!dbPromise) {
       dbPromise = new Promise(function (resolve, reject) {
-        var req = indexedDB.open('tch-app', 1);
+        var req = indexedDB.open('tch-app', 2);
         req.onupgradeneeded = function () {
           STORES.forEach(function (name) {
-            req.result.createObjectStore(name, { keyPath: name === 'legacy' ? 'owner' : 'id' });
+            if (req.result.objectStoreNames.contains(name)) return;
+            req.result.createObjectStore(name, { keyPath: name === 'legacy' || name === 'roots' ? 'owner' : 'id' });
           });
         };
         req.onsuccess = function () { resolve(req.result); };
@@ -330,6 +331,17 @@
       return get('elders', id).then(function (e) { if (e && e.owner === owner) return del('elders', id); });
     },
 
+    /** The roots portrait kept in this archive, in its saved form (TCHRootsArt.clean), or null. */
+    roots: function () {
+      var owner = need();
+      return get('roots', owner).then(function (r) { return r ? r.data : null; });
+    },
+
+    saveRoots: function (data) {
+      var owner = need();
+      return put('roots', { owner: owner, data: data, updatedAt: now().toISOString() }).then(function () { return data; });
+    },
+
     deleteAccount: function () {
       var owner = need();
       return Promise.all(['entries', 'media', 'people', 'elders'].map(function (name) {
@@ -338,6 +350,7 @@
             .map(function (x) { return del(name, x.id); }));
         });
       })).then(function () { return del('legacy', owner); })
+        .then(function () { return del('roots', owner); })
         .then(function () { return del('users', owner); })
         .then(function () { return store.signOut(); });
     },

@@ -319,6 +319,15 @@
 
       deleteElder: function (id) { return rest('weekly_elders?id=eq.' + id, { method: 'DELETE' }); },
 
+      roots: function () {
+        return rest('roots?select=data&owner_id=eq.' + me()).then(function (rows) { return rows[0] ? rows[0].data : null; });
+      },
+
+      saveRoots: function (data) {
+        return rest('roots?on_conflict=owner_id', { method: 'POST', json: { owner_id: me(), data: data }, headers: { prefer: 'resolution=merge-duplicates,return=minimal' } })
+          .then(function () { return data; });
+      },
+
       deleteAccount: function () {
         var id = me();
         return Promise.all([

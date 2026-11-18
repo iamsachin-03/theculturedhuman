@@ -57,7 +57,7 @@ test('the app page carries its backend settings, loads its scripts in order and 
   assert.ok(meta, 'backend meta tag');
   assert.deepEqual(JSON.parse(meta[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&')), site.backend);
   const scripts = [...html.matchAll(/<script src="\/scripts\/([\w-]+)\.js" defer><\/script>/g)].map((m) => m[1]);
-  assert.deepEqual(scripts, ['site', 'app-core', 'app-store-local', 'app-store-supabase', 'app']);
+  assert.deepEqual(scripts, ['site', 'roots-art', 'app-core', 'app-store-local', 'app-store-supabase', 'app']);
   assert.match(html, /<meta name="robots" content="noindex/);
   assert.ok(!read('sitemap.xml').includes('/app.html'));
   assert.ok(!read('index.html').includes('tch-backend'), 'only the app page carries the settings');

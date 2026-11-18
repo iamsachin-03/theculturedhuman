@@ -5,6 +5,7 @@
 (function () {
   var TCH = window.TCH;
   var core = TCH.core;
+  var Art = window.TCHRootsArt;
   var app = document.querySelector('[data-app]');
   if (!app) return;
 
@@ -134,7 +135,7 @@
 
   var routes = [
     [/^$/, home], [/^archive$/, archive], [/^entry\/new$/, editor], [/^entry\/([\w-]+)\/edit$/, editor],
-    [/^entry\/([\w-]+)$/, entryView], [/^weekly$/, weekly], [/^people$/, people], [/^shared$/, shared],
+    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^people$/, people], [/^shared$/, shared],
     [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings],
   ];
 
@@ -223,10 +224,12 @@
   // ---------- home ----------
   function home() {
     var h1 = page('Welcome, ' + firstName(state.user.name) + '.');
-    return Promise.all([store.entries(), store.elders(), store.sharedWithMe()]).then(function (r) {
+    return Promise.all([store.entries(), store.elders(), store.sharedWithMe(), store.roots()]).then(function (r) {
       var entries = r[0];
       var elders = r[1];
       var sharedList = r[2];
+      var keptRoots = hasRoots(r[3]) ? Art.clean(r[3]) : null;
+      var deviceHasRoots = hasRoots(deviceRoots());
       var mine = entries.filter(function (e) { return e.createdBy === state.user.id || e.owner === state.user.id; });
       var files = mine.reduce(function (n, e) { return n + e.media.length; }, 0);
       add(view, h('div', { class: 'app-quick' },
@@ -253,6 +256,12 @@
         h('h2', null, sharedList.length ? plural(sharedList.length, 'archive') : 'Nobody yet'),
         h('p', null, sharedList.length ? sharedList.map(function (s) { return s.ownerName; }).join(', ') : 'When someone adds you to their archive with this email address, it appears here.'),
         link('#/shared', 'See what is shared with you', 'text-link'),
+      ));
+      grid.appendChild(h('section', { class: 'app-card' },
+        h('p', { class: 'eyebrow' }, 'Your roots'),
+        h('h2', null, keptRoots ? plural(Art.places(Art.fromSaved(keptRoots)).length, 'place') + ' kept' : deviceHasRoots ? 'Ready to keep' : 'Not traced yet'),
+        h('p', null, keptRoots ? 'The places your family has called home, drawn as a portrait.' : deviceHasRoots ? 'You made a roots portrait in this browser. Keep it in your archive.' : 'Draw the places your family has called home as roots, a tree, a river, rings or stars.'),
+        link(keptRoots || deviceHasRoots ? '#/roots' : '/trace.html', keptRoots ? 'See your roots' : deviceHasRoots ? 'Keep your roots portrait' : 'Trace your roots', 'text-link'),
       ));
       add(view, grid);
       if (entries.length) {
@@ -541,6 +550,85 @@
       });
       add(view, form);
       if (query.get('record') === 'audio') setTimeout(function () { var b = form.querySelector('[data-record="audio"]'); if (b) b.focus(); }, 0);
+      return h1;
+    });
+  }
+
+  // ---------- roots portrait ----------
+  var ROOTS_DEVICE = 'tch-roots';
+  function deviceRoots() {
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(ROOTS_DEVICE) || 'null'); } catch (e) {}
+    return saved ? Art.clean(saved) : null;
+  }
+  function hasRoots(saved) { return !!saved && Art.places(Art.fromSaved(saved)).length > 0; }
+  function drawn(saved) {
+    var s = Art.clean(saved);
+    return JSON.stringify([s.name.trim(), s.mode, s.style, s.palette, s.format, Art.places(Art.fromSaved(s))]);
+  }
+  function sameRoots(a, b) { return drawn(a) === drawn(b); }
+
+  function portrait(saved) {
+    var p = Art.paletteById(saved.palette);
+    var data = Art.fromSaved(saved);
+    var label = 'Roots portrait: ' + Art.places(data).map(function (g) { return g.label + ', ' + g.place; }).join('; ') + '.';
+    var box = h('div', { class: 'app-roots__art', role: 'img', 'aria-label': label, 'data-format': saved.format });
+    box.innerHTML = Art.render(data, p.c || Art.siteColours(), { style: saved.style, format: saved.format, idPrefix: 'app-roots' });
+    return box;
+  }
+
+  function openOnRootsPage(saved) {
+    try { localStorage.setItem(ROOTS_DEVICE, JSON.stringify(saved)); } catch (e) {}
+    location.href = '/trace.html';
+  }
+
+  function roots() {
+    var h1 = page('My roots', 'The places your family has called home, drawn as a portrait. It is kept in your archive, where only you can see it, so you can open it on any device.');
+    return store.roots().then(function (kept) {
+      kept = hasRoots(kept) ? Art.clean(kept) : null;
+      var device = deviceRoots();
+      device = hasRoots(device) ? device : null;
+      var differs = device && (!kept || !sameRoots(kept, device));
+
+      function keep() {
+        return store.saveRoots(device).then(function () { flash = 'Your roots portrait is kept in your archive.'; render(); }).catch(fail);
+      }
+
+      if (kept) {
+        var section = h('section', { class: 'app-roots' }, portrait(kept));
+        add(section, h('div', { class: 'app-roots__side' },
+          h('p', { class: 'eyebrow' }, 'Kept in your archive'),
+          h('h2', null, plural(Art.places(Art.fromSaved(kept)).length, 'place')),
+          h('p', null, 'Change the places, the style or the colours on the roots page, then come back here to keep the new version.'),
+          h('div', { class: 'btn-row' },
+            button('Change it on the roots page', function () {
+              if (differs && !window.confirm('This browser has a different portrait. Open the one from your archive instead?')) return;
+              openOnRootsPage(kept);
+            }),
+          ),
+        ));
+        add(view, section);
+      }
+      if (differs) {
+        var card = h('section', { class: 'app-card app-roots__device' },
+          h('p', { class: 'eyebrow' }, kept ? 'A newer portrait on this device' : 'On this device'),
+          h('h2', null, kept ? 'This browser has a different version' : 'Keep the portrait you made'),
+          h('p', null, kept ? 'Keep it to replace the one in your archive.' : 'You made this on the roots page in this browser. Keep it in your archive to open it anywhere.'),
+          portrait(device),
+          h('div', { class: 'btn-row' }, button(kept ? 'Replace with this version' : 'Keep in my archive', function () {
+            if (kept && !window.confirm('Replace the portrait in your archive with this one?')) return;
+            keep();
+          })),
+        );
+        add(view, card);
+      }
+      if (!kept && !device) {
+        add(view, h('section', { class: 'app-card' },
+          h('h2', null, 'You have not traced your roots yet'),
+          h('p', null, 'Add the places your family has called home, from you back to the oldest generation you know, and choose how to draw them: roots, a tree, a river, tree rings or a sky of stars.'),
+          link('/trace.html', 'Trace your roots', 'btn'),
+        ));
+      }
       return h1;
     });
   }
