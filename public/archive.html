@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your family archive — The Cultured Human</title>
+<meta name="description" content="Keep what lives only in memory for the generations after you: favourite tales, photographs and the moments behind them, wisdom and proverbs, what helps on hard days, and letters to the future.">
+<meta name="theme-color" content="#FBF4E8">
+<link rel="canonical" href="https://theculturedhuman.vercel.app/archive.html">
+<meta property="og:site_name" content="The Cultured Human">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Your family archive — The Cultured Human">
+<meta property="og:description" content="Keep what lives only in memory for the generations after you: favourite tales, photographs and the moments behind them, wisdom and proverbs, what helps on hard days, and letters to the future.">
+<meta property="og:url" content="https://theculturedhuman.vercel.app/archive.html">
+<meta property="og:locale" content="en_IN">
+<meta property="og:image" content="https://theculturedhuman.vercel.app/assets/manuscripts/gita-palm-leaf-malayalam-1600.jpg">
+<meta property="og:image:alt" content="Long, narrow palm-leaf manuscript page of the Bhagavad Gita in Malayalam script">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/brand/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="/brand/logo-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/brand/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap">
+<link rel="stylesheet" href="/styles/editorial.css">
+<script src="/scripts/theme-init.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+<div class="site-header__inner">
+<a class="wordmark" href="/" aria-label="The Cultured Human — home"><img src="/brand/logo-96.png" width="44" height="44" alt="" decoding="async"><span>The Cultured Human</span></a>
+<button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span class="menu-toggle__label">Menu</span></button>
+<nav class="primary-nav" id="primary-nav" aria-label="Main"><ul><li><a href="/">Home</a></li><li><a href="/trace.html">Trace Your Roots</a></li><li><a href="/archive.html" aria-current="page">Family Archive</a></li><li><a href="/places/">Places</a></li><li><a href="/journal/">Stories</a></li><li><a href="/marketplace.html">Keepsakes</a></li><li><a href="/journeys.html">Journeys</a></li><li><a href="/manch.html">The Commons</a></li></ul></nav>
+<label class="theme-picker"><span class="theme-swatch" aria-hidden="true"></span><span>Theme</span>
+<select data-theme-picker aria-label="Colour theme">
+<option value="marigold">Marigold</option>
+<option value="haldi">Haldi</option>
+<option value="indigo">Indigo</option>
+<option value="gulmohar">Gulmohar</option>
+<option value="evening">Evening</option>
+</select></label>
+</div>
+</header>
+<main id="main">
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">Family archive</p>
+    <h1>What you know, <em>kept for those who come next.</em></h1>
+    <p class="lede">Our photos are in the cloud, on hard disks and in albums. But the stories behind them, the tales we were told, the sayings that steadied us and the way a grandparent laughed live only in our memories. Keep them here, in your own words and voice, for the generations after you.</p>
+  </div>
+</section>
+
+<div class="editorial-content">
+  <p class="notice"><strong>Family accounts are coming.</strong> Until then, your archive is saved in this browser on this device. Use <em>Save a copy</em> to keep a backup or to send it to a relative. <a href="/plans.html">About family accounts</a>.</p>
+
+  <div class="archive" data-archive>
+    <aside class="archive__side" aria-labelledby="archive-side-title">
+      <h2 id="archive-side-title" class="archive__heading">Your archive</h2>
+      <div class="archive__roots" data-archive-roots></div>
+      <p class="archive__count" data-archive-count aria-live="polite"></p>
+      <div class="archive__tools">
+        <button class="btn btn--ghost" type="button" data-archive-export>Save a copy</button>
+        <label class="btn btn--ghost archive__import">Add from a copy<input type="file" accept="application/json,.json" data-archive-import></label>
+        <button class="btn btn--ghost" type="button" data-archive-invite>Invite a relative</button>
+        <button class="btn btn--ghost" type="button" data-archive-print>Print as a book</button>
+      </div>
+      <p class="archive__status" data-archive-status role="status" aria-live="polite"></p>
+    </aside>
+
+    <div class="archive__main">
+      <form class="archive-form" data-archive-form aria-labelledby="archive-form-title">
+        <h2 id="archive-form-title" class="archive__heading">Add something to keep</h2>
+        <p class="field"><label for="arc-kind">What are you keeping?</label><select id="arc-kind" name="kind"></select></p>
+        <p class="field"><label for="arc-prompt">Start from a question <span class="field__optional">(optional)</span></label><select id="arc-prompt" name="prompt"></select></p>
+        <p class="field field--wide"><label for="arc-title">A title</label><input id="arc-title" name="title" type="text" maxlength="80" required placeholder="e.g. Nani's house in Darbhanga"></p>
+        <p class="field"><label for="arc-teller">From <span class="field__optional">(optional)</span></label><input id="arc-teller" name="teller" type="text" maxlength="40" placeholder="e.g. Nani"></p>
+        <p class="field"><label for="arc-for">For <span class="field__optional">(optional)</span></label><input id="arc-for" name="forWhom" type="text" maxlength="60" placeholder="e.g. my grandchildren"></p>
+        <p class="field"><label for="arc-place">Where <span class="field__optional">(optional)</span></label><input id="arc-place" name="place" type="text" maxlength="40"></p>
+        <p class="field" data-only="letter"><label for="arc-open">Open when… <span class="field__optional">(optional)</span></label><input id="arc-open" name="openWhen" type="text" maxlength="60" placeholder="e.g. when you leave home"></p>
+        <p class="field field--wide"><label for="arc-text">In their own words <span class="field__optional">(optional)</span></label><textarea id="arc-text" name="text" rows="6"></textarea></p>
+        <div class="archive-form__media">
+          <div class="archive-voice" data-voice>
+            <p class="archive-voice__label">Voice note <span class="field__optional">(optional)</span></p>
+            <div class="archive-voice__controls">
+              <button class="btn btn--ghost" type="button" data-record>Record</button>
+              <label class="archive-voice__upload">or choose a file<input type="file" accept="audio/*" data-audio-file></label>
+            </div>
+            <p class="field__hint" data-voice-status aria-live="polite">Ask first if you may record.</p>
+            <audio controls hidden data-voice-preview></audio>
+          </div>
+          <p class="field"><label for="arc-photo">A photograph <span class="field__optional">(optional)</span></label><input id="arc-photo" name="photo" type="file" accept="image/*"></p>
+        </div>
+        <div class="archive-form__footer"><button class="btn" type="submit">Keep it</button></div>
+      </form>
+
+      <section class="archive-list" aria-labelledby="archive-list-title">
+        <h2 id="archive-list-title" class="archive__heading">What your family has kept</h2>
+        <div data-archive-list></div>
+      </section>
+    </div>
+  </div>
+  <noscript><p class="notice">The family archive needs JavaScript. You can still use the <a href="/roots.html#ask">twelve questions</a> with your phone's voice recorder.</p></noscript>
+
+  <div class="section-gap"></div>
+
+  <div class="section-head">
+    <p class="eyebrow">What to keep</p>
+    <h2>Everything in between the photographs.</h2>
+  </div>
+  <ol class="steps steps--five">
+    <li><h3>Stories and tales</h3><p>The tale you asked for every night. How they met. Why the family moved.</p></li>
+    <li><h3>Moments together</h3><p>A photograph, and what was happening just outside the frame.</p></li>
+    <li><h3>Wisdom and sayings</h3><p>The proverb your grandmother repeated, and what she meant by it.</p></li>
+    <li><h3>For hard days</h3><p>What helped them stay calm, grounded and confident when life was uncertain.</p></li>
+    <li><h3>Letters to the future</h3><p>Words for someone not yet grown, or not yet born: open when you leave home, open when you feel lost.</p></li>
+  </ol>
+
+  <div class="section-gap"></div>
+
+  <section class="two-col">
+    <div>
+      <p class="eyebrow">Rather not do it yourself?</p>
+      <h2>Book a storyteller.</h2>
+      <a class="text-link" href="/family-stories.html">About storytellers</a>
+    </div>
+    <ul class="promise-list">
+      <li><strong>Storytellers on the platform</strong> sit with your elder, in person or online, in the language they are most at ease in.</li>
+      <li><strong>Everything they record</strong> goes into your family's archive, and your family owns it.</li>
+      <li><strong>Printed books</strong> can be made from any archive, whether you recorded it or they did.</li>
+    </ul>
+  </section>
+</div>
+</main>
+<footer class="site-footer">
+<div class="border-weave" aria-hidden="true"></div>
+<div class="container site-footer__grid">
+<div class="site-footer__brand"><a class="wordmark wordmark--footer" href="/"><img src="/brand/logo-192.png" width="96" height="96" alt="" decoding="async"><span>The Cultured Human</span></a><p>Everyone comes from somewhere. Trace where your family comes from, keep what they know, and pass it on.</p></div>
+<div><h2>Your roots</h2><ul><li><a href="/roots.html">Begin here</a></li><li><a href="/trace.html">Trace your roots</a></li><li><a href="/archive.html">Family archive</a></li><li><a href="/places/">Places</a></li><li><a href="/family-stories.html">Storytellers</a></li><li><a href="/roots-kit.html">The Roots Kit</a></li><li><a href="/plans.html">Plans</a></li></ul></div>
+<div><h2>Stories</h2><ul><li><a href="/journal/">All stories</a></li><li><a href="/culture.html">Many cultures</a></li><li><a href="/proverbs.html">Wisdom of the ages</a></li><li><a href="/experiences.html">Food &amp; places</a></li><li><a href="/music.html">Music &amp; curious minds</a></li><li><a href="/conscious-living.html">Conscious living</a></li><li><a href="/fitness.html">The better self</a></li></ul></div>
+<div><h2>On the platform</h2><ul><li><a href="/marketplace.html">Keepsakes</a></li><li><a href="/journeys.html">Journeys</a></li><li><a href="/commission.html">Commission a piece</a></li><li><a href="/gifting.html">Gifting</a></li><li><a href="/join.html">Join as a maker, host or storyteller</a></li><li><a href="/for-organisations.html">For organisations</a></li></ul></div>
+<div><h2>About</h2><ul><li><a href="/about.html">Our story</a></li><li><a href="/manch.html">The Commons</a></li><li><a href="/credits.html">Image credits</a></li><li><a href="https://www.instagram.com/theculturedhuman/" rel="noopener">Instagram</a></li></ul></div>
+</div>
+<div class="container site-footer__bottom"><span>© 2026 The Cultured Human. Rooted in India, curious about everywhere.</span><span>Images are credited on our <a href="/credits.html">image credits</a> page.</span></div>
+</footer>
+<script src="/scripts/site.js" defer></script>
+<script src="/scripts/archive.js" defer></script>
+</body>
+</html>

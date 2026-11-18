@@ -2,7 +2,7 @@
   "name": "The Cultured Human",
   "url": "https://theculturedhuman.vercel.app",
   "tagline": "Everyone comes from somewhere.",
-  "supportingLine": "Stories, keepsakes and journeys that bring you closer to your roots.",
+  "supportingLine": "Trace where your family comes from, keep what they know, and pass it on.",
   "locale": "en_IN",
   "defaultImage": "madhubani-kohbar-arti-kumari",
   "instagram": "https://www.instagram.com/theculturedhuman/",
@@ -18,28 +18,28 @@
       "href": "/"
     },
     {
-      "label": "Your Roots",
-      "href": "/roots.html"
-    },
-    {
       "label": "Trace Your Roots",
       "href": "/trace.html"
+    },
+    {
+      "label": "Family Archive",
+      "href": "/archive.html"
+    },
+    {
+      "label": "Places",
+      "href": "/places/"
     },
     {
       "label": "Stories",
       "href": "/journal/"
     },
     {
-      "label": "Family Stories",
-      "href": "/family-stories.html"
+      "label": "Keepsakes",
+      "href": "/marketplace.html"
     },
     {
       "label": "Journeys",
       "href": "/journeys.html"
-    },
-    {
-      "label": "Keepsakes",
-      "href": "/marketplace.html"
     },
     {
       "label": "The Commons",
@@ -59,7 +59,15 @@
           "href": "/trace.html"
         },
         {
-          "label": "Family stories",
+          "label": "Family archive",
+          "href": "/archive.html"
+        },
+        {
+          "label": "Places",
+          "href": "/places/"
+        },
+        {
+          "label": "Storytellers",
           "href": "/family-stories.html"
         },
         {
@@ -67,8 +75,8 @@
           "href": "/roots-kit.html"
         },
         {
-          "label": "Journeys",
-          "href": "/journeys.html"
+          "label": "Plans",
+          "href": "/plans.html"
         }
       ]
     },
@@ -106,11 +114,15 @@
       ]
     },
     {
-      "title": "Work with us",
+      "title": "On the platform",
       "links": [
         {
           "label": "Keepsakes",
           "href": "/marketplace.html"
+        },
+        {
+          "label": "Journeys",
+          "href": "/journeys.html"
         },
         {
           "label": "Commission a piece",
@@ -119,6 +131,10 @@
         {
           "label": "Gifting",
           "href": "/gifting.html"
+        },
+        {
+          "label": "Join as a maker, host or storyteller",
+          "href": "/join.html"
         },
         {
           "label": "For organisations",

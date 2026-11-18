@@ -1,0 +1,38 @@
+{
+  "name": "Rajasthan",
+  "region": "North-west India",
+  "lat": 26.9,
+  "lng": 74.2,
+  "image": "rajasthani-thali",
+  "intro": "Much of the land is desert, and much of what families carry from here is an answer to scarce water.",
+  "aliases": [
+    "rajasthan",
+    "jaipur",
+    "jodhpur",
+    "udaipur",
+    "bikaner",
+    "ajmer",
+    "dausa",
+    "abhaneri",
+    "jaisalmer",
+    "kota",
+    "alwar",
+    "shekhawati",
+    "marwar"
+  ],
+  "carries": [
+    {
+      "kind": "Food",
+      "title": "Dal baati churma",
+      "text": "A Rajasthani thali with dal baati and churma, from a state where much of the land is desert.",
+      "story": "regional-food-cultures"
+    },
+    {
+      "kind": "Place",
+      "title": "Chand Baori",
+      "text": "A stepwell in Abhaneri, in Dausa district: deep steps built down to the water in a dry land.",
+      "image": "chand-baori"
+    }
+  ],
+  "contributions": []
+}

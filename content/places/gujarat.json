@@ -1,0 +1,31 @@
+{
+  "name": "Gujarat",
+  "region": "Western India",
+  "lat": 22.6,
+  "lng": 71.6,
+  "image": "rani-ki-vav",
+  "intro": "On India's western coast, where some of the country's most extraordinary architecture was built around water.",
+  "aliases": [
+    "gujarat",
+    "ahmedabad",
+    "patan",
+    "surat",
+    "vadodara",
+    "baroda",
+    "rajkot",
+    "bhuj",
+    "kutch",
+    "kachchh",
+    "bhavnagar",
+    "junagadh"
+  ],
+  "carries": [
+    {
+      "kind": "Place",
+      "title": "Rani ki Vav",
+      "text": "A stepwell in Patan, inscribed as a UNESCO World Heritage Site in 2014.",
+      "image": "rani-ki-vav"
+    }
+  ],
+  "contributions": []
+}

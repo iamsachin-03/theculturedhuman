@@ -1,0 +1,40 @@
+{
+  "name": "Kerala",
+  "region": "South-west coast of India",
+  "lat": 10.5,
+  "lng": 76.3,
+  "image": "kerala-sadya",
+  "intro": "Kerala lies along India's rain-soaked south-west coast, where rice is at the centre of the plate and the grandest meal is served on a leaf.",
+  "aliases": [
+    "kerala",
+    "kochi",
+    "cochin",
+    "thiruvananthapuram",
+    "trivandrum",
+    "kozhikode",
+    "calicut",
+    "thrissur",
+    "kottayam",
+    "kollam",
+    "alappuzha",
+    "alleppey",
+    "palakkad",
+    "kannur",
+    "malappuram"
+  ],
+  "carries": [
+    {
+      "kind": "Food",
+      "title": "The sadya",
+      "text": "A vegetarian feast of rice with many accompaniments, served on a plantain leaf. The tapering end of the leaf points to the guest's left. The sadya served on Thiruvonam, the most auspicious day of Onam, is the Onasadya.",
+      "story": "regional-food-cultures"
+    },
+    {
+      "kind": "Words",
+      "title": "Kept on palm leaves",
+      "text": "Long before paper was common, texts were written on palm leaves. A sixteenth-century Bhagavad Gita in Malayalam script survives in this form.",
+      "image": "gita-palm-leaf-malayalam"
+    }
+  ],
+  "contributions": []
+}

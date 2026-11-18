@@ -11,6 +11,7 @@ const read = (p) => readFileSync(join(PUBLIC, p), 'utf8');
 const pages = [
   ...readdirSync(PUBLIC).filter((f) => f.endsWith('.html')),
   ...readdirSync(join(PUBLIC, 'journal')).map((f) => `journal/${f}`),
+  ...readdirSync(join(PUBLIC, 'places')).filter((f) => f.endsWith('.html')).map((f) => `places/${f}`),
 ];
 
 test('the committed site matches its sources and passes every build check', () => {
@@ -32,11 +33,11 @@ test('every page has the shared head, header, footer and theme script before pai
   }
 });
 
-test('the navigation is built around roots and marks the current page', () => {
+test('the navigation is built around the platform and marks the current page', () => {
   const html = read('marketplace.html');
   const nav = html.match(/<nav class="primary-nav"[\s\S]*?<\/nav>/)[0];
   const labels = [...nav.matchAll(/<a [^>]*>([^<]+)<\/a>/g)].map((m) => m[1].replace('&amp;', '&'));
-  assert.deepEqual(labels, ['Home', 'Your Roots', 'Trace Your Roots', 'Stories', 'Family Stories', 'Journeys', 'Keepsakes', 'The Commons']);
+  assert.deepEqual(labels, ['Home', 'Trace Your Roots', 'Family Archive', 'Places', 'Stories', 'Keepsakes', 'Journeys', 'The Commons']);
   assert.match(nav, /<a href="\/marketplace.html" aria-current="page">/);
   assert.equal((nav.match(/aria-current/g) || []).length, 1);
 });
@@ -96,4 +97,23 @@ test('articles with offers end with a "Bring this home" block', () => {
   const html = read('journal/madhubani-painting.html');
   assert.match(html, /Bring this home/);
   assert.match(html, /<a class="offer-card" href="\/commission.html">/);
+});
+
+test('every place has a page, a point on the roots map and a contribution form that names it', () => {
+  const index = read('places/index.html');
+  const list = JSON.parse(read('places/places.json'));
+  assert.ok(list.length >= 7);
+  for (const p of list) {
+    const html = read(`places/${p.slug}.html`);
+    assert.match(index, new RegExp(`<a href="${p.path}" aria-label="${p.name}">`), p.slug);
+    assert.match(html, new RegExp(`<input type="hidden" name="place" value="${p.name}">`), p.slug);
+    assert.match(html, /What families from here carry/);
+  }
+});
+
+test('directories with nobody listed invite the first people instead of showing an empty list', () => {
+  for (const [page, anchor] of [['marketplace.html', 'makers'], ['journeys.html', 'hosts'], ['family-stories.html', 'storytellers']]) {
+    assert.match(read(page), new RegExp(`<div class="empty-state">[^]*?href="/join.html#${anchor}"`), page);
+  }
+  assert.match(read('join.html'), /id="makers"[^]*id="hosts"[^]*id="storytellers"/);
 });

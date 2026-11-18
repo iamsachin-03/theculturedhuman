@@ -1,0 +1,32 @@
+{
+  "name": "Kashmir",
+  "region": "The Kashmir valley",
+  "lat": 34.08,
+  "lng": 74.8,
+  "image": "wazwan-preparation",
+  "intro": "A valley with its own language, its own script in the past, and one of the grandest banquets anywhere.",
+  "aliases": [
+    "kashmir",
+    "srinagar",
+    "anantnag",
+    "baramulla",
+    "sopore",
+    "pulwama",
+    "kupwara"
+  ],
+  "carries": [
+    {
+      "kind": "Food",
+      "title": "Wazwan",
+      "text": "The grand formal banquet, prepared by hereditary cooks known as waza. Guests traditionally sit in groups of four and share from a large copper plate called the traem.",
+      "story": "regional-food-cultures"
+    },
+    {
+      "kind": "Words",
+      "title": "The Sharada script",
+      "text": "A fragment of the Rigveda written in the Sharada script is kept at the Bhandarkar Oriental Research Institute in Pune.",
+      "image": "rigveda-palm-leaf-sharada"
+    }
+  ],
+  "contributions": []
+}

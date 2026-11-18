@@ -1,0 +1,37 @@
+{
+  "name": "Bengal",
+  "region": "West Bengal, India, and Bangladesh",
+  "lat": 23.2,
+  "lng": 88.6,
+  "image": "bengali-fish-mustard",
+  "intro": "A land of rivers and ponds, where freshwater fish is at the heart of the home kitchen.",
+  "aliases": [
+    "bengal",
+    "kolkata",
+    "calcutta",
+    "howrah",
+    "bankura",
+    "bardhaman",
+    "burdwan",
+    "murshidabad",
+    "siliguri",
+    "dhaka",
+    "chittagong",
+    "khulna"
+  ],
+  "carries": [
+    {
+      "kind": "Food",
+      "title": "Fish in mustard",
+      "text": "Freshwater fish cooked in a sharp mustard sauce is a signature of the Bengali home kitchen.",
+      "story": "regional-food-cultures"
+    },
+    {
+      "kind": "Craft",
+      "title": "Bankura horses",
+      "text": "Terracotta horses from Bankura in West Bengal.",
+      "image": "bankura-horses"
+    }
+  ],
+  "contributions": []
+}

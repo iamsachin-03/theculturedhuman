@@ -130,8 +130,20 @@
     }).join('; ') + '.';
   }
 
+  // Whole-word match, so "Patna" never matches a place aliased "patan".
+  function matchPlaces(names, places) {
+    var found = [];
+    names.forEach(function (name) {
+      var typed = ' ' + String(name || '').toLowerCase().replace(/[^a-z\u00c0-\u024f]+/g, ' ') + ' ';
+      places.forEach(function (p) {
+        if (found.indexOf(p) === -1 && p.aliases.some(function (a) { return typed.indexOf(' ' + a + ' ') !== -1; })) found.push(p);
+      });
+    });
+    return found;
+  }
+
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { renderRoots: renderRoots, describe: describe };
+    module.exports = { renderRoots: renderRoots, describe: describe, matchPlaces: matchPlaces };
     return;
   }
 
@@ -144,6 +156,9 @@
   var MAX = 6;
   var DEFAULTS = ['Me', 'My parents', 'My grandparents', 'My great-grandparents'];
   var counter = 0;
+  var placeLinks = document.querySelector('[data-place-links]');
+  var shareBtn = form.querySelector('[data-share]');
+  var places = [];
 
   function palette() {
     var s = getComputedStyle(document.documentElement);
@@ -193,6 +208,38 @@
     preview.setAttribute('aria-label', describe(data));
     addBtn.hidden = list.children.length >= MAX;
     try { localStorage.setItem(STORAGE, JSON.stringify(data)); } catch (e) {}
+    showPlaces(data);
+  }
+
+  function showPlaces(data) {
+    if (!placeLinks) return;
+    var found = matchPlaces(data.generations.map(function (g) { return g.place; }), places);
+    placeLinks.hidden = !found.length;
+    var ul = placeLinks.querySelector('ul');
+    ul.innerHTML = '';
+    found.forEach(function (p) {
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = p.path;
+      a.textContent = p.name;
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+  }
+
+  function toPng(done) {
+    var svg = renderRoots(read(), palette());
+    var img = new Image();
+    var url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    img.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(done, 'image/png');
+    };
+    img.src = url;
   }
 
   function load(data) {
@@ -219,28 +266,30 @@
 
   form.querySelector('[data-download]').addEventListener('click', function () {
     var btn = this;
-    var svg = renderRoots(read(), palette());
-    var img = new Image();
-    var url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
-    img.onload = function () {
-      var canvas = document.createElement('canvas');
-      canvas.width = W;
-      canvas.height = H;
-      canvas.getContext('2d').drawImage(img, 0, 0);
-      URL.revokeObjectURL(url);
-      canvas.toBlob(function (blob) {
-        var a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'my-roots.png';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        btn.textContent = 'Downloaded';
-        setTimeout(function () { btn.textContent = 'Download image'; }, 2500);
-      }, 'image/png');
-    };
-    img.src = url;
+    toPng(function (blob) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'my-roots.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      btn.textContent = 'Downloaded';
+      setTimeout(function () { btn.textContent = 'Download image'; }, 2500);
+    });
   });
+
+  // Sharing a file is only offered where the browser supports it (mostly phones).
+  if (shareBtn && navigator.canShare && navigator.canShare({ files: [new File([''], 'x.png', { type: 'image/png' })] })) {
+    shareBtn.hidden = false;
+    shareBtn.addEventListener('click', function () {
+      toPng(function (blob) {
+        navigator.share({
+          files: [new File([blob], 'my-roots.png', { type: 'image/png' })],
+          text: 'Where I come from. Trace yours at ' + location.origin + '/trace.html #theculturedhuman',
+        }).catch(function () {});
+      });
+    });
+  }
 
   window.addEventListener('storage', function (e) { if (e.key === 'tch-theme') update(); });
   new MutationObserver(update).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -248,4 +297,11 @@
   var saved = {};
   try { saved = JSON.parse(localStorage.getItem(STORAGE) || '{}') || {}; } catch (e) {}
   load(saved);
+
+  if (placeLinks && window.fetch) {
+    fetch('/places/places.json').then(function (r) { return r.ok ? r.json() : []; }).then(function (list) {
+      places = list;
+      showPlaces(read());
+    }).catch(function () {});
+  }
 })(this);

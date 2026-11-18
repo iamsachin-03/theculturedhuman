@@ -1,6 +1,6 @@
 # The Cultured Human
 
-**Everyone comes from somewhere.** The Cultured Human helps people reconnect with their roots: tracing where their family comes from, keeping their elders' stories, and discovering the languages, recipes, rituals and places families carry. It begins in India and welcomes everyone.
+**Everyone comes from somewhere.** The Cultured Human is a platform where families trace where they come from, keep what their elders know for the generations after them, add to the pages of the places they come from, and find the makers, hosts and storytellers who keep those places alive. It begins in India and welcomes everyone.
 
 Live site: <https://theculturedhuman.vercel.app> · Instagram: [@theculturedhuman](https://www.instagram.com/theculturedhuman/)
 
@@ -26,6 +26,10 @@ Node 18 or newer is all you need. There is nothing to `npm install`.
 | `content/site.json` | Navigation, footer links, the six editorial pillars, the site URL and where enquiries are sent. |
 | `content/offers.json` | What readers can commission, book or join: each offer's card text, page and enquiry form questions. |
 | `content/quiz.json` | Questions for the Curious Minds quiz. |
+| `content/places/*.json` | One file per place. The build turns each into `/places/<name>.html`, adds it to the roots map and to `/places/places.json`, which the Trace tool uses to link typed places to their pages. `carries` must come from sourced stories; `contributions` are what families sent in, added after review with the credit they chose. |
+| `content/people.json` | Makers, hosts and storytellers listed on the platform (`id`, `name`, `role`, `place`, `summary`, optional `languages` and `link`). Empty until the first people are reviewed; pages show an invitation to join instead. |
+| `public/scripts/archive.js` | The family archive: stories, photo memories, wisdom, things for hard days and letters to the future, with voice notes and photographs. Stored in the browser's IndexedDB until family accounts exist; saved copies can be exported, merged and printed as a book. |
+| `backend/` | The database for family accounts and the marketplace (Supabase/Postgres), with tested access rules. See [`backend/README.md`](backend/README.md). |
 | `public/assets/register.json` | Every image, with its creator, source, licence and alt text. |
 | `public/styles/editorial.css` | The design system: five themes, type scale, spacing and components. |
 | `public/scripts/theme-init.js` | Applies the saved theme in `<head>`, before the page paints. |
@@ -65,7 +69,8 @@ Only use images whose licence allows reuse, and keep their credit. The build ref
 - `{{latest-articles 3}}` inserts cards for the newest articles.
 - `{{offer-cards commission gifting}}` inserts cards for offers from `content/offers.json`.
 - `{{enquiry commission}}` inserts that offer's enquiry form.
-- `script: roots` in a page's front matter loads `public/scripts/roots.js` on that page only.
+- `script: roots` (or `script: archive`) in a page's front matter loads that file from `public/scripts/` on that page only.
+- `{{directory maker}}`, `{{directory host}}` and `{{directory storyteller}}` list people from `content/people.json`; `{{place-cards}}` and `{{roots-map}}` show the places.
 
 In an article, `offers: [commission, journeys]` in the front matter adds a "Bring this home" block after the sources.
 

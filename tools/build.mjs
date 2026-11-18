@@ -9,11 +9,15 @@
 //   content/articles/*.md   journal articles (see content/articles/README.md)
 //   content/site.json       navigation, footer, pillars, site URL, enquiry settings
 //   content/offers.json     what readers can commission, book or join, with each enquiry form
+//   content/places/*.json   place pages: what families from each place carry, and what they have shared
+//   content/people.json     makers, hosts and storytellers listed on the platform
 //   public/assets/register.json   every image, with its creator and licence
 //
 // Inside pages, {{img id}}, {{figure id caption="…"}} and {{credit id}} expand
 // into responsive images and credit lines drawn from the register.
 // {{offer-cards id id …}} lists offers as cards and {{enquiry id}} renders an offer's enquiry form.
+// {{directory maker|host|storyteller}} lists people from content/people.json, {{place-cards}} and
+// {{roots-map}} show the places.
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, statSync, rmSync } from 'node:fs';
 import { join, relative, dirname, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -50,6 +54,37 @@ function offer(id, where, { card = false } = {}) {
   }
   return o;
 }
+
+const ROLES = ['maker', 'host', 'storyteller'];
+const placesDir = join(ROOT, 'content/places');
+const places = readdirSync(placesDir)
+  .filter((f) => f.endsWith('.json'))
+  .sort()
+  .map((file) => {
+    const where = `content/places/${file}`;
+    const p = JSON.parse(readFileSync(join(placesDir, file), 'utf8'));
+    for (const key of ['name', 'region', 'image', 'intro']) if (!p[key]) throw new Error(`${where} needs "${key}"`);
+    if (typeof p.lat !== 'number' || typeof p.lng !== 'number') throw new Error(`${where} needs numeric "lat" and "lng"`);
+    if (!Array.isArray(p.aliases) || !p.aliases.length) throw new Error(`${where} needs "aliases" for matching typed place names`);
+    for (const [i, c] of (p.carries || []).entries()) {
+      if (!c.kind || !c.title || !c.text) throw new Error(`${where}: carries[${i}] needs kind, title and text`);
+    }
+    for (const [i, c] of (p.contributions || []).entries()) {
+      if (!c.kind || !c.title || !c.text || !c.credit) throw new Error(`${where}: contributions[${i}] needs kind, title, text and credit`);
+    }
+    return { ...p, slug: file.replace(/\.json$/, ''), where, carries: p.carries || [], contributions: p.contributions || [], path: `/places/${file.replace(/\.json$/, '')}.html` };
+  });
+const placeBySlug = new Map(places.map((p) => [p.slug, p]));
+
+const people = JSON.parse(readFileSync(join(ROOT, 'content/people.json'), 'utf8'));
+for (const [i, person] of people.entries()) {
+  const where = `content/people.json: entry ${i + 1}`;
+  for (const key of ['id', 'name', 'role', 'place', 'summary']) if (!person[key]) throw new Error(`${where} needs "${key}"`);
+  if (!ROLES.includes(person.role)) throw new Error(`${where}: role must be one of ${ROLES.join(', ')}`);
+  if (!placeBySlug.has(person.place)) throw new Error(`${where}: place "${person.place}" has no file in content/places`);
+}
+const withPlace = (person) => ({ ...person, placeInfo: placeBySlug.get(person.place) });
+const directory = (role) => t.directory(role, people.filter((p) => p.role === role).map(withPlace));
 
 const problems = [];
 /** @type {Map<string, string>} absolute output path → file contents */
@@ -168,6 +203,46 @@ emit(
   t.creditsMain({ assets: register }),
 );
 
+// ---------- places ----------
+for (const place of places) {
+  const carries = place.carries.map((c) => {
+    const story = c.story && bySlug.get(c.story);
+    if (c.story && !story) throw new Error(`${place.where}: story "${c.story}" does not exist`);
+    return { ...c, storyInfo: story, imageInfo: c.image && asset(c.image, place.where) };
+  });
+  emit(
+    {
+      path: place.path,
+      title: `${place.name} — Places — ${site.name}`,
+      description: `What families from ${place.name} carry with them: ${carries.map((c) => c.title).join(', ')}. Add your family's words, dishes and memories.`,
+    },
+    t.placeMain({
+      site,
+      place,
+      hero: asset(place.image, place.where),
+      carries,
+      people: people.filter((p) => p.place === place.slug).map(withPlace),
+      form: t.enquiryForm(site, offer('contribute', place.where), { place: place.name }),
+    }),
+    place.image,
+  );
+}
+const placeCards = () => t.placeCards(places.map((p) => ({ ...p, hero: asset(p.image, p.where) })));
+const rootsMap = () => t.rootsMap(places);
+emit(
+  {
+    path: '/places/',
+    title: `Places — ${site.name}`,
+    description: 'Every family comes from a place. Explore what families from each place carry with them, and add your own.',
+  },
+  t.placesIndexMain({ map: rootsMap(), cards: placeCards(), form: t.enquiryForm(site, offer('contribute', 'places index'), { place: 'A new place' }) }),
+  places[0]?.image,
+);
+outputs.set(
+  join(PUBLIC, 'places/places.json'),
+  JSON.stringify(places.map((p) => ({ slug: p.slug, name: p.name, path: p.path, aliases: p.aliases }))) + '\n',
+);
+
 // ---------- hand-written pages ----------
 function attrs(s) {
   const out = {};
@@ -193,7 +268,10 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
     .replace(/\{\{latest-articles(?:\s+(\d+))?\}\}/g, (_, n) => articles.slice(0, Number(n) || 3).map(card).join('\n'))
     .replace(/\{\{quiz\}\}/g, () => t.quiz(quiz))
     .replace(/\{\{offer-cards\s+([\w\s-]+)\}\}/g, (_, ids) => `<div class="offer-grid">${offerCards(ids.trim().split(/\s+/), where).join('')}</div>`)
-    .replace(/\{\{enquiry\s+([\w-]+)\}\}/g, (_, id) => t.enquiryForm(site, offer(id, where)));
+    .replace(/\{\{enquiry\s+([\w-]+)\}\}/g, (_, id) => t.enquiryForm(site, offer(id, where)))
+    .replace(/\{\{directory\s+(maker|host|storyteller)\}\}/g, (_, role) => directory(role))
+    .replace(/\{\{place-cards\}\}/g, placeCards)
+    .replace(/\{\{roots-map\}\}/g, rootsMap);
   if (/\{\{/.test(main)) problems.push(`${where}: unrecognised {{…}} placeholder`);
 
   emit(
