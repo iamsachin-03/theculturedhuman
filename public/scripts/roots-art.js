@@ -10,6 +10,7 @@
   var FORMATS = {
     post: { id: 'post', name: 'Post', hint: '4:5', w: 1080, h: 1350 },
     story: { id: 'story', name: 'Story', hint: '9:16', w: 1080, h: 1920 },
+    print: { id: 'print', name: 'Print', hint: 'A4 · A3', w: 1080, h: 1527 },
   };
 
   var STYLES = [
@@ -98,7 +99,13 @@
     var top = y - (place.length > 1 ? 34 : 14) * k;
     var h = halo(o.halo);
     var a = 'text-anchor="' + anchor + '" ';
-    var s = text(x, top - 34 * k, wrap(kick, 40, 1), a + 'font-family="' + SANS + '" font-size="' + f(kickSize) + '" font-weight="700" letter-spacing="' + (kickSize > 17 ? 3 : 1.5) + '" fill="' + o.kicker + '"' + h, 0);
+    var kickFits = Math.floor(width / (kickSize * 0.66 + (kickSize > 17 ? 3 : 1.5)));
+    var kickMax = Math.min(40, Math.max(10, kickFits));
+    var kickName = (g.label || '').toUpperCase();
+    var kickLines = kick.length > kickMax && g.years && g.years.trim() && kickName.length <= kickMax
+      ? [kickName, g.years.trim()]
+      : wrap(kick, kickMax, 2);
+    var s = text(x, top - 34 * k - (kickLines.length - 1) * (kickSize + 3), kickLines, a + 'font-family="' + SANS + '" font-size="' + f(kickSize) + '" font-weight="700" letter-spacing="' + (kickSize > 17 ? 3 : 1.5) + '" fill="' + o.kicker + '"' + h, f(kickSize + 3));
     s += text(x, top + 12 * k, place, a + 'font-family="' + SERIF + '" font-size="' + f(44 * k) + '" fill="' + o.place + '"' + h, f(46 * k));
     if (detail.length) {
       s += text(x, top + 12 * k + place.length * 46 * k, detail, a + 'font-family="' + SERIF + '" font-style="italic" font-size="' + f(27 * k) + '" fill="' + o.muted + '"' + (o.mutedOpacity ? ' fill-opacity="' + o.mutedOpacity + '"' : '') + h, f(32 * k));
@@ -742,7 +749,7 @@
     var style = styleById(opts.style).id;
     var c = complete(colours);
     var dark = style === 'stars';
-    var ctx = { W: fmt.w, H: fmt.h, c: c, id: (opts.idPrefix || 'tch') + '-', out: [], rand: seeded(style), inset: fmt.h > 1500 ? 150 : 0 };
+    var ctx = { W: fmt.w, H: fmt.h, c: c, id: (opts.idPrefix || 'tch') + '-', out: [], rand: seeded(style), inset: Math.round((fmt.h - 1350) * 150 / 570) };
     var gens = places(data);
     var name = (data.name || '').trim();
     var titleLines = wrap(name ? 'The roots of ' + name : 'Where I come from', 30, 2);

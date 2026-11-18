@@ -541,6 +541,9 @@ p { margin: 0 0 1em; }
 .trace__clear { background: none; border: 0; padding: .5rem 0; color: var(--muted); font-size: .9rem; text-decoration: underline; cursor: pointer; }
 .trace__preview-wrap { position: sticky; top: calc(var(--header-h) + 1.25rem); }
 .trace__preview svg, .trace__preview-wrap img { display: block; width: 100%; height: auto; border-radius: var(--radius); box-shadow: var(--shadow); }
+.trace__preview[data-format="print"] { max-width: min(100%, calc((100vh - var(--header-h) - 6rem) * 1080 / 1527)); margin-inline: auto; }
+.trace__print-frame { position: fixed; right: 0; bottom: 0; width: 1px; height: 1px; border: 0; opacity: 0; pointer-events: none; }
+.trace__print-hint { margin: .25rem 0 0; font-size: .86rem; color: var(--muted); }
 .trace__preview[data-format="story"] { max-width: min(100%, calc((100vh - var(--header-h) - 6rem) * 9 / 16)); margin-inline: auto; }
 .trace__progress { margin: 1rem 0 0; text-align: center; font: italic 500 var(--step-1)/1.35 var(--serif); color: var(--muted); transition: color .4s; }
 .trace__progress.is-deep { color: var(--accent-ink); }

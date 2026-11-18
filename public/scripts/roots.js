@@ -315,18 +315,37 @@
     var svg = art(read(), { style: look.style, palette: look.palette, format: look.format, idPrefix: 'dl' });
     var img = new Image();
     var url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    var scale = look.format === 'print' ? 3 : 1;
     img.onload = function () {
       var canvas = document.createElement('canvas');
-      canvas.width = fm.w;
-      canvas.height = fm.h;
-      canvas.getContext('2d').drawImage(img, 0, 0);
+      canvas.width = fm.w * scale;
+      canvas.height = fm.h * scale;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(url);
       canvas.toBlob(done, 'image/png');
     };
     img.src = url;
   }
 
-  function fileName() { return 'my-roots-' + look.style + (look.format === 'story' ? '-story' : '') + '.png'; }
+  function fileName() { return 'my-roots-' + look.style + (look.format === 'post' ? '' : '-' + look.format) + '.png'; }
+
+  /** The poster on its own in a hidden frame, so it prints as vector artwork filling one page. */
+  function printPoster() {
+    if (look.format !== 'print') { setLook({ style: look.style, palette: look.palette, format: 'print' }); update(); }
+    var svg = art(read(), { style: look.style, palette: look.palette, format: 'print', idPrefix: 'pr' });
+    var frame = document.createElement('iframe');
+    frame.className = 'trace__print-frame';
+    frame.setAttribute('aria-hidden', 'true');
+    frame.tabIndex = -1;
+    frame.srcdoc = '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>' + fileName().replace('.png', '') + '</title>' +
+      '<style>@page{size:portrait;margin:8mm}html,body{margin:0;height:100%}svg{display:block;width:100%;height:100%}</style></head><body>' + svg + '</body></html>';
+    frame.onload = function () {
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+      setTimeout(function () { frame.remove(); }, 60000);
+    };
+    document.body.appendChild(frame);
+  }
 
   function load(data) {
     list.innerHTML = '';
@@ -387,6 +406,8 @@
       setTimeout(function () { btn.textContent = 'Download image'; }, 2500);
     });
   });
+
+  form.querySelector('[data-print]').addEventListener('click', printPoster);
 
   // Sharing a file is only offered where the browser supports it (mostly phones).
   if (shareBtn && navigator.canShare && navigator.canShare({ files: [new File([''], 'x.png', { type: 'image/png' })] })) {
