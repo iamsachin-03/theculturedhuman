@@ -177,6 +177,7 @@
     var email = h('input', { type: 'email', name: 'email', autocomplete: 'email', required: true });
     var name = h('input', { type: 'text', name: 'name', autocomplete: 'name' });
     add(form, [
+      h('img', { class: 'app-signin__art', src: '/assets/illustrations/keepsake-box-800.jpg', width: 800, height: 534, alt: '' }),
       h('h2', null, store.mode === 'local' ? 'Try it on this device' : 'Sign in or create your archive'),
       field('Email', email, store.mode === 'local' ? 'Any address works in preview mode. Sign in as different addresses to see what each person would see.' : 'We will email you a link to sign in. No password to remember.'),
       field('Your name (optional)', name, 'Shown to the people you share with.'),

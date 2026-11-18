@@ -872,6 +872,7 @@ p { margin: 0 0 1em; }
 .app-shared:hover { border-color: var(--primary); }
 .app-legacy { border-left: 3px solid var(--accent-2); }
 .app-signin { max-width: 36rem; }
+.app-signin__art { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; margin-bottom: 1.25rem; border-radius: calc(var(--radius) - 4px); }
 .app-signin .field { margin-bottom: 1rem; }
 .app-or { margin-top: 1rem; }
 .app-accounts { margin: 0 0 1.25rem; display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
