@@ -2,7 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "public",
-  "crons": [{ "path": "/api/weekly-send", "schedule": "30 4 * * *" }],
+  "crons": [
+    { "path": "/api/weekly-send", "schedule": "30 4 * * *" },
+    { "path": "/api/notify", "schedule": "30 12 * * *" }
+  ],
   "functions": { "api/weekly-send.mjs": { "includeFiles": "public/scripts/app-core.js" } },
   "redirects": [
     { "source": "/bazaar.html", "destination": "/marketplace.html", "permanent": true },
