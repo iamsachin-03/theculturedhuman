@@ -420,15 +420,18 @@ create trigger people_email before update on people for each row execute functio
 -- pending when the person who shared them edits what they say.
 create function guard_review() returns trigger
 language plpgsql security definer set search_path = public as $$
+declare
+  changed boolean;
 begin
-  if auth.uid() is null or is_moderator() then
+  if auth.uid() is null then
     return new;
   end if;
   if tg_table_name = 'listings' then
-    new.status := 'pending';
+    if not is_moderator() then new.status := 'pending'; end if;
     return new;
   end if;
   if tg_op = 'INSERT' then
+    if is_moderator() then return new; end if;
     if (select count(*) from place_contributions where submitted_by = auth.uid() and created_at > now() - interval '1 day') >= 10 then
       raise exception 'You have shared 10 things today. Thank you! Please come back tomorrow for more.';
     end if;
@@ -438,9 +441,18 @@ begin
     return new;
   end if;
   if new.submitted_by <> old.submitted_by then raise exception 'This cannot be changed'; end if;
+  changed := (new.place_slug, new.suggested_place, new.kind, new.title, new.body, new.credit, new.script, new.pronunciation, new.prompt_week)
+    is distinct from (old.place_slug, old.suggested_place, old.kind, old.title, old.body, old.credit, old.script, old.pronunciation, old.prompt_week);
+  if is_moderator() then
+    -- Moderators review other people's words; their own edits are read again like anyone's.
+    if changed and old.submitted_by = auth.uid() then
+      new.status := 'pending';
+      new.review_note := null;
+    end if;
+    return new;
+  end if;
   new.notified_status := old.notified_status;
-  if (new.place_slug, new.suggested_place, new.kind, new.title, new.body, new.credit, new.script, new.pronunciation, new.prompt_week)
-     is distinct from (old.place_slug, old.suggested_place, old.kind, old.title, old.body, old.credit, old.script, old.pronunciation, old.prompt_week) then
+  if changed then
     new.status := 'pending';
     new.review_note := null;
   else

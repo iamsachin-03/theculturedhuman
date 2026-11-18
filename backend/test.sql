@@ -175,6 +175,10 @@ update place_contributions set review_note = null, status = 'published' where ti
 select check_that((select status = 'rejected' and review_note is not null from place_contributions), 'and cannot clear the reason or publish it themselves');
 select as_user('00000000-0000-0000-0000-00000000000e');
 update place_contributions set status = 'published', review_note = null;
+insert into place_contributions (place_slug, kind, title, body, credit, consent, status) values ('mithila', 'Word', 'Moderator word', 'x', 'M.', true, 'published');
+update place_contributions set body = 'changed' where title = 'Moderator word';
+select check_that((select status from place_contributions where title = 'Moderator word') = 'pending', 'a moderator''s own edits are read again too');
+delete from place_contributions where title = 'Moderator word';
 select as_user('00000000-0000-0000-0000-00000000000b');
 insert into contribution_reports (contribution_id, reason, note) select id, 'wrong', 'Sasur means father-in-law' from place_contributions;
 select check_that(fails($$insert into contribution_reports (contribution_id, reason) select id, 'spam' from place_contributions$$), 'one report per person per contribution');

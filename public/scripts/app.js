@@ -1092,8 +1092,8 @@
         var title = h('input', { name: 'title', required: true, maxlength: 120, value: editing ? editing.title : '' });
         var script = h('input', { name: 'script', maxlength: 120, value: editing && editing.script || '' });
         var pronunciation = h('input', { name: 'pronunciation', maxlength: 120, value: editing && editing.pronunciation || '' });
-        var scriptField = field('The word in its own script (optional)', script, 'For example সাৰথি, ಅಜ್ಜಿ or ਨਾਨੀ.');
-        var sayField = field('How it is said (optional)', pronunciation, 'Spell it the way it sounds, for example "SAH-ruh-thee".');
+        var scriptField = field('The word in its own script (optional)', script, 'For example ঠাকুমা, ಅಜ್ಜಿ or ਨਾਨੀ.');
+        var sayField = field('How it is said (optional)', pronunciation, 'Spell it the way it sounds, for example "THAA-koo-maa".');
         var body = h('textarea', { name: 'body', rows: 8, required: true, maxlength: 5000 });
         body.value = editing ? editing.body : '';
         var credit = h('input', { name: 'credit', required: true, maxlength: 80, value: editing ? editing.credit : state.user.name || '' });
@@ -1196,7 +1196,9 @@
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var picked = form.querySelector('[name="reason"]:checked');
-      store.report(id, { reason: picked ? picked.value : '', note: note.value }).then(function () {
+      Promise.resolve().then(function () {
+        return store.report(id, { reason: picked ? picked.value : '', note: note.value });
+      }).then(function () {
         view.textContent = '';
         var done = page('Thank you', 'A moderator will read it. If it breaks the community guidelines, it will be taken down.');
         add(view, h('p', null, h('a', { href: back, class: 'btn' }, 'Go back')));
