@@ -1032,6 +1032,11 @@
     return fetch('/places/places.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
       .then(function (list) { placeList = list; return list; });
   }
+  function loadPrompt(n) {
+    if (n === null || !/^\d+$/.test(n)) return Promise.resolve(null);
+    return fetch('/community/prompts.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+      .then(function (data) { return data && data.prompts[Number(n)] || null; });
+  }
   function placeName(list, c) {
     var p = list.filter(function (x) { return x.slug === c.placeSlug; })[0];
     return p ? p.name : c.suggestedPlace ? c.suggestedPlace + ' (a new place)' : c.placeSlug;
@@ -1039,11 +1044,20 @@
   var REVIEW = { pending: 'Waiting to be read', published: 'Published on the place page', rejected: 'Not published' };
 
   function contribute(_, query) {
-    return Promise.all([loadPlaces(), store.myContributions(), store.isModerator()]).then(function (r) {
+    return Promise.all([loadPlaces(), store.myContributions(), store.isModerator(), loadPrompt(query.get('prompt'))]).then(function (r) {
       var list = r[0];
       var sent = r[1];
+      var prompt = r[3];
+      var wantKind = prompt ? prompt.kind : query.get('kind');
+      if (core.CONTRIBUTION_KINDS.indexOf(wantKind) < 0) wantKind = core.CONTRIBUTION_KINDS[0];
       var chosen = list.filter(function (p) { return p.slug === query.get('place'); })[0];
       var h1 = page(chosen ? 'Add to ' + chosen.name : 'Add to a place', 'A word with no translation, a dish, a festival as your grandparents kept it, a song, a street that has changed. Everything is read before it appears on the place page, and credited the way you choose.');
+      if (prompt) {
+        add(view, h('div', { class: 'app-card app-prompt' },
+          h('p', { class: 'eyebrow' }, 'Answering this week\'s question'),
+          h('p', { class: 'app-prompt__text' }, prompt.text),
+          prompt.hashtag ? h('p', { class: 'field__hint' }, 'Sharing it on Instagram too? Use #' + prompt.hashtag + ' and tag @theculturedhuman.') : null));
+      }
       var form = h('form', { class: 'app-card app-form app-contribute' });
       var place = options(h('select', { name: 'place' }),
         [{ id: '?', label: 'Choose a place' }].concat(list.map(function (p) { return { id: p.slug, label: p.name }; }), [{ id: '', label: 'Somewhere else' }]),
@@ -1053,7 +1067,7 @@
       function showOther() { otherField.hidden = place.value !== ''; }
       place.addEventListener('change', showOther);
       showOther();
-      var kind = options(h('select', { name: 'kind' }), core.CONTRIBUTION_KINDS.map(function (k) { return { id: k, label: k }; }), core.CONTRIBUTION_KINDS[0]);
+      var kind = options(h('select', { name: 'kind' }), core.CONTRIBUTION_KINDS.map(function (k) { return { id: k, label: k }; }), wantKind);
       var title = h('input', { name: 'title', required: true, maxlength: 120 });
       var body = h('textarea', { name: 'body', rows: 8, required: true, maxlength: 5000 });
       var credit = h('input', { name: 'credit', required: true, maxlength: 80, value: state.user.name || '' });

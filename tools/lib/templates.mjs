@@ -35,15 +35,40 @@ export function headBlock({ site, page, image }) {
   ].filter(Boolean).join('\n');
 }
 
-function isActive(href, path) {
+function isActive(href, path, match = []) {
   if (href === '/') return path === '/' || path === '/index.html';
   if (href.endsWith('/')) return path.startsWith(href);
-  return path === href;
+  return path === href || match.includes(path);
+}
+
+// Trace your roots and the family archive are one product; its pages share this menu.
+const PRODUCT_NAV = {
+  roots: {
+    label: 'My Roots',
+    links: [
+      ['/roots.html', 'How it works'],
+      ['/trace.html', 'Trace your roots'],
+      ['/archive.html', 'Family archive'],
+      ['/family-stories.html', 'Storytellers'],
+      ['/roots-kit.html', 'The Roots Kit'],
+    ],
+    action: ['/app.html', 'Open my archive'],
+  },
+};
+
+export function productNav(product, path) {
+  const p = PRODUCT_NAV[product];
+  if (!p) throw new Error(`Unknown product "${product}"`);
+  return `<nav class="product-nav" aria-label="${e(p.label)}"><div class="container product-nav__inner">
+<a class="product-nav__name" href="${p.links[0][0]}">${e(p.label)}</a>
+<ul>${p.links.map(([href, label]) => `<li><a href="${href}"${href === path ? ' aria-current="page"' : ''}>${e(label)}</a></li>`).join('')}</ul>
+<a class="product-nav__action" href="${p.action[0]}">${e(p.action[1])}</a>
+</div></nav>`;
 }
 
 export function headerBlock({ site, page }) {
   const links = site.nav
-    .map((n) => `<li><a href="${n.href}"${isActive(n.href, page.path) ? ' aria-current="page"' : ''}>${e(n.label)}</a></li>`)
+    .map((n) => `<li><a href="${n.href}"${n.href === page.path ? ' aria-current="page"' : isActive(n.href, page.path, n.match) ? ' aria-current="true"' : ''}>${e(n.label)}</a></li>`)
     .join('');
   return `<a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
@@ -171,7 +196,7 @@ function formatDate(iso) {
 }
 
 /**
- * @param {{ site: any, page: { path: string, title: string, description: string, type?: string, jsonLd?: object, noindex?: boolean, script?: string }, image?: any, main: string }} args
+ * @param {{ site: any, page: { path: string, title: string, description: string, type?: string, jsonLd?: object, noindex?: boolean, script?: string, product?: string }, image?: any, main: string }} args
  */
 export function layout({ site, page, image, main }) {
   return `<!doctype html>
@@ -186,7 +211,7 @@ ${page.noindex ? '<meta name="robots" content="noindex, follow">\n' : ''}${/(^|\
 <body>
 ${headerBlock({ site, page })}
 <main id="main">
-${main.trim()}
+${page.product ? productNav(page.product, page.path) + '\n' : ''}${main.trim()}
 </main>
 ${footerBlock({ site })}
 ${(page.script || '').split(/\s+/).filter(Boolean).map((name) => `<script src="/scripts/${name}.js" defer></script>\n`).join('')}</body>
@@ -305,6 +330,30 @@ ${form}
 </div>`;
 }
 
+/** This week's Commons question. community-live.js replaces the first prompt with the current one. */
+export function thisWeek(prompts) {
+  const p = prompts.prompts[0];
+  return `<div class="this-week" data-this-week>
+<p class="eyebrow">This week's question</p>
+<p class="this-week__question" data-this-week-text>${e(p.text)}</p>
+<p class="this-week__tag" data-this-week-tag${p.hashtag ? '' : ' hidden'}>${p.hashtag ? `#${e(p.hashtag)}` : ''}</p>
+<div class="btn-row"><a class="btn btn--light" href="/app.html#/contribute?prompt=0" data-this-week-link>Answer it</a><a class="btn btn--light btn--outline" href="/places/">Read what families carry</a></div>
+<p class="this-week__note">A new question every Monday. Answers are read before they appear, then added to the page of the place they come from, credited the way you choose.</p>
+</div>`;
+}
+
+/** What families have shared and moderators have published, read live by community-live.js. */
+export function communityFeed({ site, limit = 6, kind, style = 'cards', place }) {
+  const words = style === 'words';
+  const empty = words
+    ? '<p><strong>The first words will appear here.</strong> Add a word from your family that has no translation, and where it comes from.</p><a class="text-link" href="/app.html#/contribute?kind=A%20word%20or%20saying">Add your word</a>'
+    : '<p><strong>Nothing shared yet.</strong> Be the first: answer this week\'s question, or add something to your place.</p><a class="text-link" href="/app.html#/contribute">Add to a place</a>';
+  const backend = site.backend && site.backend.url ? ` data-url="${e(site.backend.url)}" data-key="${e(site.backend.anonKey)}"` : '';
+  return `<div class="community-feed community-feed--${words ? 'words' : 'cards'}" data-community-feed data-limit="${limit}"${kind ? ` data-kind="${e(kind)}"` : ''}${place ? ` data-place="${e(place)}"` : ''}${backend}>
+<div class="empty-state">${empty}</div>
+</div>`;
+}
+
 export function placesIndexMain({ site, map, cards, form }) {
   return `<section class="page-hero">
 <div class="container">
@@ -359,7 +408,7 @@ export function placeMain({ site, place, hero, carries, people, form }) {
 <div class="carry-grid">${carries.map(carry).join('')}</div>
 <div class="section-gap"></div>
 <div class="section-head"><p class="eyebrow">Shared by families</p><h2>In their own words.</h2></div>
-<div data-shared-by-families data-place="${e(place.slug)}"${site.backend && site.backend.url ? ` data-url="${e(site.backend.url)}" data-key="${e(site.backend.anonKey)}"` : ''}>
+<div class="community-feed" data-community-feed data-limit="100" data-place="${e(place.slug)}"${site.backend && site.backend.url ? ` data-url="${e(site.backend.url)}" data-key="${e(site.backend.anonKey)}"` : ''}>
 ${shared}
 </div>
 <div class="section-gap"></div>

@@ -1,0 +1,17 @@
+{
+  "start": "2026-11-16",
+  "prompts": [
+    { "text": "Which word from your family has no translation?", "kind": "A word or saying", "hashtag": "OneWordFromHome" },
+    { "text": "Which dish means home, and who made it best?", "kind": "A dish or recipe" },
+    { "text": "What did your family carry with it when it moved?", "kind": "A memory of the place" },
+    { "text": "How did your grandparents celebrate the biggest festival of the year?", "kind": "A festival or ritual" },
+    { "text": "Which song was sung at every family wedding?", "kind": "A song" },
+    { "text": "Which saying did your elders repeat most, and what did they mean by it?", "kind": "A word or saying" },
+    { "text": "What is the story behind your family name?", "kind": "A memory of the place" },
+    { "text": "Which street, temple, river or tree do you remember from your family's place?", "kind": "A memory of the place" },
+    { "text": "What did your family cook only once a year?", "kind": "A dish or recipe" },
+    { "text": "Which ritual did your family never skip?", "kind": "A festival or ritual" },
+    { "text": "Which lullaby or children's rhyme was sung in your home?", "kind": "A song" },
+    { "text": "Which craft or skill has been passed down in your family?", "kind": "A memory of the place" }
+  ]
+}

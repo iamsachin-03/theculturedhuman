@@ -1,48 +1,104 @@
 ---
 title: The Commons — The Cultured Human
-description: Where are your roots? A space to share the words, dishes, rituals and places your family carries, with a new prompt every week. Opening in stages.
+description: Where are your roots? One question every week about the words, dishes, rituals and places your family carries. Answer it, read what other families share, and add yours to the place it comes from.
 image: madhubani-station-murals
+script: community-live
 ---
 <section class="page-hero">
   <div class="container">
     <p class="eyebrow">Community · The Commons</p>
     <h1>Where are <em>your roots?</em></h1>
-    <p class="lede">A place to share one thing your family carries, and to discover what everyone else's carries too.</p>
+    <p class="lede">One question every week about where we come from. Answer it, read what other families carry, and add your own to the page of the place it belongs to.</p>
   </div>
 </section>
 
 <div class="editorial-content">
-  <article class="feature-quote">
-    <p class="eyebrow">This week's prompt</p>
-    <blockquote>Which word from your family has no translation?</blockquote>
-    <p class="quote-note">Every week there is one prompt about roots: a dish, a ritual, a journey, a name. Answers are added to the page of the place they come from, credited the way each person chooses.</p>
-  </article>
+  <section id="this-week" class="commons-week" aria-label="This week's question">
+{{this-week}}
+  </section>
 
-  <div class="content-columns">
-    <section>
-      <p class="eyebrow">What to bring</p>
-      <h2>A word, a dish, a place.</h2>
-      <p>Prompts to come include: the dish that means home, the object your family kept when it moved, the festival as your grandparents celebrated it, and the story behind your family name. Be curious, be generous, and leave room to learn.</p>
-    </section>
-    <section>
-      <p class="eyebrow">How it will open</p>
-      <h2>Slowly, and safely.</h2>
-      <p>Everything shared is read before it appears, and anything hostile to a caste, community or faith is removed. Place pages are open now; profiles and replies will follow.</p>
-    </section>
-  </div>
+  <div class="section-gap"></div>
+
+  <section aria-labelledby="latest-title">
+    <div class="section-head">
+      <p class="eyebrow">Latest from families</p>
+      <h2 id="latest-title">What people are carrying.</h2>
+      <p>Each one was read by a person before it appeared, and lives on the page of its place. <a href="/places/">Browse every place</a>.</p>
+    </div>
+{{community-feed limit="6"}}
+  </section>
+
+  <div class="section-gap"></div>
+
+  <section id="words" class="word-wall-section" aria-labelledby="words-title">
+    <div class="section-head">
+      <p class="eyebrow">#OneWordFromHome</p>
+      <h2 id="words-title">One word from home.</h2>
+      <p>Every family has a word that doesn't survive translation: a name for a feeling, a food, a kind of afternoon. Add yours, say what it means and where it comes from, and it joins the wall.</p>
+    </div>
+{{community-feed kind="A word or saying" style="words" limit="30"}}
+    <div class="btn-row"><a class="btn" href="/app.html#/contribute?kind=A%20word%20or%20saying">Add your word</a></div>
+  </section>
+
+  <div class="section-gap"></div>
+
+  <section aria-labelledby="how-title">
+    <div class="section-head">
+      <p class="eyebrow">How it works</p>
+      <h2 id="how-title">Share one thing. It finds its place.</h2>
+    </div>
+    <ol class="steps">
+      <li><h3>Answer</h3><p>Sign in with your email, no password, and share a word, a dish, a ritual, a song or a memory. Choose the place it comes from and how you want to be credited.</p></li>
+      <li><h3>We read it</h3><p>A person reads everything before it appears. You can see what you've shared, and whether it's published, in <a href="/app.html#/contribute">your account</a>.</p></li>
+      <li><h3>It joins a place</h3><p>Once published, it appears on the page of its place, here in The Commons, and becomes part of what that place carries.</p></li>
+    </ol>
+  </section>
+
+  <div class="section-gap"></div>
+
+  <section class="two-col" aria-labelledby="rules-title">
+    <div>
+      <p class="eyebrow">House rules</p>
+      <h2 id="rules-title">Be curious, be generous.</h2>
+      <p>The Commons only works if everyone feels safe bringing something personal. These are the few things we ask.</p>
+    </div>
+    <ul class="promise-list">
+      <li>Share what is yours to share. Ask before writing about a living person, and leave out details that could identify someone who hasn't agreed.</li>
+      <li>Say where you heard it. "My grandmother said" is a source; so is a book or a song.</li>
+      <li>Nothing hostile to any caste, community, faith, gender or region is published.</li>
+      <li>Disagree kindly. Places are remembered differently by different families, and both can be true.</li>
+      <li>Spot a mistake? Send it as "A correction" from the place's page, and we'll fix it with credit. To ask for something to be removed, <a href="https://ig.me/m/theculturedhuman">message us on Instagram</a>.</li>
+    </ul>
+  </section>
+
+  <div class="section-gap"></div>
 
   <div class="invite">
     <div class="invite__card invite__card--accent">
-      <p class="eyebrow">Join the conversation today</p>
-      <h2>Answer on your place's page.</h2>
-      <p>Find the place your family comes from and add your answer there. The prompt is also shared on Instagram every week.</p>
-      <a class="btn btn--light" href="/places/">Find your place</a>
+      <p class="eyebrow">Share it on Instagram too</p>
+      <h2>Tag @theculturedhuman.</h2>
+      <p>Post your answer with #OneWordFromHome or this week's question, and tag us. We share some of them every week, always with credit and only with permission.</p>
+      <a class="btn btn--light" href="https://www.instagram.com/theculturedhuman/">Follow on Instagram</a>
     </div>
     <div class="invite__card">
-      <p class="eyebrow">Read first</p>
+      <p class="eyebrow">Start with yourself</p>
       <h2>Draw your roots first.</h2>
-      <p>Trace the places your family has lived, then share your portrait and tag us. It is the easiest way to begin.</p>
+      <p>Trace the places your family has lived and you'll know which places to add to. It takes five minutes and stays in your browser.</p>
       <a class="text-link" href="/trace.html">Trace your roots</a>
     </div>
   </div>
+
+  <div class="section-gap"></div>
+
+  <section aria-labelledby="more-title">
+    <div class="section-head">
+      <p class="eyebrow">Other ways to take part</p>
+      <h2 id="more-title">Bring what you know.</h2>
+    </div>
+    <div class="offer-grid">
+      <a class="offer-card" href="/join.html#hosts"><div class="offer-card__body"><span class="eyebrow">Join</span><h3>Host a journey</h3><p>Welcome families coming back to your town, village or neighbourhood, at your own price.</p><span class="offer-card__action">Tell us about yourself</span></div></a>
+      <a class="offer-card" href="/join.html#makers"><div class="offer-card__body"><span class="eyebrow">Join</span><h3>Make keepsakes</h3><p>Weave, paint or carve the things that carry someone's roots, with your name on the work.</p><span class="offer-card__action">Tell us about yourself</span></div></a>
+      <a class="offer-card" href="/join.html#storytellers"><div class="offer-card__body"><span class="eyebrow">Join</span><h3>Tell family stories</h3><p>Help a family record and keep an elder's voice, in their own language.</p><span class="offer-card__action">Tell us about yourself</span></div></a>
+    </div>
+  </section>
 </div>

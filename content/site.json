@@ -14,12 +14,15 @@
   },
   "nav": [
     {
-      "label": "Trace Your Roots",
-      "href": "/trace.html"
-    },
-    {
-      "label": "Family Archive",
-      "href": "/archive.html"
+      "label": "My Roots",
+      "href": "/roots.html",
+      "match": [
+        "/trace.html",
+        "/archive.html",
+        "/roots-kit.html",
+        "/family-stories.html",
+        "/app.html"
+      ]
     },
     {
       "label": "Places",
@@ -48,14 +51,10 @@
   ],
   "footer": [
     {
-      "title": "Your roots",
+      "title": "My Roots",
       "links": [
         {
-          "label": "My archive",
-          "href": "/app.html"
-        },
-        {
-          "label": "Begin here",
+          "label": "How it works",
           "href": "/roots.html"
         },
         {
@@ -67,8 +66,12 @@
           "href": "/archive.html"
         },
         {
-          "label": "Places",
-          "href": "/places/"
+          "label": "The weekly question",
+          "href": "/archive.html#weekly"
+        },
+        {
+          "label": "Open my archive",
+          "href": "/app.html"
         },
         {
           "label": "Storytellers",
@@ -143,6 +146,31 @@
       ]
     },
     {
+      "title": "Community",
+      "links": [
+        {
+          "label": "The Commons",
+          "href": "/manch.html"
+        },
+        {
+          "label": "This week's question",
+          "href": "/manch.html#this-week"
+        },
+        {
+          "label": "One word from home",
+          "href": "/manch.html#words"
+        },
+        {
+          "label": "Places",
+          "href": "/places/"
+        },
+        {
+          "label": "Add to a place",
+          "href": "/app.html#/contribute"
+        }
+      ]
+    },
+    {
       "title": "About",
       "links": [
         {
@@ -152,10 +180,6 @@
         {
           "label": "Plans",
           "href": "/plans.html"
-        },
-        {
-          "label": "The Commons",
-          "href": "/manch.html"
         },
         {
           "label": "Image credits",

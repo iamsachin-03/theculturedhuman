@@ -38,10 +38,40 @@ test('the navigation is built around the platform and marks the current page', (
   const html = read('marketplace.html');
   const nav = html.match(/<nav class="primary-nav"[\s\S]*?<\/nav>/)[0];
   const labels = [...nav.matchAll(/<a [^>]*>([^<]+)<\/a>/g)].map((m) => m[1].replace('&amp;', '&'));
-  assert.deepEqual(labels, ['Trace Your Roots', 'Family Archive', 'Places', 'Stories', 'Keepsakes', 'Journeys', 'The Commons', 'Plans']);
+  assert.deepEqual(labels, ['My Roots', 'Places', 'Stories', 'Keepsakes', 'Journeys', 'The Commons', 'Plans']);
   assert.match(nav, /<a href="\/marketplace.html" aria-current="page">/);
   assert.equal((nav.match(/aria-current/g) || []).length, 1);
   assert.match(html, /<a class="account-link" href="\/app.html" data-account-link>Sign in<\/a>/);
+  assert.doesNotMatch(html, /class="product-nav"/);
+});
+
+test('tracing and the archive are one product, My Roots, with its own menu on each of its pages', () => {
+  for (const page of ['roots.html', 'trace.html', 'archive.html', 'family-stories.html', 'roots-kit.html']) {
+    const html = read(page);
+    const nav = html.match(/<nav class="primary-nav"[\s\S]*?<\/nav>/)[0];
+    assert.match(nav, /<a href="\/roots.html" aria-current="(page|true)">My Roots<\/a>/, page);
+    const sub = html.match(/<nav class="product-nav"[\s\S]*?<\/nav>/);
+    assert.ok(sub, `${page}: has the My Roots menu`);
+    for (const href of ['/roots.html', '/trace.html', '/archive.html', '/app.html']) assert.ok(sub[0].includes(`href="${href}"`), `${page}: ${href}`);
+    assert.equal((sub[0].match(/aria-current="page"/g) || []).length, 1, `${page}: marks itself`);
+  }
+});
+
+test('The Commons asks a weekly question, shows live contributions and a word wall, and links answers to the app', () => {
+  const prompts = JSON.parse(read('community/prompts.json'));
+  assert.equal(new Date(prompts.start + 'T00:00:00Z').getUTCDay(), 1, 'the weekly cycle starts on a Monday');
+  assert.ok(prompts.prompts.length >= 12);
+  const kinds = readFileSync(join(PUBLIC, 'scripts/app-core.js'), 'utf8');
+  for (const p of prompts.prompts) assert.ok(kinds.includes(`'${p.kind}'`), `${p.text}: "${p.kind}" is a contribution kind`);
+  const html = read('manch.html');
+  assert.match(html, /id="this-week"[\s\S]*data-this-week-link[^>]*|href="\/app\.html#\/contribute\?prompt=0"/);
+  assert.match(html, /id="words"[\s\S]*data-community-feed[^>]*data-kind="A word or saying"/);
+  assert.match(html, /data-community-feed data-limit="6" data-url="https:\/\//);
+  assert.match(html, /\/scripts\/community-live\.js/);
+  for (const page of pages) {
+    const footer = read(page).match(/<footer[\s\S]*<\/footer>/)[0];
+    assert.ok(footer.includes('href="/manch.html#this-week"') && footer.includes('href="/manch.html#words"'), `${page}: footer links to the Commons`);
+  }
 });
 
 test('the homepage has four sections and leads to the archive', () => {
@@ -158,8 +188,8 @@ test('place pages send families to the app to write, keep the enquiry form, and 
     const html = read(`places/${p.slug}.html`);
     assert.match(html, new RegExp(`href="/app\\.html#/contribute\\?place=${p.slug}"`), p.slug);
     assert.match(html, /<details class="contribute-other">[\s\S]*<form/, p.slug);
-    assert.match(html, new RegExp(`data-shared-by-families data-place="${p.slug}" data-url="https://`), p.slug);
-    assert.match(html, /\/scripts\/places-live\.js/, p.slug);
+    assert.match(html, new RegExp(`data-community-feed data-limit="100" data-place="${p.slug}" data-url="https://`), p.slug);
+    assert.match(html, /\/scripts\/community-live\.js/, p.slug);
     assert.match(seed, new RegExp(`\\('${p.slug}', `), `backend/places.sql seeds ${p.slug}`);
   }
   assert.match(read('places/index.html'), /href="\/app\.html#\/contribute"/);

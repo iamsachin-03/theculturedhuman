@@ -77,6 +77,8 @@ const places = readdirSync(placesDir)
 const placeBySlug = new Map(places.map((p) => [p.slug, p]));
 
 const people = JSON.parse(readFileSync(join(ROOT, 'content/people.json'), 'utf8'));
+const prompts = JSON.parse(readFileSync(join(ROOT, 'content/prompts.json'), 'utf8'));
+if (new Date(prompts.start + 'T00:00:00Z').getUTCDay() !== 1) throw new Error('content/prompts.json: "start" must be a Monday');
 for (const [i, person] of people.entries()) {
   const where = `content/people.json: entry ${i + 1}`;
   for (const key of ['id', 'name', 'role', 'place', 'summary']) if (!person[key]) throw new Error(`${where} needs "${key}"`);
@@ -215,7 +217,7 @@ for (const place of places) {
       path: place.path,
       title: `${place.name} — Places — ${site.name}`,
       description: `What families from ${place.name} carry with them: ${carries.map((c) => c.title).join(', ')}. Add your family's words, dishes and memories.`,
-      script: 'places-live',
+      script: 'community-live',
     },
     t.placeMain({
       site,
@@ -255,6 +257,9 @@ outputs.set(
   JSON.stringify(places.map((p) => ({ slug: p.slug, name: p.name, path: p.path, aliases: p.aliases }))) + '\n',
 );
 
+// The page shows the first prompt; community-live.js swaps in this week's from this file.
+outputs.set(join(PUBLIC, 'community/prompts.json'), JSON.stringify(prompts) + '\n');
+
 // ---------- hand-written pages ----------
 function attrs(s) {
   const out = {};
@@ -283,11 +288,17 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
     .replace(/\{\{enquiry\s+([\w-]+)\}\}/g, (_, id) => t.enquiryForm(site, offer(id, where)))
     .replace(/\{\{directory\s+(maker|host|storyteller)\}\}/g, (_, role) => directory(role))
     .replace(/\{\{place-cards\}\}/g, placeCards)
-    .replace(/\{\{roots-map\}\}/g, rootsMap);
+    .replace(/\{\{roots-map\}\}/g, rootsMap)
+    .replace(/\{\{this-week\}\}/g, () => t.thisWeek(prompts))
+    .replace(/\{\{community-feed([^}]*)\}\}/g, (_, rest) => {
+      const opt = attrs(rest);
+      if (opt.kind && !prompts.prompts.some((p) => p.kind === opt.kind)) problems.push(`${where}: community-feed kind "${opt.kind}" is not a contribution kind`);
+      return t.communityFeed({ site, limit: Number(opt.limit) || 6, kind: opt.kind, style: opt.style });
+    });
   if (/\{\{/.test(main)) problems.push(`${where}: unrecognised {{…}} placeholder`);
 
   emit(
-    { path, title: data.title, description: data.description, noindex: data.noindex === 'true', script: data.script },
+    { path, title: data.title, description: data.description, noindex: data.noindex === 'true', script: data.script, product: data.product },
     main,
     data.image,
   );
