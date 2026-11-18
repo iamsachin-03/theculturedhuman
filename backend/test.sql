@@ -156,7 +156,7 @@ select check_that(fails($$select * from entries$$), 'anonymous visitors cannot r
 set role authenticated;
 
 -- A maker lists herself; she is not public until reviewed, and families can then book.
-select as_user('00000000-0000-0000-0000-00000000000d');
+select as_user('00000000-0000-0000-0000-00000000000d', 'devi@example.com');
 insert into listings (id, role, place_slug, name, summary, status) values ('33333333-3333-3333-3333-333333333333', 'maker', 'mithila', 'Devi', 'Kohbar paintings', 'published');
 select check_that((select status from listings) = 'pending', 'new listings wait for review');
 select as_user('00000000-0000-0000-0000-00000000000c');
@@ -164,17 +164,50 @@ select check_that((select count(*) from listings) = 0, 'unreviewed listings are 
 select check_that(fails($$insert into bookings (listing_id, message) values ('33333333-3333-3333-3333-333333333333', 'hello')$$), 'unreviewed listings cannot be booked');
 select as_user('00000000-0000-0000-0000-00000000000e');
 update listings set status = 'published';
-select as_user('00000000-0000-0000-0000-00000000000c');
-insert into bookings (listing_id, message) values ('33333333-3333-3333-3333-333333333333', 'A painting of our village, please');
+select as_user('00000000-0000-0000-0000-00000000000d', 'devi@example.com');
+select check_that(fails($$insert into bookings (listing_id, message) values ('33333333-3333-3333-3333-333333333333', 'me')$$), 'makers cannot book themselves');
+select as_user('00000000-0000-0000-0000-00000000000c', 'chetan@example.com');
+insert into bookings (listing_id, message, status, price_paise) values ('33333333-3333-3333-3333-333333333333', 'A painting of our village, please', 'accepted', 1);
+select check_that((select status = 'requested' and price_paise is null from bookings), 'a new request starts as a request, whatever the browser sends');
 select check_that(fails($$update bookings set price_paise = 1$$), 'families cannot set the price');
+select check_that(fails($$update bookings set status = 'accepted'$$), 'families cannot accept before there is a quote');
 select check_that(fails($$update bookings set status = 'paid'$$), 'nobody can mark a booking paid from a browser');
-select as_user('00000000-0000-0000-0000-00000000000d');
-update bookings set price_paise = 800000, platform_fee_paise = 120000, status = 'quoted';
-select as_user('00000000-0000-0000-0000-00000000000c');
+select check_that((select count(*) from booking_contacts((select id from bookings))) = 0, 'no contact details before a quote is accepted');
+select as_user('00000000-0000-0000-0000-00000000000d', 'devi@example.com');
+select check_that(fails($$update bookings set status = 'quoted'$$), 'a quote needs a price');
+select check_that(fails($$update bookings set message = 'changed'$$), 'makers cannot rewrite the family''s message');
+update bookings set price_paise = 800000, platform_fee_paise = 1, reply = 'Two weeks, on handmade paper', status = 'quoted';
+select check_that((select platform_fee_paise from bookings) = 80000, 'the platform fee is worked out by the database, not the browser');
+select check_that(fails($$update bookings set status = 'accepted'$$), 'makers cannot accept their own quote');
+select as_user('00000000-0000-0000-0000-00000000000c', 'chetan@example.com');
 update bookings set status = 'accepted';
 select check_that((select status from bookings) = 'accepted', 'the maker quotes and the family accepts');
+select check_that((select email from booking_contacts((select id from bookings))) = 'devi@example.com'
+  and (select count(*) from booking_contacts((select id from bookings))) = 1, 'once accepted, the family sees only the maker''s email');
+select as_user('00000000-0000-0000-0000-00000000000d', 'devi@example.com');
+select check_that((select email from booking_contacts((select id from bookings))) = 'chetan@example.com', 'and the maker sees only the family''s');
+select check_that(fails($$update bookings set price_paise = 1$$), 'the price cannot change once accepted');
+select check_that((select count(*) from contacts) = 1, 'people can read only their own contact row');
 select as_user('00000000-0000-0000-0000-00000000000b');
 select check_that((select count(*) from bookings) = 0, 'other people cannot see a booking');
+select check_that((select count(*) from booking_contacts((select id from bookings limit 1))) = 0, 'or anyone''s contact details');
+select as_user('00000000-0000-0000-0000-00000000000e');
+update bookings set status = 'paid', payment_ref = 'link-123';
+select check_that((select status from bookings) = 'paid' and (select count(*) from booking_contacts((select id from bookings))) = 2, 'a moderator records a payment and can reach both sides');
+select as_user('00000000-0000-0000-0000-00000000000c', 'chetan@example.com');
+select check_that(fails($$update bookings set status = 'cancelled'$$), 'a paid booking cannot be cancelled from the browser');
+
+-- Families recognise what others shared; visitors see counts but never who.
+select as_user('00000000-0000-0000-0000-00000000000b');
+insert into contribution_echoes (contribution_id) select id from place_contributions where status = 'published';
+select check_that(fails($$insert into contribution_echoes (contribution_id) select id from place_contributions where status = 'published'$$), 'one echo per person');
+select check_that(fails($$insert into contribution_echoes (contribution_id, user_id) select id, '00000000-0000-0000-0000-00000000000c' from place_contributions where status = 'published'$$), 'nobody can echo for someone else');
+reset role;
+set role anon;
+select as_user('', '');
+select check_that((select sum(echoes) from contribution_echo_counts) = 1, 'visitors see how many families recognise it');
+select check_that(fails($$select * from contribution_echoes$$), 'but not who');
+set role authenticated;
 
 -- A roots portrait is the owner's alone.
 select as_user('00000000-0000-0000-0000-00000000000a', 'asha@example.com');

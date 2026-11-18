@@ -204,3 +204,10 @@ test('the other sections lead into My Roots and The Commons', () => {
   assert.match(read('marketplace.html'), /href="\/trace\.html"[\s\S]*href="\/commission\.html"/);
   assert.match(read('journeys.html'), /Trace your roots first[\s\S]*href="\/roots\.html#ask"/);
 });
+
+test('the platform fee shown on the site is the one the database charges', () => {
+  const site = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8'));
+  const schema = readFileSync(join(ROOT, 'backend/schema.sql'), 'utf8');
+  const rate = Number(schema.match(/create function platform_fee[\s\S]*?round\(price \* ([\d.]+)\)/)[1]);
+  assert.equal(Math.round(rate * 100), site.platformFeePercent);
+});

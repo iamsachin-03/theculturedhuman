@@ -144,6 +144,8 @@ create table listings (
   summary text not null check (length(summary) between 1 and 600),
   languages text[] not null default '{}',
   link text check (link is null or link ~ '^https://'),
+  -- Shown on the listing, for example "From ₹2,500 a session". The real price is quoted per request.
+  price_note text check (price_note is null or length(price_note) <= 80),
   status listing_status not null default 'pending',
   created_at timestamptz not null default now()
 );
@@ -155,12 +157,34 @@ create table bookings (
   message text not null check (length(message) between 1 and 5000),
   -- Set by the maker, host or storyteller. The platform fee is kept separate so families see both.
   price_paise bigint check (price_paise >= 0),
+  -- Always platform_fee(price_paise), set by guard_booking(), never by a browser.
   platform_fee_paise bigint check (platform_fee_paise >= 0),
+  -- The maker's note with their quote, or why they can't take it on.
+  reply text check (reply is null or length(reply) <= 2000),
   status booking_status not null default 'requested',
   -- Filled in by the payment webhook (service role only), never by a browser.
   payment_ref text,
   created_at timestamptz not null default now()
 );
+
+-- Where the two sides of an accepted booking can reach each other. Never readable directly; only
+-- booking_contacts() hands an email out, and only to the other side of an accepted booking.
+create table contacts (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  email text not null,
+  updated_at timestamptz not null default now()
+);
+
+-- "We have this too": families from the same place recognising what someone shared.
+create table contribution_echoes (
+  contribution_id uuid not null references place_contributions (id) on delete cascade,
+  user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (contribution_id, user_id)
+);
+-- Counts only, so visitors see how many families recognise something but never who.
+create view contribution_echo_counts as
+  select contribution_id, count(*)::int as echoes from contribution_echoes group by contribution_id;
 
 -- ---------- helpers ----------
 -- security definer so policies can ask about people and legacy without recursing into RLS.
@@ -298,7 +322,8 @@ language plpgsql security definer set search_path = public as $$
 begin
   if auth.uid() is null then raise exception 'Sign in first'; end if;
   delete from entries where created_by = auth.uid();
-  delete from bookings where requested_by = auth.uid();
+  delete from bookings where requested_by = auth.uid()
+    or listing_id in (select id from listings where user_id = auth.uid());
   delete from place_contributions where submitted_by = auth.uid();
   update legacy set reported_by = null where reported_by = auth.uid();
   delete from auth.users where id = auth.uid();
@@ -381,30 +406,97 @@ $$;
 create trigger listings_review before insert or update on listings for each row execute function guard_review();
 create trigger contributions_review before insert or update on place_contributions for each row execute function guard_review();
 
--- Families can change only the message and cancel. Prices and payment state belong to the listing
--- owner and the payment webhook.
+-- The platform fee, added on top of the maker's price and shown separately. Must match
+-- platformFeePercent in content/site.json (test/site.test.mjs checks).
+create function platform_fee(price bigint) returns bigint
+language sql immutable as $$
+  select round(price * 0.10)::bigint;
+$$;
+
+-- A booking moves requested -> quoted -> accepted -> paid -> completed, or is cancelled before it is
+-- paid. The maker, host or storyteller quotes; the family accepts; payment is recorded by the payment
+-- provider's webhook (no signed-in user) or by a moderator reconciling a payment link.
 create function guard_booking() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare
   owner uuid;
 begin
-  select user_id into owner from listings where id = new.listing_id;
-  if auth.uid() is null then
+  if tg_op = 'INSERT' then
+    new.status := 'requested';
+    new.price_paise := null;
+    new.platform_fee_paise := null;
+    new.reply := null;
+    new.payment_ref := null;
     return new;
   end if;
-  if new.payment_ref is distinct from old.payment_ref or (new.status in ('paid', 'completed') and new.status is distinct from old.status) then
-    raise exception 'Payment status is set by the payment provider';
-  end if;
-  if auth.uid() <> owner then
-    if new.price_paise is distinct from old.price_paise or new.platform_fee_paise is distinct from old.platform_fee_paise
-       or (new.status is distinct from old.status and new.status not in ('accepted', 'cancelled')) then
-      raise exception 'Only the maker, host or storyteller can quote';
+  select user_id into owner from listings where id = new.listing_id;
+  if auth.uid() is not null and not is_moderator() then
+    if new.listing_id <> old.listing_id or new.requested_by <> old.requested_by or new.payment_ref is distinct from old.payment_ref then
+      raise exception 'This part of a booking cannot be changed';
     end if;
+    if new.status in ('paid', 'completed') and new.status is distinct from old.status then
+      raise exception 'Payment status is set by the payment provider';
+    end if;
+    if new.status = 'cancelled' and new.status is distinct from old.status and old.status not in ('requested', 'quoted', 'accepted') then
+      raise exception 'A paid booking cannot be cancelled here';
+    end if;
+    if auth.uid() = owner then
+      if new.message <> old.message then raise exception 'Only the family can change their message'; end if;
+      if new.price_paise is distinct from old.price_paise and old.status not in ('requested', 'quoted') then
+        raise exception 'The price cannot change once it is accepted';
+      end if;
+      if new.status is distinct from old.status and new.status not in ('quoted', 'cancelled') then
+        raise exception 'Only the family can accept a quote';
+      end if;
+      if new.status = 'quoted' and (new.price_paise is null or old.status not in ('requested', 'quoted')) then
+        raise exception 'Add a price to quote';
+      end if;
+    else
+      if new.price_paise is distinct from old.price_paise or new.reply is distinct from old.reply then
+        raise exception 'Only the maker, host or storyteller can quote';
+      end if;
+      if new.status is distinct from old.status and not (new.status = 'accepted' and old.status = 'quoted') and new.status <> 'cancelled' then
+        raise exception 'A quote can only be accepted once it has been given';
+      end if;
+    end if;
+  end if;
+  new.platform_fee_paise := case when new.price_paise is null then null else platform_fee(new.price_paise) end;
+  return new;
+end;
+$$;
+create trigger bookings_guard before insert or update on bookings for each row execute function guard_booking();
+
+-- Keeps the signed-in person's email for booking_contacts() when they list themselves or ask.
+create function remember_contact() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is not null and coalesce(auth.email(), '') <> '' then
+    insert into contacts (user_id, email) values (auth.uid(), auth.email())
+      on conflict (user_id) do update set email = excluded.email, updated_at = now();
   end if;
   return new;
 end;
 $$;
-create trigger bookings_guard before update on bookings for each row execute function guard_booking();
+create trigger listings_contact after insert on listings for each row execute function remember_contact();
+create trigger bookings_contact after insert on bookings for each row execute function remember_contact();
+
+-- Once a family accepts a quote, each side can see how to reach the other. Moderators see both.
+create function booking_contacts(booking uuid) returns table (side text, name text, email text)
+language sql stable security definer set search_path = public as $$
+  select x.side, x.name, c.email
+  from bookings b
+  join listings l on l.id = b.listing_id
+  cross join lateral (values
+    ('provider', l.name, l.user_id),
+    ('family', coalesce((select display_name from profiles where id = b.requested_by), 'The family'), b.requested_by)
+  ) as x (side, name, uid)
+  left join contacts c on c.user_id = x.uid
+  where b.id = booking
+    and b.status in ('accepted', 'paid', 'completed')
+    and (is_moderator()
+      or (x.side = 'provider' and b.requested_by = auth.uid())
+      or (x.side = 'family' and l.user_id = auth.uid()));
+$$;
 
 -- ---------- row-level security ----------
 alter table profiles enable row level security;
@@ -419,6 +511,8 @@ alter table places enable row level security;
 alter table place_contributions enable row level security;
 alter table listings enable row level security;
 alter table bookings enable row level security;
+alter table contacts enable row level security;
+alter table contribution_echoes enable row level security;
 
 create policy "see own profile and the people who share with each other" on profiles for select using (
   id = auth.uid()
@@ -465,24 +559,34 @@ create policy "owners and moderators edit listings" on listings for update using
 create policy "owners remove listings" on listings for delete using (user_id = auth.uid());
 
 create policy "both sides see a booking" on bookings for select using (
-  requested_by = auth.uid() or exists (select 1 from listings l where l.id = listing_id and l.user_id = auth.uid())
+  requested_by = auth.uid() or is_moderator() or exists (select 1 from listings l where l.id = listing_id and l.user_id = auth.uid())
 );
 create policy "families request published listings" on bookings for insert with check (
-  requested_by = auth.uid() and status = 'requested' and price_paise is null and payment_ref is null
-  and exists (select 1 from listings l where l.id = listing_id and l.status = 'published')
+  requested_by = auth.uid()
+  and exists (select 1 from listings l where l.id = listing_id and l.status = 'published' and l.user_id <> auth.uid())
 );
 create policy "both sides update a booking" on bookings for update using (
-  requested_by = auth.uid() or exists (select 1 from listings l where l.id = listing_id and l.user_id = auth.uid())
+  requested_by = auth.uid() or is_moderator() or exists (select 1 from listings l where l.id = listing_id and l.user_id = auth.uid())
 );
+
+create policy "your own contact" on contacts for select using (user_id = auth.uid());
+
+create policy "see your own echoes" on contribution_echoes for select using (user_id = auth.uid());
+create policy "echo what is published" on contribution_echoes for insert with check (
+  user_id = auth.uid() and exists (select 1 from place_contributions c where c.id = contribution_id and c.status = 'published')
+);
+create policy "take back your echo" on contribution_echoes for delete using (user_id = auth.uid());
 
 
 grant usage on schema public to anon, authenticated;
-grant select on places, place_contributions, listings to anon;
+grant select on places, place_contributions, listings, contribution_echo_counts to anon;
 grant select, insert, update, delete on all tables in schema public to authenticated;
+revoke insert, update, delete on contacts, contribution_echo_counts from authenticated;
 revoke update on legacy, people from authenticated;
 grant update (quiet_months, wait_days) on legacy to authenticated;
 grant update (name, email, role) on people to authenticated;
-grant execute on function claim_people(), touch_seen(), report_passing(uuid), legacy_for(uuid), delete_my_account() to authenticated;
+grant execute on function claim_people(), touch_seen(), report_passing(uuid), legacy_for(uuid), delete_my_account(), booking_contacts(uuid) to authenticated;
+revoke execute on function booking_contacts(uuid) from public, anon;
 revoke execute on function delete_my_account() from public, anon;
 revoke execute on function legacy_tick() from public, anon, authenticated;
 

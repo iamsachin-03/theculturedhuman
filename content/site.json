@@ -8,6 +8,7 @@
   "instagram": "https://www.instagram.com/theculturedhuman/",
   "instagramHandle": "@theculturedhuman",
   "instagramDm": "https://ig.me/m/theculturedhuman",
+  "platformFeePercent": 10,
   "enquiries": {
     "endpoint": "",
     "email": ""
