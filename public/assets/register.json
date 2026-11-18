@@ -613,5 +613,27 @@
     "alt": "Illustration of an open book with small scenes rising from its pages: a weaver at a loom, a family cooking together, musicians, a painter decorating a wall and a boat on a river",
     "usage": "Original work made for The Cultured Human",
     "addedAt": "2026-11-18"
+  },
+  {
+    "id": "family-photo-album",
+    "kind": "illustration",
+    "files": {
+      "800": "/assets/illustrations/family-photo-album-800.jpg",
+      "1600": "/assets/illustrations/family-photo-album-1600.jpg"
+    },
+    "width": 1536,
+    "height": 1024,
+    "subject": "A family looking through an old photo album",
+    "region": "",
+    "artForm": "Illustration",
+    "creator": "The Cultured Human",
+    "source": "Original illustration",
+    "sourceUrl": "/about.html",
+    "licence": "© The Cultured Human",
+    "licenceUrl": "",
+    "attribution": "Illustration: The Cultured Human",
+    "alt": "Illustration of a grandfather, a mother and two children on a rug looking through an old photo album, one child holding up a photograph and the other recording on a phone, framed family portraits on the wall",
+    "usage": "Original work made for The Cultured Human",
+    "addedAt": "2026-11-18"
   }
 ]

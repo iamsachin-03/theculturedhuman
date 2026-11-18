@@ -435,6 +435,9 @@ p { margin: 0 0 1em; }
 .editorial-hero h1 { font-size: var(--step-5); line-height: .95; letter-spacing: -.025em; max-width: 15ch; margin: .25rem 0 1.5rem; }
 .hero-sub { max-width: 42rem; font-size: var(--step-1); line-height: 1.6; color: var(--muted); margin: 0; }
 .editorial-content { width: min(100% - 2.5rem, var(--wide)); margin-inline: auto; padding-block: var(--space-5); }
+.feature-figure { margin: 0 0 var(--space-5); }
+.feature-figure img { width: 100%; height: auto; border-radius: var(--radius); box-shadow: var(--shadow); }
+.feature-figure figcaption { margin-top: .75rem; font-size: .78rem; color: var(--muted); }
 .feature-quote { padding: clamp(1.75rem, 5vw, 4rem); background: var(--band); color: var(--band-ink); border-radius: var(--radius); }
 .feature-quote .eyebrow { color: var(--band-accent); }
 .feature-quote blockquote { font: italic 500 var(--step-3)/1.12 var(--serif); margin: 1rem 0; max-width: 28ch; }
