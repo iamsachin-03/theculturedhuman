@@ -237,6 +237,7 @@ emit(
     path: '/places/',
     title: `Places — ${site.name}`,
     description: 'Every family comes from a place. Explore what families from each place carry with them, and add your own.',
+    script: 'community-live',
   },
   t.placesIndexMain({ site, map: rootsMap(), cards: placeCards(), form: t.enquiryForm(site, offer('contribute', 'places index'), { place: 'A new place' }) }),
   places[0]?.image,

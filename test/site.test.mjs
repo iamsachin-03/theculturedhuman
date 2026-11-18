@@ -74,9 +74,11 @@ test('The Commons asks a weekly question, shows live contributions and a word wa
   }
 });
 
-test('the homepage has four sections and leads to the archive', () => {
+test('the homepage has five sections and leads to the archive and The Commons', () => {
   const main = read('index.html').match(/<main id="main">([\s\S]*)<\/main>/)[1];
-  assert.equal((main.match(/<section\b/g) || []).length, 4);
+  assert.equal((main.match(/<section\b/g) || []).length, 5);
+  assert.match(main, /data-this-week[\s\S]*data-community-feed data-limit="3"/);
+  assert.ok(main.includes('href="/manch.html"') && main.includes('href="/roots.html"'));
   assert.match(main, /href="\/app.html">Start your family archive/);
   for (const href of ['/trace.html', '/places/', '/journal/']) assert.ok(main.includes(`href="${href}"`), href);
 });
@@ -194,4 +196,11 @@ test('place pages send families to the app to write, keep the enquiry form, and 
   }
   assert.match(read('places/index.html'), /href="\/app\.html#\/contribute"/);
   assert.doesNotMatch(read('sitemap.xml'), /places\.json|\.sql/);
+});
+
+test('the other sections lead into My Roots and The Commons', () => {
+  assert.match(read('places/index.html'), /data-community-feed data-limit="6"[\s\S]*\/scripts\/community-live\.js/);
+  assert.match(read('journal/index.html'), /href="\/manch\.html#this-week"[\s\S]*href="\/roots\.html"/);
+  assert.match(read('marketplace.html'), /href="\/trace\.html"[\s\S]*href="\/commission\.html"/);
+  assert.match(read('journeys.html'), /Trace your roots first[\s\S]*href="\/roots\.html#ask"/);
 });

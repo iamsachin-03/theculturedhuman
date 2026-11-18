@@ -252,6 +252,22 @@ export function journalMain({ cards }) {
 <div class="container card-grid">
 ${cards.join('\n')}
 </div>
+</section>
+<section class="section section--surface" aria-labelledby="your-story-title">
+<div class="container invite">
+<div class="invite__card invite__card--accent">
+<p class="eyebrow">The Commons</p>
+<h2 id="your-story-title">Your family has a story too.</h2>
+<p>A word that doesn't translate, a dish made once a year, a song from every wedding. Answer this week's question, and it joins the page of the place it comes from.</p>
+<a class="btn btn--light" href="/manch.html#this-week">See this week's question</a>
+</div>
+<div class="invite__card">
+<p class="eyebrow">My Roots</p>
+<h2>Keep the ones only your family knows.</h2>
+<p>Some stories aren't for everyone. Record them in your elders' own voices and keep them in a private family archive, shared only with the people you choose.</p>
+<a class="text-link" href="/roots.html">How My Roots works</a>
+</div>
+</div>
 </section>`;
 }
 
@@ -370,6 +386,11 @@ ${map}
 <div class="section-head"><p class="eyebrow">The first places</p><h2>Start where your family began.</h2><p>These pages begin with what our sourced stories already tell. Everything after that comes from families.</p></div>
 ${cards}
 </div>
+</section>
+<div class="section-gap"></div>
+<section aria-labelledby="latest-title">
+<div class="section-head"><p class="eyebrow">Latest from families</p><h2 id="latest-title">Added this week, and before.</h2><p>Everything here was read by a person before it appeared. This week's question is on <a href="/manch.html#this-week">The Commons</a>.</p></div>
+${communityFeed({ site, limit: 6 })}
 </section>
 <div class="section-gap"></div>
 <section class="enquiry-section" id="contribute" aria-labelledby="contribute-title">
