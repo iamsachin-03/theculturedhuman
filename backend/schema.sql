@@ -128,10 +128,33 @@ create table place_contributions (
   title text not null check (length(title) between 1 and 120),
   body text not null check (length(body) between 1 and 5000),
   credit text not null check (length(credit) between 1 and 80),
+  -- For words and sayings: the word in its own script, and how it is said.
+  script text check (script is null or length(script) <= 120),
+  pronunciation text check (pronunciation is null or length(pronunciation) <= 120),
+  -- Weeks since content/prompts.json "start", when this answers that week's question.
+  prompt_week int check (prompt_week is null or prompt_week >= 0),
+  -- The person confirmed it is theirs to share and follows the community guidelines.
+  consent boolean not null default false check (consent),
   status review_status not null default 'pending',
+  -- Why a moderator did not publish it, or removed it. Shown only to the person who shared it.
+  review_note text check (review_note is null or length(review_note) <= 300),
+  -- The last status the notifier emailed about (backend/notify), so nobody is told twice.
+  notified_status review_status,
   submitted_by uuid not null default auth.uid() references auth.users (id),
   created_at timestamptz not null default now(),
   check (place_slug is not null or suggested_place is not null)
+);
+
+-- Visitors who are signed in can report something published; moderators decide.
+create table contribution_reports (
+  id uuid primary key default gen_random_uuid(),
+  contribution_id uuid not null references place_contributions (id) on delete cascade,
+  reported_by uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  reason text not null check (reason in ('private', 'hostile', 'wrong', 'not-theirs', 'spam', 'other')),
+  note text check (note is null or length(note) <= 500),
+  resolved boolean not null default false,
+  created_at timestamptz not null default now(),
+  unique (contribution_id, reported_by)
 );
 
 -- ---------- makers, hosts and storytellers ----------
@@ -164,6 +187,8 @@ create table bookings (
   status booking_status not null default 'requested',
   -- Filled in by the payment webhook (service role only), never by a browser.
   payment_ref text,
+  -- The last status the notifier emailed about (backend/notify).
+  notified_status booking_status,
   created_at timestamptz not null default now()
 );
 
@@ -390,15 +415,37 @@ $$;
 create trigger people_email before update on people for each row execute function unlink_changed_email();
 
 -- Only moderators publish. Anyone else's insert starts as pending and their edits send it back to review.
+-- Moderation, for every write from a browser (the service role, with no signed-in user, is trusted):
+-- listings wait for review after every change; contributions start as pending, and go back to
+-- pending when the person who shared them edits what they say.
 create function guard_review() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-  if not is_moderator() then
-    if tg_table_name = 'listings' then
-      new.status := 'pending';
-    else
-      new.status := case when tg_op = 'INSERT' then 'pending'::review_status else old.status end;
+  if auth.uid() is null or is_moderator() then
+    return new;
+  end if;
+  if tg_table_name = 'listings' then
+    new.status := 'pending';
+    return new;
+  end if;
+  if tg_op = 'INSERT' then
+    if (select count(*) from place_contributions where submitted_by = auth.uid() and created_at > now() - interval '1 day') >= 10 then
+      raise exception 'You have shared 10 things today. Thank you! Please come back tomorrow for more.';
     end if;
+    new.status := 'pending';
+    new.review_note := null;
+    new.notified_status := null;
+    return new;
+  end if;
+  if new.submitted_by <> old.submitted_by then raise exception 'This cannot be changed'; end if;
+  new.notified_status := old.notified_status;
+  if (new.place_slug, new.suggested_place, new.kind, new.title, new.body, new.credit, new.script, new.pronunciation, new.prompt_week)
+     is distinct from (old.place_slug, old.suggested_place, old.kind, old.title, old.body, old.credit, old.script, old.pronunciation, old.prompt_week) then
+    new.status := 'pending';
+    new.review_note := null;
+  else
+    new.status := old.status;
+    new.review_note := old.review_note;
   end if;
   return new;
 end;
@@ -421,6 +468,9 @@ language plpgsql security definer set search_path = public as $$
 declare
   owner uuid;
 begin
+  if auth.uid() is not null then
+    new.notified_status := case when tg_op = 'INSERT' then null else old.notified_status end;
+  end if;
   if tg_op = 'INSERT' then
     new.status := 'requested';
     new.price_paise := null;
@@ -479,6 +529,7 @@ end;
 $$;
 create trigger listings_contact after insert on listings for each row execute function remember_contact();
 create trigger bookings_contact after insert on bookings for each row execute function remember_contact();
+create trigger contributions_contact after insert on place_contributions for each row execute function remember_contact();
 
 -- Once a family accepts a quote, each side can see how to reach the other. Moderators see both.
 create function booking_contacts(booking uuid) returns table (side text, name text, email text)
@@ -513,6 +564,7 @@ alter table listings enable row level security;
 alter table bookings enable row level security;
 alter table contacts enable row level security;
 alter table contribution_echoes enable row level security;
+alter table contribution_reports enable row level security;
 
 create policy "see own profile and the people who share with each other" on profiles for select using (
   id = auth.uid()
@@ -551,7 +603,14 @@ create policy "published contributions are public" on place_contributions for se
   status = 'published' or submitted_by = auth.uid() or is_moderator()
 );
 create policy "signed-in people contribute" on place_contributions for insert with check (auth.uid() is not null and submitted_by = auth.uid());
-create policy "moderators review" on place_contributions for update using (is_moderator());
+create policy "moderators review, people edit their own" on place_contributions for update using (is_moderator() or submitted_by = auth.uid());
+create policy "people delete their own, moderators anything" on place_contributions for delete using (is_moderator() or submitted_by = auth.uid());
+
+create policy "see your own reports, moderators see all" on contribution_reports for select using (reported_by = auth.uid() or is_moderator());
+create policy "report what is published" on contribution_reports for insert with check (
+  reported_by = auth.uid() and exists (select 1 from place_contributions c where c.id = contribution_id and c.status = 'published')
+);
+create policy "moderators resolve reports" on contribution_reports for update using (is_moderator());
 
 create policy "published listings are public" on listings for select using (status = 'published' or user_id = auth.uid() or is_moderator());
 create policy "people manage their own listing" on listings for insert with check (user_id = auth.uid());

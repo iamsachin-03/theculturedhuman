@@ -144,8 +144,13 @@ set role authenticated;
 
 -- Place contributions are moderated.
 select as_user('00000000-0000-0000-0000-00000000000c');
-insert into place_contributions (place_slug, kind, title, body, credit, status) values ('mithila', 'Word', 'Sasur', 'x', 'C.', 'published');
-select check_that((select status from place_contributions) = 'pending', 'contributions start as pending, whatever the browser sends');
+select check_that(fails($$insert into place_contributions (place_slug, kind, title, body, credit) values ('mithila', 'Word', 'No consent', 'x', 'C.')$$), 'nothing is shared without saying it is yours to share');
+insert into place_contributions (place_slug, kind, title, body, credit, status, consent, review_note, notified_status) values ('mithila', 'Word', 'Sasur', 'x', 'C.', 'published', true, 'fake', 'published');
+select check_that((select status = 'pending' and review_note is null and notified_status is null from place_contributions), 'contributions start as pending, whatever the browser sends');
+insert into place_contributions (place_slug, kind, title, body, credit, consent) select 'mithila', 'Word', 'Extra ' || n, 'x', 'C.', true from generate_series(1, 9) n;
+select check_that(fails($$insert into place_contributions (place_slug, kind, title, body, credit, consent) values ('mithila', 'Word', 'Eleventh', 'x', 'C.', true)$$), 'ten contributions a day is the limit');
+delete from place_contributions where title like 'Extra %';
+select check_that((select count(*) from place_contributions) = 1, 'people can delete what they shared');
 select as_user('00000000-0000-0000-0000-00000000000e');
 update place_contributions set status = 'published';
 reset role;
@@ -153,6 +158,38 @@ set role anon;
 select as_user('', '');
 select check_that((select count(*) from place_contributions) = 1, 'published contributions are public');
 select check_that(fails($$select * from entries$$), 'anonymous visitors cannot read archives at all');
+set role authenticated;
+
+-- Editing sends it back to be read; moderators give reasons; reports reach moderators only.
+select as_user('00000000-0000-0000-0000-00000000000c');
+select check_that(fails($$update place_contributions set submitted_by = '00000000-0000-0000-0000-00000000000b'$$), 'nobody can hand their contribution to someone else');
+update place_contributions set status = 'published', notified_status = null where title = 'Sasur';
+select check_that((select status = 'published' and notified_status is null from place_contributions where title = 'Sasur'), 'touching nothing that matters keeps it published, and the browser cannot fake notifications');
+update place_contributions set body = 'Father-in-law, in Maithili' where title = 'Sasur';
+select check_that((select status from place_contributions where title = 'Sasur') = 'pending', 'an edit goes back to be read');
+select as_user('00000000-0000-0000-0000-00000000000e');
+update place_contributions set status = 'rejected', review_note = 'Please say where you heard it.';
+select as_user('00000000-0000-0000-0000-00000000000c');
+select check_that((select review_note from place_contributions) = 'Please say where you heard it.', 'the person who shared it sees why it was not published');
+update place_contributions set review_note = null, status = 'published' where title = 'Sasur';
+select check_that((select status = 'rejected' and review_note is not null from place_contributions), 'and cannot clear the reason or publish it themselves');
+select as_user('00000000-0000-0000-0000-00000000000e');
+update place_contributions set status = 'published', review_note = null;
+select as_user('00000000-0000-0000-0000-00000000000b');
+insert into contribution_reports (contribution_id, reason, note) select id, 'wrong', 'Sasur means father-in-law' from place_contributions;
+select check_that(fails($$insert into contribution_reports (contribution_id, reason) select id, 'spam' from place_contributions$$), 'one report per person per contribution');
+select check_that(fails($$insert into contribution_reports (contribution_id, reason) select id, 'because' from place_contributions$$), 'reports need a known reason');
+select as_user('00000000-0000-0000-0000-00000000000c');
+select check_that((select count(*) from contribution_reports) = 0, 'the person reported cannot see who reported them');
+select as_user('00000000-0000-0000-0000-00000000000e');
+select check_that((select count(*) from contribution_reports) = 1, 'moderators see reports');
+update contribution_reports set resolved = true;
+select as_user('00000000-0000-0000-0000-00000000000b');
+select check_that(fails($$update contribution_reports set resolved = false$$) or (select resolved from contribution_reports), 'only moderators resolve reports');
+reset role;
+set role anon;
+select as_user('', '');
+select check_that(fails($$insert into contribution_reports (contribution_id, reason) select id, 'spam' from place_contributions$$), 'visitors must sign in to report');
 set role authenticated;
 
 -- A maker lists herself; she is not public until reviewed, and families can then book.
