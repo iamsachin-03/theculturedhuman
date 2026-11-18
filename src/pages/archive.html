@@ -2,7 +2,7 @@
 title: Your family archive — The Cultured Human
 description: Keep what lives only in memory for the generations after you: favourite tales, photographs and the moments behind them, wisdom and proverbs, what helps on hard days, and letters to the future.
 image: gita-palm-leaf-malayalam
-script: archive
+script: archive weekly
 ---
 <section class="page-hero">
   <div class="container">
@@ -14,6 +14,55 @@ script: archive
 
 <div class="editorial-content">
   <p class="notice"><strong>Family accounts are coming.</strong> Until then, your archive is saved in this browser on this device. Use <em>Save a copy</em> to keep a backup or to send it to a relative. <a href="/plans.html">About family accounts</a>.</p>
+
+  <section class="weekly" id="weekly" data-weekly aria-labelledby="weekly-title">
+    <div class="weekly__intro">
+      <p class="eyebrow">The weekly question</p>
+      <h2 id="weekly-title">One question a week. <em>A year of their voice.</em></h2>
+      <p>Send an elder one question each week on WhatsApp. They reply with a voice note, in whichever language feels right, whenever they like. You keep the reply here. Fifty-two weeks later, you have a year of their stories, sayings and wisdom, enough for a book.</p>
+      <ol class="weekly__how">
+        <li>Tell us who you're asking.</li>
+        <li>Send this week's question with one tap.</li>
+        <li>Save their voice note when it arrives.</li>
+      </ol>
+    </div>
+    <div class="weekly__panel">
+      <form class="weekly__setup" data-weekly-setup aria-labelledby="weekly-setup-title">
+        <h3 id="weekly-setup-title" class="archive__heading">Who will you ask?</h3>
+        <p class="field"><label for="wk-name">Their name, as you call them</label><input id="wk-name" name="name" type="text" maxlength="40" required placeholder="e.g. Nani"></p>
+        <p class="field"><label for="wk-relation">Who they are to you <span class="field__optional">(optional)</span></label><input id="wk-relation" name="relation" type="text" maxlength="40" placeholder="e.g. my grandmother"></p>
+        <p class="field"><label for="wk-phone">Their WhatsApp number <span class="field__optional">(optional)</span></label><input id="wk-phone" name="phone" type="tel" maxlength="20" autocomplete="off" aria-describedby="wk-phone-hint" placeholder="+91 98765 43210"><span class="field__hint" id="wk-phone-hint">With the country code. Leave it empty to choose the chat in WhatsApp yourself.</span></p>
+        <p class="field"><label for="wk-day">Which day will you send it?</label><select id="wk-day" name="day"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></p>
+        <p class="field field--wide"><label for="wk-from">Your name, to sign the questions <span class="field__optional">(optional)</span></label><input id="wk-from" name="from" type="text" maxlength="40" placeholder="e.g. Riya"></p>
+        <div class="weekly__actions"><button class="btn" type="submit">Start the weekly question</button><button class="trace__clear" type="button" data-weekly-cancel hidden>Cancel</button></div>
+        <p class="enquiry__note">Names and numbers stay in this browser. Nothing is sent to us.</p>
+      </form>
+      <div class="weekly__card" data-weekly-card hidden>
+        <div class="weekly__elders" data-weekly-elders role="group" aria-label="Who you are asking"></div>
+        <p class="eyebrow" data-weekly-week></p>
+        <h3 tabindex="-1">This week's question</h3>
+        <p class="field field--wide"><label for="wk-message">Your message <span class="field__optional">(change the words or translate it)</span></label><textarea id="wk-message" rows="8" data-weekly-message></textarea></p>
+        <div class="weekly__actions">
+          <a class="btn" href="https://wa.me/" target="_blank" rel="noopener" data-weekly-whatsapp>Send on WhatsApp</a>
+          <button class="btn btn--ghost" type="button" data-weekly-copy>Copy message</button>
+        </div>
+        <p class="weekly__asked" data-weekly-asked></p>
+        <div class="weekly__actions">
+          <button class="btn btn--ghost" type="button" data-weekly-save>Save their answer</button>
+          <button class="trace__clear" type="button" data-weekly-skip>Skip this question</button>
+        </div>
+        <div class="weekly__progress"><label for="wk-progress" data-weekly-answered></label><progress id="wk-progress" data-weekly-progress></progress></div>
+        <div class="weekly__more">
+          <button class="trace__clear" type="button" data-weekly-reminder>Add a weekly reminder to my calendar</button>
+          <button class="trace__clear" type="button" data-weekly-add>Ask someone else too</button>
+          <button class="trace__clear" type="button" data-weekly-stop>Stop</button>
+        </div>
+      </div>
+      <p class="archive__status" data-weekly-status role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <div class="section-gap"></div>
 
   <div class="archive" data-archive>
     <aside class="archive__side" aria-labelledby="archive-side-title">
@@ -45,7 +94,7 @@ script: archive
             <p class="archive-voice__label">Voice note <span class="field__optional">(optional)</span></p>
             <div class="archive-voice__controls">
               <button class="btn btn--ghost" type="button" data-record>Record</button>
-              <label class="archive-voice__upload">or choose a file<input type="file" accept="audio/*" data-audio-file></label>
+              <label class="archive-voice__upload">or choose a file<input type="file" accept="audio/*,.opus,.ogg,.m4a" data-audio-file></label>
             </div>
             <p class="field__hint" data-voice-status aria-live="polite">Ask first if you may record.</p>
             <audio controls hidden data-voice-preview></audio>

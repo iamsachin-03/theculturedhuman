@@ -186,8 +186,7 @@ ${headerBlock({ site, page })}
 ${main.trim()}
 </main>
 ${footerBlock({ site })}
-${page.script ? `<script src="/scripts/${page.script}.js" defer></script>
-` : ''}</body>
+${(page.script || '').split(/\s+/).filter(Boolean).map((name) => `<script src="/scripts/${name}.js" defer></script>\n`).join('')}</body>
 </html>
 `;
 }

@@ -799,3 +799,33 @@ p { margin: 0 0 1em; }
   .archive-entry { break-inside: avoid; border: 0; padding: 0 0 1.5rem; }
   .archive-entry audio { display: none; }
 }
+
+/* The weekly question. */
+.weekly { display: grid; grid-template-columns: 1fr 1.25fr; gap: clamp(1.5rem, 4vw, 3.5rem); align-items: start; padding: clamp(1.5rem, 4vw, 3rem); background: var(--band); color: var(--band-ink); border-radius: var(--radius); }
+.weekly__intro .eyebrow { color: var(--band-accent); }
+.weekly__intro h2 { font-size: var(--step-4); color: var(--band-ink); }
+.weekly__intro h2 em { color: var(--band-accent); }
+.weekly__intro p { color: var(--band-ink); opacity: .9; }
+.weekly__how { margin: 1.25rem 0 0; padding-left: 1.3rem; display: grid; gap: .4rem; }
+.weekly__panel { background: var(--surface); color: var(--ink); border-radius: var(--radius); padding: clamp(1.25rem, 3vw, 2rem); }
+.weekly__setup { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.25rem; }
+.weekly__setup .archive__heading, .weekly__setup .enquiry__note, .weekly__setup .weekly__actions { grid-column: 1 / -1; margin: 0; }
+.weekly__setup[hidden], .weekly__card[hidden] { display: none; }
+.weekly__card { display: grid; gap: .9rem; }
+.weekly__card .eyebrow { margin: 0; }
+.weekly__card h3 { font: 500 var(--step-3)/1.2 var(--serif); margin: 0; color: var(--primary); }
+.weekly__card h3:focus { outline: none; }
+.weekly__actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+.weekly__asked { margin: 0; font-size: .88rem; color: var(--muted); }
+.weekly__asked:empty { display: none; }
+.weekly__elders { display: flex; flex-wrap: wrap; gap: .5rem; }
+.weekly__elders[hidden] { display: none; }
+.weekly__elder { min-height: 40px; padding: .35rem .9rem; font: inherit; font-size: .9rem; border-radius: 999px; border: 1.5px solid var(--line); background: var(--page); color: var(--ink); cursor: pointer; }
+.weekly__elder[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.weekly__progress { display: grid; gap: .35rem; font-size: .88rem; color: var(--muted); }
+.weekly__progress progress { width: 100%; height: 10px; accent-color: var(--accent); }
+.weekly__more { display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; padding-top: .75rem; border-top: 1px solid var(--line); }
+.weekly .archive__status { margin-top: 1rem; }
+@media (max-width: 900px) { .weekly { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .weekly__setup { grid-template-columns: 1fr; } }
+@media print { .weekly, .weekly + .section-gap { display: none !important; } }
