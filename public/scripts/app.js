@@ -11,6 +11,7 @@
   // ---------- which backend ----------
   function backendConfig() {
     var cfg = {};
+    if (/[?&]preview\b/.test(location.search)) return cfg;
     try { cfg = JSON.parse(document.querySelector('meta[name="tch-backend"]').content || '{}'); } catch (e) {}
     try {
       var override = JSON.parse(localStorage.getItem('tch-backend') || 'null');
@@ -20,7 +21,7 @@
   }
   var cfg = backendConfig();
   var store = cfg.url && cfg.anonKey ? TCH.stores.supabase(cfg) : TCH.stores.local;
-  var returnTo = location.origin + location.pathname;
+  var returnTo = location.origin + location.pathname + (store.mode === 'local' && location.search ? location.search : '');
   var MAX_BYTES = store.mode === 'supabase' ? 50 * 1024 * 1024 : 500 * 1024 * 1024;
 
   var state = { user: null, legacy: null, people: null };
