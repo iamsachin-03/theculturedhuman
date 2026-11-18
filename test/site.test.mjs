@@ -64,7 +64,7 @@ test('The Commons asks a weekly question, shows live contributions and a word wa
   const kinds = readFileSync(join(PUBLIC, 'scripts/app-core.js'), 'utf8');
   for (const p of prompts.prompts) assert.ok(kinds.includes(`'${p.kind}'`), `${p.text}: "${p.kind}" is a contribution kind`);
   const html = read('manch.html');
-  assert.match(html, /id="this-week"[\s\S]*data-this-week-link[^>]*|href="\/app\.html#\/contribute\?prompt=0"/);
+  assert.match(html, /id="this-week"[\s\S]*data-this-week-link[^>]*|href="\/app\.html#\/contribute\?week=0"/);
   assert.match(html, /id="words"[\s\S]*data-community-feed[^>]*data-kind="A word or saying"/);
   assert.match(html, /data-community-feed data-limit="6" data-url="https:\/\//);
   assert.match(html, /\/scripts\/community-live\.js/);
@@ -231,4 +231,24 @@ test('the footer stays short, and every page it dropped is still reachable', () 
   const themes = read('journal/index.html').match(/<nav class="theme-links"[\s\S]*?<\/nav>/)[0];
   for (const href of ['/culture.html', '/proverbs.html', '/experiences.html', '/conscious-living.html', '/fitness.html', '/music.html']) assert.ok(themes.includes(`href="${href}"`), href);
   assert.match(read('index.html'), /href="\/credits\.html"/);
+});
+
+test('privacy, terms and community guidelines are on every page, and the contribute form points to them', () => {
+  for (const page of pages) {
+    const bottom = read(page).match(/<div class="container site-footer__bottom">[\s\S]*?<\/div>/)[0];
+    for (const href of ['/privacy.html', '/terms.html', '/community-guidelines.html', '/credits.html']) assert.ok(bottom.includes(`href="${href}"`), `${page}: ${href}`);
+  }
+  const app = readFileSync(join(PUBLIC, 'scripts/app.js'), 'utf8');
+  assert.ok(app.includes("'/community-guidelines.html'") && app.includes("'/privacy.html'"));
+  assert.ok(read('terms.html').includes(`${JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8')).platformFeePercent}%`), 'terms state the configured fee');
+});
+
+test('each contribution has its own page, kept out of search, and past questions have an archive', () => {
+  const shared = read('shared.html');
+  assert.match(shared, /<meta name="robots" content="noindex/);
+  assert.match(shared, /data-shared[^>]*data-url=/);
+  assert.doesNotMatch(read('sitemap.xml'), /shared\.html/);
+  assert.match(read('questions.html'), /data-question-archive[^>]*data-url=/);
+  assert.match(read('manch.html'), /href="\/questions\.html"/);
+  for (const page of ['shared.html', 'questions.html']) assert.match(read(page), /<script src="\/scripts\/community-live\.js" defer>/, page);
 });

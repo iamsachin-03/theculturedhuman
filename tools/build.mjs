@@ -293,6 +293,8 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
     .replace(/\{\{fee-percent\}\}/g, String(site.platformFeePercent))
     .replace(/\{\{fee-example\s+(\d+)\}\}/g, (_, n) => t.feeExample(Number(n), site.platformFeePercent))
     .replace(/\{\{this-week\}\}/g, () => t.thisWeek(prompts))
+    .replace(/\{\{shared-contribution\}\}/g, () => t.sharedContribution(site))
+    .replace(/\{\{question-archive\}\}/g, () => t.questionArchive(site))
     .replace(/\{\{community-feed([^}]*)\}\}/g, (_, rest) => {
       const opt = attrs(rest);
       if (opt.kind && !prompts.prompts.some((p) => p.kind === opt.kind)) problems.push(`${where}: community-feed kind "${opt.kind}" is not a contribution kind`);

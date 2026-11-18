@@ -101,7 +101,7 @@ export function footerBlock({ site }) {
 <div class="site-footer__brand"><a class="wordmark wordmark--footer" href="/">${logo(96)}<span>${e(site.name)}</span></a><p>${e(site.tagline)} ${e(site.supportingLine)}</p></div>
 ${cols}
 </div>
-<div class="container site-footer__bottom"><span>© ${new Date().getFullYear()} ${e(site.name)}. Rooted in India, curious about everywhere.</span><span>Images are credited on our <a href="/credits.html">image credits</a> page.</span></div>
+<div class="container site-footer__bottom"><span>© ${new Date().getFullYear()} ${e(site.name)}. Rooted in India, curious about everywhere.</span><span class="site-footer__legal"><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/community-guidelines.html">Community guidelines</a><a href="/credits.html">Image credits</a></span></div>
 </footer>
 <script src="/scripts/site.js" defer></script>`;
 }
@@ -373,8 +373,8 @@ export function thisWeek(prompts) {
 <p class="eyebrow">This week's question</p>
 <p class="this-week__question" data-this-week-text>${e(p.text)}</p>
 <p class="this-week__tag" data-this-week-tag${p.hashtag ? '' : ' hidden'}>${p.hashtag ? `#${e(p.hashtag)}` : ''}</p>
-<div class="btn-row"><a class="btn btn--light" href="/app.html#/contribute?prompt=0" data-this-week-link>Answer it</a><a class="btn btn--light btn--outline" href="/places/">Read what families carry</a></div>
-<p class="this-week__note">A new question every Monday. Answers are read before they appear, then added to the page of the place they come from, credited the way you choose.</p>
+<div class="btn-row"><a class="btn btn--light" href="/app.html#/contribute?week=0" data-this-week-link>Answer it</a><a class="btn btn--light btn--outline" href="/questions.html">Read the answers</a></div>
+<p class="this-week__note">A new question every Monday. Answers are read before they appear, then added to the page of the place they come from, credited the way you choose. <a href="/questions.html">Past questions</a>.</p>
 </div>`;
 }
 
@@ -387,6 +387,20 @@ export function communityFeed({ site, limit = 6, kind, style = 'cards', place })
   const backend = backendAttrs(site);
   return `<div class="community-feed community-feed--${words ? 'words' : 'cards'}" data-community-feed data-limit="${limit}"${kind ? ` data-kind="${e(kind)}"` : ''}${place ? ` data-place="${e(place)}"` : ''}${backend}>
 <div class="empty-state">${empty}</div>
+</div>`;
+}
+
+/** One contribution, large, with sharing; filled in by community-live.js from ?id=. */
+export function sharedContribution(site) {
+  return `<div class="shared-item" data-shared${backendAttrs(site)}>
+<div class="shared-missing" data-shared-empty><p class="eyebrow">Shared on The Cultured Human</p><h1>Looking for it…</h1><p>If nothing appears, it may have been changed, or removed by the person who shared it.</p><a class="btn" href="/manch.html">Go to The Commons</a></div>
+</div>`;
+}
+
+/** Every week's question so far, newest first, with its published answers; filled in by community-live.js. */
+export function questionArchive(site) {
+  return `<div class="question-archive" data-question-archive${backendAttrs(site)}>
+<div class="empty-state"><p><strong>The questions are loading.</strong> A new one arrives every Monday.</p><a class="text-link" href="/manch.html#this-week">This week's question</a></div>
 </div>`;
 }
 
