@@ -749,7 +749,9 @@ p { margin: 0 0 1em; }
 
 /* The simpler homepage. */
 .how-steps { list-style: none; counter-reset: how; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1.25rem; }
-.how-steps li { counter-increment: how; padding: clamp(1.25rem, 3vw, 1.75rem); background: var(--page); border: 1px solid var(--line); border-radius: var(--radius); }
+.how-steps li { counter-increment: how; display: flex; flex-direction: column; align-items: flex-start; padding: clamp(1.25rem, 3vw, 1.75rem); background: var(--page); border: 1px solid var(--line); border-radius: var(--radius); }
+/* The image sits above the step number, which is the li's ::before. */
+.how-steps img { order: -1; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; margin-bottom: 1rem; border-radius: calc(var(--radius) - 4px); background: var(--surface-2); }
 .how-steps li::before { content: counter(how); display: inline-grid; place-items: center; width: 2.2rem; height: 2.2rem; margin-bottom: .8rem; border-radius: 50%; background: var(--accent); color: var(--on-primary); font-weight: 600; }
 .how-steps h3 { font-size: var(--step-3); margin: 0 0 .4rem; }
 .how-steps p { color: var(--muted); margin: 0; }

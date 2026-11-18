@@ -503,5 +503,71 @@
     "alt": "Illustration of a grandmother telling a story while her granddaughter records her voice on a phone, old family photographs on the table and a painted tree with spreading roots behind them",
     "usage": "Original work made for The Cultured Human",
     "addedAt": "2026-11-18"
+  },
+  {
+    "id": "ask-a-question",
+    "kind": "illustration",
+    "files": {
+      "800": "/assets/illustrations/ask-a-question-800.jpg",
+      "1600": "/assets/illustrations/ask-a-question-1600.jpg"
+    },
+    "width": 1536,
+    "height": 1024,
+    "subject": "Asking a question",
+    "region": "",
+    "artForm": "Illustration",
+    "creator": "The Cultured Human",
+    "source": "Original illustration",
+    "sourceUrl": "/about.html",
+    "licence": "© The Cultured Human",
+    "licenceUrl": "",
+    "attribution": "Illustration: The Cultured Human",
+    "alt": "Illustration of a grandfather on a sunlit veranda smiling as he reads a question on his phone, a cup of tea beside him",
+    "usage": "Original work made for The Cultured Human",
+    "addedAt": "2026-11-18"
+  },
+  {
+    "id": "keepsake-box",
+    "kind": "illustration",
+    "files": {
+      "800": "/assets/illustrations/keepsake-box-800.jpg",
+      "1600": "/assets/illustrations/keepsake-box-1600.jpg"
+    },
+    "width": 1536,
+    "height": 1024,
+    "subject": "A box of family keepsakes",
+    "region": "",
+    "artForm": "Illustration",
+    "creator": "The Cultured Human",
+    "source": "Original illustration",
+    "sourceUrl": "/about.html",
+    "licence": "© The Cultured Human",
+    "licenceUrl": "",
+    "attribution": "Illustration: The Cultured Human",
+    "alt": "Illustration of an open wooden keepsake box holding old family photographs, a letter, a cassette tape, a key and a marigold, with ribbons of sound rising from it",
+    "usage": "Original work made for The Cultured Human",
+    "addedAt": "2026-11-18"
+  },
+  {
+    "id": "passing-it-on",
+    "kind": "illustration",
+    "files": {
+      "800": "/assets/illustrations/passing-it-on-800.jpg",
+      "1600": "/assets/illustrations/passing-it-on-1600.jpg"
+    },
+    "width": 1536,
+    "height": 1024,
+    "subject": "Passing it on",
+    "region": "",
+    "artForm": "Illustration",
+    "creator": "The Cultured Human",
+    "source": "Original illustration",
+    "sourceUrl": "/about.html",
+    "licence": "© The Cultured Human",
+    "licenceUrl": "",
+    "attribution": "Illustration: The Cultured Human",
+    "alt": "Illustration of an elder's hands passing a ribbon-tied family book to a child's reaching hands, old photographs and marigold petals around them",
+    "usage": "Original work made for The Cultured Human",
+    "addedAt": "2026-11-18"
   }
 ]
