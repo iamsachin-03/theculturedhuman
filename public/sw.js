@@ -29,11 +29,30 @@ function keepShared(files, text) {
   });
 }
 
+var MAX_FILES = 10;
+var MAX_FILE_BYTES = 500 * 1024 * 1024;
+
+// A share from another app arrives with no referrer. A form on some other website could also post
+// here, so anything sent from another site is turned away, and only a few media files are kept.
+function fromAnotherSite(request) {
+  if (!request.referrer) return false;
+  try { return new URL(request.referrer).origin !== self.location.origin; } catch (e) { return true; }
+}
+
+function isMedia(f) {
+  if (!f || typeof f === 'string' || !f.size || f.size > MAX_FILE_BYTES) return false;
+  return /^(image|audio|video)\//.test(f.type || '') || (!f.type && /\.(opus|ogg|oga|m4a|mp3|aac|amr|wav|jpe?g|png|webp|heic|mp4|3gp|mov)$/i.test(f.name || ''));
+}
+
 self.addEventListener('fetch', function (event) {
   var url = new URL(event.request.url);
   if (event.request.method !== 'POST' || url.origin !== self.location.origin || url.pathname !== '/share-target') return;
+  if (fromAnotherSite(event.request)) {
+    event.respondWith(Response.redirect('/', 303));
+    return;
+  }
   event.respondWith(event.request.formData().then(function (data) {
-    var files = data.getAll('media').filter(function (f) { return f && typeof f !== 'string' && f.size; });
+    var files = data.getAll('media').filter(isMedia).slice(0, MAX_FILES);
     var text = [data.get('title'), data.get('text')].filter(Boolean).join(' ').slice(0, 2000);
     return keepShared(files, text).then(function () {
       return Response.redirect('/app.html#/entry/new?shared=' + files.length, 303);
