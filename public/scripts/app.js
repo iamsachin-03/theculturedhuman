@@ -373,8 +373,15 @@
     e.media.forEach(function (m) { counts[m.kind] = (counts[m.kind] || 0) + 1; });
     var names = { audio: 'voice note', video: 'video', photo: 'photograph', document: 'document' };
     var media = Object.keys(counts).map(function (k) { return plural(counts[k], names[k]); }).join(', ');
-    return h('a', { class: 'app-entry', href: '#/entry/' + e.id },
-      h('span', { class: 'eyebrow' }, kind ? kind.heading : ''),
+    var photo = e.media.filter(function (m) { return m.kind === 'photo'; })[0];
+    var frame = null;
+    if (photo) {
+      frame = h('span', { class: 'app-entry__photo' });
+      store.mediaUrl(photo).then(function (url) { frame.appendChild(h('img', { src: url, alt: '', loading: 'lazy' })); }).catch(function () { frame.remove(); });
+    }
+    return h('a', { class: 'app-entry' + (photo ? ' app-entry--photo' : ''), href: '#/entry/' + e.id },
+      frame,
+      h('span', { class: 'eyebrow' }, kind ? kind.heading : '', counts.audio ? h('span', { class: 'app-entry__voice' }, 'Voice') : null),
       h('h3', null, e.title),
       e.body ? h('p', null, e.body.length > 160 ? e.body.slice(0, 157) + '…' : e.body) : null,
       h('span', { class: 'app-entry__meta' }, [e.teller ? 'Told by ' + e.teller : null, media || null, core.audienceLabel(e, state.people || []), core.formatDate(e.createdAt)].filter(Boolean).join(' · ')),
@@ -435,13 +442,28 @@
         ));
       }
       var shown = kind ? entries.filter(function (e) { return e.kind === kind; }) : entries;
-      if (!shown.length) {
-        add(view, h('p', { class: 'empty-state' }, entries.length ? 'Nothing of this kind yet.' : 'Nothing kept yet. Start with one question, one photograph or one saying.'));
+      if (!entries.length) {
+        add(view, emptyArchive());
+      } else if (!shown.length) {
+        add(view, h('p', { class: 'empty-state' }, 'Nothing of this kind yet.'));
       } else {
         add(view, h('div', { class: 'app-list' }, shown.map(entryCard)));
       }
       return h1;
     });
+  }
+
+  function emptyArchive() {
+    return h('section', { class: 'app-card app-welcome' },
+      h('img', { class: 'app-welcome__art', src: '/assets/illustrations/family-photo-album-800.jpg', alt: '', width: '800', height: '600', loading: 'lazy' }),
+      h('div', null,
+        h('h2', null, 'An album waiting for its first page'),
+        h('p', null, 'Most families begin with one small thing. Pick whichever is nearest to hand.'),
+        h('ul', { class: 'app-welcome__steps' },
+          h('li', null, link('#/entry/new?kind=story&record=audio', 'Record a grandparent telling one story', 'text-link'), h('small', null, 'Five minutes on the phone is enough.')),
+          h('li', null, link('#/entry/new?kind=memory', 'Keep an old photograph and who is in it', 'text-link'), h('small', null, 'A photo of a photo works.')),
+          h('li', null, link('#/entry/new?kind=wisdom', 'Write down a saying only your family uses', 'text-link'), h('small', null, 'The kind nobody outside would understand.'))),
+        h('p', { class: 'field__hint' }, 'Everything stays private to you until you choose who can see it.')));
   }
 
   // Everything told by or about one person, and a way to ask the rest of the family for theirs.
@@ -646,9 +668,17 @@
         });
         add(audience, [peopleBox, dateField]);
       }
+      var privacy = h('p', { class: 'app-privacy', 'aria-live': 'polite' });
       function sync() {
         peopleBox.hidden = ['people', 'date', 'passed'].indexOf(picked) === -1;
         dateField.hidden = picked !== 'date';
+        privacy.textContent = privacyLine();
+      }
+      function privacyLine() {
+        if (forOther) return picked === 'private' ? 'Only you and ' + sharedRow.ownerName + ' will be able to hear or see this.' : 'Only ' + sharedRow.ownerName + '\u2019s family will be able to hear or see this.';
+        if (picked === 'private') return 'Only you will be able to hear or see this. Nothing here is ever public.';
+        if (picked === 'family') return 'Only the family you have added will be able to hear or see this. Nothing here is ever public.';
+        return 'Only the people you choose under \u201cWho can see it\u201d will be able to hear or see this. Nothing here is ever public.';
       }
       sync();
       add(form, audience);
@@ -719,7 +749,7 @@
         h('legend', null, 'Voices, videos, photographs and documents'),
         h('p', { class: 'field__hint' }, 'Old certificates, letters, deeds and photographs of them count too. Up to ' + core.formatBytes(MAX_BYTES) + ' each.'),
         h('div', { class: 'btn-row' }, recordButton('audio'), recordButton('video'), h('label', { class: 'btn btn--ghost app-upload' }, 'Attach files', picker)),
-        recordStatus, preview, fileList,
+        privacy, recordStatus, preview, fileList,
       ));
       drawFiles();
 
