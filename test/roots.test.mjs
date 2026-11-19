@@ -221,3 +221,31 @@ test('the encouragement grows with each generation and stops changing after six'
   assert.equal(new Set(lines).size, 7);
   assert.equal(progressText(9), progressText(6));
 });
+
+test('a hostile invite link cannot put markup or script into the portrait', () => {
+  const evil = '"><script>alert(1)</script><img src=x onerror=alert(1)><a href="javascript:alert(1)">\'';
+  const gen = { label: evil, place: evil, years: evil, detail: evil, photo: 'p1' };
+  const saved = { name: evil, mode: 'line', generations: [gen, gen, gen], me: gen, sides: [[gen], [gen]], style: '"><x', palette: '<x>', format: 'post', lang: 'x' };
+  const link = Art.pack({ ...saved }, evil);
+  const got = Art.unpack(link);
+  assert.ok(got, 'the link still opens');
+  assert.equal(got.saved.style, Art.STYLES[0].id, 'unknown style ids fall back');
+  assert.ok(!got.saved.generations.some((g) => 'photo' in g), 'invite links never carry photo references');
+  const svgTags = new Set(['svg', 'rect', 'g', 'path', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan', 'textPath', 'defs', 'clipPath', 'linearGradient', 'radialGradient', 'stop', 'filter', 'feGaussianBlur', 'feMorphology', 'feFlood', 'feComposite', 'feMerge', 'feMergeNode', 'image', 'pattern', 'use', 'mask', 'title']);
+  const photos = { p1: 'javascript:alert(1)' };
+  for (const { id } of Art.STYLES) {
+    for (const mode of ['line', 'sides']) {
+      for (const lang of Art.LANGS.map((l) => l.id)) {
+        const opened = Art.unpack(Art.pack({ ...saved, mode }, evil)).saved;
+        const svg = Art.render(Art.fromSaved(opened), colours, { style: id, lang, photos });
+        const where = `${id}/${mode}/${lang}`;
+        for (const [, tag] of svg.matchAll(/<([a-zA-Z][\w:-]*)/g)) assert.ok(svgTags.has(tag), `${where}: unexpected <${tag}>`);
+        for (const [tag] of svg.matchAll(/<[^>]*>/g)) {
+          assert.doesNotMatch(tag, /\son[a-z]+\s*=/i, `${where}: event handler in ${tag}`);
+          assert.doesNotMatch(tag, /javascript:/i, `${where}: javascript: URL in ${tag}`);
+        }
+        assert.ok(svg.includes('&quot;&gt;'), `${where}: the text is shown, escaped`);
+      }
+    }
+  }
+});
