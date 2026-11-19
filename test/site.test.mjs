@@ -264,3 +264,16 @@ test('What we offer lists every offering, grouped by step, with the archive feat
   assert.ok(!/\{\{/.test(html), 'no unexpanded placeholders');
   assert.match(read('index.html'), /href="\/offerings\.html"/, 'the home page links to it');
 });
+
+test('every product page opens with the same facts: who it is for, price, promise, three steps and one action', () => {
+  const { products } = JSON.parse(readFileSync(join(ROOT, 'content/products.json'), 'utf8'));
+  for (const p of products.filter((x) => x.steps)) {
+    const html = read(p.href.slice(1));
+    const glance = html.match(/<section class="glance"[\s\S]*?<\/section>/);
+    assert.ok(glance, `${p.href} has an at-a-glance strip`);
+    for (const label of ['Who it is for', 'What it costs', 'Our promise', 'How it works']) assert.ok(glance[0].includes(label), `${p.href}: ${label}`);
+    assert.equal((glance[0].match(/<li>/g) || []).length, 3, `${p.href}: three steps`);
+    assert.ok(glance[0].includes(`href="${p.cta.href}"`), `${p.href}: its main action`);
+    assert.ok(html.indexOf('class="glance"') < html.indexOf('</section>', html.indexOf('class="glance"')) && html.indexOf('page-hero') < html.indexOf('class="glance"'), `${p.href}: right after the hero`);
+  }
+});

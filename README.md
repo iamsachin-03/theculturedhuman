@@ -90,7 +90,7 @@ Run `npm run build` after changing these settings.
 
 ## Accounts
 
-The top menu is What we offer, Places, Stories, The Commons and Plans, with a **My archive** button that leads to `/app.html` (sign-in, if needed, happens there). Every offering is described once in `content/products.json`, which draws the What we offer page (`{{product-journey}}`). To connect real accounts, create a Supabase project and fill in `backend` in `content/site.json`; [`backend/README.md`](backend/README.md) has the steps. Visitors who used the earlier on-device archive or weekly question are offered to bring them into their account the first time they sign in.
+The top menu is What we offer, Places, Stories, The Commons and Plans, with a **My archive** button that leads to `/app.html` (sign-in, if needed, happens there). Every offering is described once in `content/products.json`, which draws the What we offer page (`{{product-journey}}`). Each product page puts `{{at-a-glance <id>}}` right after its hero: who it is for, what it costs, our promise, three steps and one main action, from the same file, so a price or promise is changed in one place. To connect real accounts, create a Supabase project and fill in `backend` in `content/site.json`; [`backend/README.md`](backend/README.md) has the steps. Visitors who used the earlier on-device archive or weekly question are offered to bring them into their account the first time they sign in.
 
 ## A first story before signing up
 
