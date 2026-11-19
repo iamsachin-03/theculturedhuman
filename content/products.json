@@ -1,0 +1,175 @@
+{
+  "groups": [
+    {
+      "id": "discover",
+      "step": "1",
+      "eyebrow": "Discover",
+      "title": "Find where your family comes from.",
+      "intro": "Free, and a good place to begin if you know a village name and not much more."
+    },
+    {
+      "id": "keep",
+      "step": "2",
+      "eyebrow": "Keep",
+      "title": "Keep what your family knows.",
+      "intro": "The stories, voices and sayings that live only in memory, kept privately for the people who come next."
+    },
+    {
+      "id": "give",
+      "step": "3",
+      "eyebrow": "Give and go back",
+      "title": "Hold it, give it, walk it.",
+      "intro": "Objects made by named makers, and journeys with hosts who live in the places families come from."
+    },
+    {
+      "id": "groups",
+      "step": "4",
+      "eyebrow": "Together",
+      "title": "For schools, communities and teams.",
+      "intro": "The same tools and the same people, for a whole class, association or workplace."
+    }
+  ],
+  "products": [
+    {
+      "id": "trace",
+      "group": "discover",
+      "name": "Trace your roots",
+      "line": "Add the places your family has lived, generation by generation, and see them grow into a portrait of where you come from.",
+      "who": "Anyone who knows even one place in their family's story.",
+      "price": "Free",
+      "steps": ["Add the places you know, one generation at a time.", "Ask a relative to fill in the gaps.", "Keep the portrait, or have it painted."],
+      "trust": "Everything you type stays in your browser until you choose to keep it in your archive.",
+      "href": "/trace.html",
+      "cta": { "label": "Trace your roots", "href": "/trace.html#trace-form-title" },
+      "image": "warli-wall"
+    },
+    {
+      "id": "places",
+      "group": "discover",
+      "name": "Places",
+      "line": "Pages for the towns and regions families come from: their words, dishes, rituals and songs, added to by families themselves.",
+      "price": "Free",
+      "href": "/places/",
+      "image": "places-journey-map"
+    },
+    {
+      "id": "commons",
+      "group": "discover",
+      "name": "The Commons",
+      "line": "One question every week about the words, dishes and rituals families carry. Read what others remember, and add yours.",
+      "who": "Anyone curious about where their family's ways come from.",
+      "price": "Free",
+      "steps": ["Read this week's question.", "Share a word, a dish or a memory.", "A person reads it before it appears."],
+      "trust": "Nothing appears until a person has read it, and you choose the name it is credited to.",
+      "href": "/manch.html",
+      "cta": { "label": "Answer this week's question", "href": "/manch.html#this-week" },
+      "image": "madhubani-station"
+    },
+    {
+      "id": "archive",
+      "group": "keep",
+      "featured": true,
+      "badge": "Most families start here",
+      "name": "Family archive",
+      "line": "A private home for your family's stories, voice notes, photographs, sayings and letters, shared with the people you choose and passed on when you decide.",
+      "who": "Families who want a grandparent's voice and stories kept, wherever everyone lives.",
+      "price": "Free to begin. A Family plan with more room and a printed book is coming.",
+      "steps": ["Ask an elder one question a week.", "Keep their voice note or your own words.", "Share it, or leave it for later."],
+      "trust": "Private by default. Never sold, never used for advertising, always yours to download.",
+      "href": "/archive.html",
+      "cta": { "label": "Start your family archive", "href": "/app.html" },
+      "image": "family-photo-album"
+    },
+    {
+      "id": "roots-kit",
+      "group": "keep",
+      "name": "The Roots Kit",
+      "line": "Question cards, recording tips and a family-book template, so you can record your elders yourself.",
+      "who": "Anyone who wishes they had asked sooner, and would like a gentle structure.",
+      "price": "Waitlist. Priced before it opens.",
+      "steps": ["Pick a card and ask.", "Record the answer on your phone.", "Keep it in your archive, or in the book."],
+      "trust": "Joining the waitlist is one message. You will see the price before you decide.",
+      "href": "/roots-kit.html",
+      "cta": { "label": "Join the waitlist", "href": "/roots-kit.html#enquire" },
+      "image": "ask-a-question"
+    },
+    {
+      "id": "storytellers",
+      "group": "keep",
+      "name": "Storytellers",
+      "line": "A trained storyteller sits with your elder, in person or online, in their own language, and records their stories for your archive.",
+      "who": "Families who can't ask the questions themselves, or want it done gently and well.",
+      "price": "The storyteller's own price, plus a {{fee-percent}}% booking fee shown separately.",
+      "steps": ["Tell us whose stories to keep.", "We introduce a storyteller who speaks their language.", "The recordings arrive in your archive."],
+      "trust": "Everything recorded goes into your family's archive, and your family owns it.",
+      "href": "/family-stories.html",
+      "cta": { "label": "Request a storyteller", "href": "/family-stories.html#enquire" },
+      "image": "three-generations-story"
+    },
+    {
+      "id": "keepsakes",
+      "group": "give",
+      "name": "Keepsakes",
+      "line": "Objects that carry your roots: a painting of your family's place, your roots portrait made into art, and small drops from named makers.",
+      "who": "Anyone who wants something to hang, hold or hand down.",
+      "price": "Each maker's own price, plus a {{fee-percent}}% fee shown separately.",
+      "steps": ["Choose a maker or a drop.", "Tell them what it is for.", "It is made for you, with its story."],
+      "trust": "Every piece is credited to the person who made it, and their price is never hidden in ours.",
+      "href": "/marketplace.html",
+      "cta": { "label": "See the keepsakes", "href": "/marketplace.html" },
+      "image": "bankura-horses"
+    },
+    {
+      "id": "commission",
+      "group": "give",
+      "name": "Commission a piece",
+      "line": "A painting of your family's home town or your family name in a folk-art style, made by a named artist who sets the price.",
+      "who": "Families marking a wedding, a birthday or a homecoming.",
+      "price": "The artist's own price, plus a {{fee-percent}}% fee shown separately.",
+      "steps": ["Tell us what you would like made.", "The artist proposes, with a price.", "They make it, and it comes with their story."],
+      "trust": "The artist is named, sets their own price and keeps all of it.",
+      "href": "/commission.html",
+      "cta": { "label": "Commission a piece", "href": "/commission.html#enquire" },
+      "image": "kohbar-wall"
+    },
+    {
+      "id": "gifting",
+      "group": "give",
+      "name": "Gifting",
+      "line": "Festive, wedding and company gifts from named makers, made to pre-order, each with a card that tells its story.",
+      "who": "Anyone sending gifts that should mean something, from one box to a whole company.",
+      "price": "Quoted per order, with the makers' prices shown.",
+      "steps": ["Tell us who the gifts are for.", "We suggest makers and pieces.", "They are made to order and sent with their story."],
+      "trust": "Made to pre-order, never mass-stocked, and every maker is named.",
+      "href": "/gifting.html",
+      "cta": { "label": "Plan your gifts", "href": "/gifting.html#enquire" },
+      "image": "keepsake-box"
+    },
+    {
+      "id": "journeys",
+      "group": "give",
+      "name": "Journeys",
+      "line": "Go back to your family's village or town with a host who knows it, or spend a few days with a tradition and the people who keep it.",
+      "who": "Families going back, often for the first time in generations.",
+      "price": "Each host's own price, plus a {{fee-percent}}% booking fee. The first hosts are being invited now.",
+      "steps": ["Tell us what you know about the place.", "We introduce a host who lives there.", "Plan the visit together."],
+      "trust": "Nothing is promised that can't be found, and hosts set their own prices.",
+      "href": "/journeys.html",
+      "cta": { "label": "Register interest", "href": "/journeys.html#enquire" },
+      "image": "rani-ki-vav"
+    },
+    {
+      "id": "organisations",
+      "group": "groups",
+      "name": "For organisations",
+      "line": "Roots programmes for schools, diaspora and community groups and workplaces, led by makers and storytellers on the platform.",
+      "who": "Schools, associations and teams.",
+      "price": "Quoted per programme, with the practitioner's fee shown separately.",
+      "steps": ["Tell us about your group.", "We propose a session and a practitioner.", "Agree a clear quote before anything is booked."],
+      "trust": "Everything is agreed in writing before it begins.",
+      "href": "/for-organisations.html",
+      "cta": { "label": "Plan a programme", "href": "/for-organisations.html#enquire" },
+      "image": "mithila-painter"
+    }
+  ]
+}

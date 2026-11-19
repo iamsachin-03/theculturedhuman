@@ -253,3 +253,14 @@ test('each contribution has its own page, kept out of search, and past questions
   assert.match(read('manch.html'), /href="\/questions\.html"/);
   for (const page of ['shared.html', 'questions.html']) assert.match(read(page), /<script src="\/scripts\/community-live\.js" defer>/, page);
 });
+
+test('What we offer lists every offering, grouped by step, with the archive featured first', () => {
+  const { groups, products } = JSON.parse(readFileSync(join(ROOT, 'content/products.json'), 'utf8'));
+  const html = read('offerings.html');
+  for (const g of groups) assert.ok(html.includes(`id="${g.id}"`), `group ${g.id}`);
+  for (const p of products) assert.ok(html.includes(`href="${p.href}"`), `${p.id} links to ${p.href}`);
+  assert.equal(products.filter((p) => p.featured).length, 1, 'one featured product');
+  assert.match(html, /class="product-feature"[\s\S]*Family archive/, 'the archive is the featured offering');
+  assert.ok(!/\{\{/.test(html), 'no unexpanded placeholders');
+  assert.match(read('index.html'), /href="\/offerings\.html"/, 'the home page links to it');
+});

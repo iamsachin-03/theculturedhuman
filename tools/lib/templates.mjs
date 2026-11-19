@@ -141,6 +141,40 @@ export function offerCard(offer, asset) {
   return `<a class="offer-card" href="${offer.href}"><div class="offer-card__media">${picture(asset, { sizes: '(max-width: 700px) 100vw, 360px', alt: '' })}</div><div class="offer-card__body"><span class="eyebrow">${e(offer.label)}</span><h3>${e(offer.title)}</h3><p>${e(offer.summary)}</p><span class="offer-card__action">${e(offer.action)}</span></div></a>`;
 }
 
+/** Every offering, grouped by the steps a family goes through, with the featured one shown large. */
+export function productJourney(groups) {
+  const tile = (p) => p.featured
+    ? `<article class="product-feature"><div class="product-feature__media">${picture(p.asset, { sizes: '(max-width: 860px) 100vw, 560px', alt: '' })}</div><div class="product-feature__body">${p.badge ? `<p class="product-badge">${e(p.badge)}</p>` : ''}<h3><a href="${p.href}">${e(p.name)}</a></h3><p>${e(p.line)}</p><p class="product-price">${e(p.price)}</p><div class="btn-row"><a class="btn" href="${p.cta.href}">${e(p.cta.label)}</a>${p.sample ? `<a class="btn btn--ghost" href="${p.sample.href}">${e(p.sample.label)}</a>` : ''}</div><a class="text-link" href="${p.href}">More about the ${e(p.name.toLowerCase())}</a></div></article>`
+    : `<a class="offer-card product-card" href="${p.href}"><div class="offer-card__media">${picture(p.asset, { sizes: '(max-width: 700px) 100vw, 360px', alt: '' })}</div><div class="offer-card__body"><h3>${e(p.name)}</h3><p>${e(p.line)}</p><span class="product-price">${e(p.price)}</span><span class="offer-card__action">Find out more</span></div></a>`;
+  return groups.map((g) => {
+    const featured = g.items.filter((p) => p.featured);
+    const rest = g.items.filter((p) => !p.featured);
+    return `<section class="product-group" id="${g.id}" aria-labelledby="${g.id}-title">
+<div class="section-head"><p class="eyebrow"><span class="product-group__step">${e(g.step)}</span> ${e(g.eyebrow)}</p><h2 id="${g.id}-title">${e(g.title)}</h2><p>${e(g.intro)}</p></div>
+${featured.map(tile).join('')}
+${rest.length ? `<div class="offer-grid${rest.length < 3 ? ' offer-grid--few' : ''}">${rest.map(tile).join('')}</div>` : ''}
+</section>`;
+  }).join('\n');
+}
+
+/** The same few facts at the top of every product page: who it is for, what it costs, how it works and what we promise. */
+export function atAGlance(p, group) {
+  return `<section class="glance" aria-label="${e(p.name)} at a glance">
+<div class="container">
+<p class="glance__trail"><a href="/offerings.html">What we offer</a> · <a href="/offerings.html#${group.id}">${e(group.eyebrow)}</a></p>
+<div class="glance__grid">
+<dl class="glance__facts">
+<div><dt>Who it is for</dt><dd>${e(p.who)}</dd></div>
+<div><dt>What it costs</dt><dd>${e(p.price)}</dd></div>
+<div><dt>Our promise</dt><dd>${e(p.trust)}</dd></div>
+</dl>
+<div class="glance__how"><p class="glance__label">How it works</p><ol>${p.steps.map((s) => `<li>${e(s)}</li>`).join('')}</ol>
+<div class="btn-row"><a class="btn" href="${p.cta.href}">${e(p.cta.label)}</a>${p.sample ? `<a class="btn btn--ghost" href="${p.sample.href}">${e(p.sample.label)}</a>` : ''}</div></div>
+</div>
+</div>
+</section>`;
+}
+
 export function bringHome(cards) {
   return `<section class="bring-home container" aria-labelledby="bring-home-title">
 <p class="eyebrow">Bring this home</p>

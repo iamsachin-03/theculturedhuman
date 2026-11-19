@@ -55,6 +55,30 @@ function offer(id, where, { card = false } = {}) {
   return o;
 }
 
+// What we offer, grouped by the steps a family goes through. Drives /offerings.html and the
+// "at a glance" strip at the top of each product page.
+const productData = JSON.parse(readFileSync(join(ROOT, 'content/products.json'), 'utf8'));
+const productGroups = new Map(productData.groups.map((g) => [g.id, g]));
+const products = new Map();
+for (const [i, p] of productData.products.entries()) {
+  const where = `content/products.json: product ${i + 1}`;
+  for (const key of ['id', 'group', 'name', 'line', 'price', 'href', 'image']) if (!p[key]) throw new Error(`${where} needs "${key}"`);
+  if (products.has(p.id)) throw new Error(`${where}: duplicate id "${p.id}"`);
+  if (!productGroups.has(p.group)) throw new Error(`${where}: unknown group "${p.group}"`);
+  if (p.steps && (p.steps.length !== 3 || !p.who || !p.trust || !p.cta?.href || !p.cta?.label)) {
+    throw new Error(`${where}: a product page needs exactly three steps, "who", "trust" and a "cta" with label and href`);
+  }
+  products.set(p.id, p);
+}
+function product(id, where) {
+  const p = products.get(id);
+  if (!p) throw new Error(`${where}: unknown product "${id}" — add it to content/products.json first`);
+  if (!p.steps) throw new Error(`${where}: product "${id}" has no steps, so it has no "at a glance" strip`);
+  return p;
+}
+const productJourney = (where) =>
+  t.productJourney(productData.groups.map((g) => ({ ...g, items: [...products.values()].filter((p) => p.group === g.id).map((p) => ({ ...p, asset: asset(p.image, where) })) })));
+
 const ROLES = ['maker', 'host', 'storyteller'];
 const placesDir = join(ROOT, 'content/places');
 const places = readdirSync(placesDir)
@@ -306,6 +330,8 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
     .replace(/\{\{directory\s+(maker|host|storyteller)\}\}/g, (_, role) => directory(role))
     .replace(/\{\{place-cards\}\}/g, placeCards)
     .replace(/\{\{roots-map\}\}/g, rootsMap)
+    .replace(/\{\{product-journey\}\}/g, () => productJourney(where))
+    .replace(/\{\{at-a-glance\s+([\w-]+)\}\}/g, (_, id) => { const p = product(id, where); return t.atAGlance(p, productGroups.get(p.group)); })
     .replace(/\{\{fee-percent\}\}/g, String(site.platformFeePercent))
     .replace(/\{\{fee-example\s+(\d+)\}\}/g, (_, n) => t.feeExample(Number(n), site.platformFeePercent))
     .replace(/\{\{this-week\}\}/g, () => t.thisWeek(prompts))
