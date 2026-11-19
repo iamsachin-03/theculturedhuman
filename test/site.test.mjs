@@ -277,3 +277,30 @@ test('every product page opens with the same facts: who it is for, price, promis
     assert.ok(html.indexOf('class="glance"') < html.indexOf('</section>', html.indexOf('class="glance"')) && html.indexOf('page-hero') < html.indexOf('class="glance"'), `${p.href}: right after the hero`);
   }
 });
+
+test('every page is served with a content security policy the pages actually keep to', () => {
+  const vercel = JSON.parse(readFileSync(join(ROOT, 'vercel.json'), 'utf8'));
+  const all = Object.fromEntries(vercel.headers.find((h) => h.source === '/(.*)').headers.map((h) => [h.key, h.value]));
+  const csp = Object.fromEntries(all['Content-Security-Policy'].split(';').map((d) => d.trim().split(/\s+/)).map(([k, ...v]) => [k, v]));
+  const backend = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8')).backend.url;
+  for (const d of ['connect-src', 'img-src', 'media-src']) assert.ok(csp[d].includes(backend), `${d} allows the archive's backend`);
+  assert.deepEqual(csp['frame-ancestors'], ["'none'"]);
+  assert.deepEqual(csp['object-src'], ["'none'"]);
+  assert.ok(!csp['script-src'].some((s) => /unsafe|\*/.test(s)), 'no inline or wildcard scripts');
+  assert.equal(all['X-Frame-Options'], 'DENY');
+  assert.match(all['Strict-Transport-Security'], /max-age=\d{8}/);
+  assert.match(all['Permissions-Policy'], /microphone=\(self\)/);
+  for (const page of pages) {
+    const html = read(page);
+    for (const tag of html.match(/<script\b[^>]*>/g) || []) {
+      const src = tag.match(/src="([^"]+)"/);
+      if (!src) assert.match(tag, /type="application\/(ld\+)?json"/, `${page}: inline script ${tag}`);
+      else if (/^https?:/.test(src[1])) assert.ok(csp['script-src'].includes(new URL(src[1]).origin), `${page}: ${src[1]} is allowed`);
+    }
+    assert.ok(!/<[^>]+\son[a-z]+=/i.test(html), `${page}: no inline event handlers`);
+    for (const href of html.match(/<link[^>]+href="https:[^"]+"[^>]*>/g) || []) {
+      const origin = new URL(href.match(/href="([^"]+)"/)[1]).origin;
+      if (/stylesheet/.test(href)) assert.ok(csp['style-src'].includes(origin), `${page}: stylesheet from ${origin}`);
+    }
+  }
+});
