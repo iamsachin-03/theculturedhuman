@@ -7,6 +7,8 @@
 //                     and access decided by the database's can_read_object / can_write_object
 // It also catches GoTrue's emails on SMTP_PORT, so magic links can be read at /dev/mail.
 // Start everything with backend/dev/start.sh.
+// Those links sign anyone in, so it listens on this computer only, answers only requests addressed
+// to localhost (which stops DNS-rebinding pages), and lets only pages on localhost read its replies.
 import { createServer, request } from 'node:http';
 import { createServer as createTcpServer } from 'node:net';
 import { createHmac, timingSafeEqual } from 'node:crypto';
@@ -17,14 +19,20 @@ const PORT = Number(process.env.PORT || 54321);
 const AUTH_PORT = Number(process.env.AUTH_PORT || 9999);
 const REST_PORT = Number(process.env.REST_PORT || 3000);
 const SMTP_PORT = Number(process.env.SMTP_PORT || 2500);
+const HOST = '127.0.0.1';
+const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
+const MAX_MAIL = 200;
 const FILES = process.env.FILES || '/tmp/tch-storage';
 const SECRET = process.env.JWT_SECRET;
 if (!SECRET) throw new Error('Set JWT_SECRET to the same secret GoTrue and PostgREST use');
 
 const mail = [];
 
-function cors(res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+function cors(req, res) {
+  const origin = req.headers.origin;
+  if (!origin || !LOCAL.test(origin.replace(/^https?:\/\//, ''))) return;
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Headers', 'authorization, apikey, content-type, prefer, x-client-info, x-upsert, range, accept-profile, content-profile');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Expose-Headers', 'content-range, location');
@@ -131,7 +139,8 @@ async function storage(req, res, url) {
 }
 
 createServer(async (req, res) => {
-  cors(res);
+  if (!LOCAL.test(req.headers.host || '')) return send(res, 421, { message: 'This stand-in only answers localhost' });
+  cors(req, res);
   if (req.method === 'OPTIONS') return res.writeHead(204).end();
   const url = new URL(req.url, `http://localhost:${PORT}`);
   if (url.pathname.startsWith('/auth/v1/')) return proxy(req, res, AUTH_PORT, req.url.slice('/auth/v1'.length));
@@ -139,7 +148,7 @@ createServer(async (req, res) => {
   if (url.pathname.startsWith('/storage/v1/')) return storage(req, res, url).catch((e) => send(res, 500, { message: e.message }));
   if (url.pathname === '/dev/mail') return send(res, 200, mail);
   send(res, 404, { message: 'Not found' });
-}).listen(PORT, () => console.log(`Local Supabase stand-in on http://localhost:${PORT}`));
+}).listen(PORT, HOST, () => console.log(`Local Supabase stand-in on http://localhost:${PORT}`));
 
 // ---------- a tiny SMTP sink ----------
 function decodeQuotedPrintable(s) {
@@ -165,6 +174,7 @@ createTcpServer((socket) => {
         const subject = (text.match(/^Subject: (.*)$/m) || [])[1] || '';
         const link = (text.match(/https?:\/\/[^\s"'<>]+verify\?[^\s"'<>]+/) || [])[0] || null;
         mail.push({ to: message.to, subject, link: link && link.replace(/&amp;/g, '&'), at: new Date().toISOString() });
+        if (mail.length > MAX_MAIL) mail.splice(0, mail.length - MAX_MAIL);
         message = { to: [] };
         socket.write('250 OK\r\n');
         continue;
@@ -180,4 +190,4 @@ createTcpServer((socket) => {
       else socket.write('250 OK\r\n');
     }
   });
-}).listen(SMTP_PORT);
+}).listen(SMTP_PORT, HOST);
