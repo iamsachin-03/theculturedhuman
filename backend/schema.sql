@@ -187,6 +187,8 @@ create table bookings (
   status booking_status not null default 'requested',
   -- Filled in by the payment webhook (service role only), never by a browser.
   payment_ref text,
+  -- The Razorpay order for this booking (backend/payments), set with the service key only.
+  payment_order_id text,
   -- The last status the notifier emailed about (backend/notify).
   notified_status booking_status,
   created_at timestamptz not null default now()
@@ -489,11 +491,13 @@ begin
     new.platform_fee_paise := null;
     new.reply := null;
     new.payment_ref := null;
+    new.payment_order_id := null;
     return new;
   end if;
   select user_id into owner from listings where id = new.listing_id;
   if auth.uid() is not null and not is_moderator() then
-    if new.listing_id <> old.listing_id or new.requested_by <> old.requested_by or new.payment_ref is distinct from old.payment_ref then
+    if new.listing_id <> old.listing_id or new.requested_by <> old.requested_by or new.payment_ref is distinct from old.payment_ref
+       or new.payment_order_id is distinct from old.payment_order_id then
       raise exception 'This part of a booking cannot be changed';
     end if;
     if new.status in ('paid', 'completed') and new.status is distinct from old.status then

@@ -53,7 +53,9 @@ export function bookingEmail(b, listingName, siteUrl) {
     case 'quoted':
       return { to: 'family', subject: `${listingName} has replied to your request`, text: `${listingName} has replied with a price. Read it and accept it here:\n${requests}${SIGN_OFF}` };
     case 'accepted':
-      return { to: 'provider', subject: `Your quote was accepted`, text: `The family accepted your quote for ${listingName}. You can now see each other's email address here:\n${requests}\n\nWe will email the family a payment link.${SIGN_OFF}` };
+      return { to: 'provider', subject: `Your quote was accepted`, text: `The family accepted your quote for ${listingName}. You can now see each other's email address here:\n${requests}\n\nWe will tell you as soon as they have paid.${SIGN_OFF}` };
+    case 'paid':
+      return { to: 'provider', subject: `Paid: you can begin`, text: `The family has paid for ${listingName}. You can begin the work, and reach them here:\n${requests}${SIGN_OFF}` };
     default:
       return null;
   }
@@ -81,7 +83,7 @@ export async function run(cfg, { fetch, now = new Date(), dryRun = false }) {
 
   const contributions = (await db(`place_contributions?select=id,title,place_slug,status,review_note,notified_status,submitted_by&status=in.(published,rejected)&created_at=gte.${since}`))
     .filter((c) => c.notified_status !== c.status);
-  const bookings = (await db(`bookings?select=id,status,notified_status,requested_by,listings(name,user_id)&status=in.(requested,quoted,accepted)&created_at=gte.${since}`))
+  const bookings = (await db(`bookings?select=id,status,notified_status,requested_by,listings(name,user_id)&status=in.(requested,quoted,accepted,paid)&created_at=gte.${since}`))
     .filter((b) => b.notified_status !== b.status && b.listings);
 
   const users = new Set(contributions.map((c) => c.submitted_by));

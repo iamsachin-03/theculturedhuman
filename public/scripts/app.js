@@ -1461,8 +1461,14 @@
     }
     if (side === 'family' && b.status === 'quoted') {
       add(card, h('div', { class: 'btn-row' },
-        button('Accept ' + core.formatRupees(b.pricePaise + b.feePaise), act({ status: 'accepted' }, 'Accepted. We will email you a secure payment link, and you can now reach ' + l.name + ' directly.')),
+        button('Accept ' + core.formatRupees(b.pricePaise + b.feePaise), act({ status: 'accepted' }, 'Accepted. You can pay below, and you can now reach ' + l.name + ' directly.')),
         button('Decline', act({ status: 'cancelled' }, 'Declined.'), 'btn btn--ghost')));
+    }
+    if (side === 'family' && b.status === 'accepted') {
+      var payBtn = button('Pay ' + core.formatRupees(b.pricePaise + b.feePaise) + ' securely', function () { payOnline(b, l, payBtn); });
+      add(card, h('div', { class: 'app-pay' },
+        h('div', { class: 'btn-row' }, payBtn),
+        h('p', { class: 'field__hint' }, 'By UPI, card or net banking, through Razorpay. ' + l.name + ' receives ' + core.formatRupees(b.pricePaise) + '; the rest is our ' + FEE_PERCENT + '% fee.')));
     }
     if (side === 'family' && b.status === 'requested') {
       add(card, h('div', { class: 'btn-row' }, button('Cancel request', act({ status: 'cancelled' }, 'Request cancelled.'), 'btn btn--ghost')));
@@ -1478,6 +1484,64 @@
     }
     if (opts.settle) add(card, opts.settle);
     return card;
+  }
+
+  function postJson(url, body, token) {
+    return fetch(url, {
+      method: 'POST',
+      headers: Object.assign({ 'content-type': 'application/json' }, token ? { authorization: 'Bearer ' + token } : {}),
+      body: JSON.stringify(body),
+    }).then(function (res) {
+      var json = /json/.test(res.headers.get('content-type') || '') ? res.json() : Promise.resolve(null);
+      return json.then(function (data) {
+        if (!data) return { unavailable: true };
+        if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+        return data;
+      });
+    });
+  }
+  var checkoutReady = null;
+  function loadCheckout() {
+    if (!checkoutReady) {
+      checkoutReady = new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        s.onload = resolve;
+        s.onerror = function () { checkoutReady = null; reject(new Error('The payment window could not load. Check your connection and try again.')); };
+        document.head.appendChild(s);
+      });
+    }
+    return checkoutReady;
+  }
+  // Razorpay Checkout when the site's payment function has keys; otherwise the manual payment link.
+  function payOnline(b, l, btn) {
+    var token = store.accessToken ? store.accessToken() : null;
+    btn.disabled = true;
+    postJson('/api/razorpay-order', { bookingId: b.id }, token).then(function (order) {
+      if (order.unavailable || order.dryRun) {
+        flash = 'Online payment is not switched on yet. We will email you a secure payment link for ' + core.formatRupees(b.pricePaise + b.feePaise) + ' instead.';
+        return render();
+      }
+      return loadCheckout().then(function () {
+        return new Promise(function (resolve, reject) {
+          var rz = new window.Razorpay({
+            key: order.keyId, order_id: order.orderId, amount: order.amount, currency: order.currency,
+            name: 'The Cultured Human', description: order.name + (order.testMode ? ' (test payment)' : ''),
+            prefill: { email: order.email }, theme: { color: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#28594B' },
+            handler: function (resp) {
+              postJson('/api/razorpay-order', { bookingId: b.id, orderId: resp.razorpay_order_id, paymentId: resp.razorpay_payment_id, signature: resp.razorpay_signature }, token).then(resolve, reject);
+            },
+            modal: { ondismiss: function () { resolve(null); } },
+          });
+          rz.on('payment.failed', function (r) { reject(new Error((r.error && r.error.description) || 'The payment did not go through. Nothing was charged.')); });
+          rz.open();
+        });
+      }).then(function (done) {
+        if (!done) return null;
+        flash = 'Paid. Thank you! ' + l.name + ' has been told and can begin.';
+        return render();
+      });
+    }).catch(fail).then(function () { btn.disabled = false; });
   }
 
   function requests() {
@@ -1531,7 +1595,7 @@
     }
     if (bookings.length) {
       add(view, h('h2', { class: 'app-sub' }, 'Bookings to settle'));
-      add(view, h('p', { class: 'field__hint' }, 'Send the family a payment link for the total. When it is paid, record the payment reference; when the work is done, mark it completed. Pay the maker their price.'));
+      add(view, h('p', { class: 'field__hint' }, 'Families who pay online are marked paid automatically. Otherwise, send the family a payment link for the total, then record the payment reference here. When the work is done, mark it completed and pay the maker their price.'));
       add(view, h('div', { class: 'app-list' }, bookings.map(function (b) {
         var settle;
         if (b.status === 'accepted') {

@@ -411,6 +411,9 @@
         return rest('place_contributions?submitted_by=eq.' + me() + '&order=created_at.desc').then(function (rows) { return rows.map(contributionOut); });
       },
 
+      /** For the site's own serverless functions (payments), which check it with Supabase. */
+      accessToken: function () { return session && session.access_token ? session.access_token : null; },
+
       isModerator: function () { return rpc('is_moderator').then(function (r) { return r === true; }); },
 
       pendingContributions: function () {

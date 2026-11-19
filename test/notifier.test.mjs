@@ -46,7 +46,8 @@ test('emails say what happened and where to go next', () => {
   assert.equal(bookingEmail(bookings[0], 'Sita Devi', SITE).to, 'provider');
   assert.equal(bookingEmail(bookings[1], 'Sita Devi', SITE).to, 'family');
   assert.equal(bookingEmail(bookings[2], 'Sita Devi', SITE).to, 'provider');
-  assert.equal(bookingEmail({ status: 'paid' }, 'Sita Devi', SITE), null);
+  assert.equal(bookingEmail({ status: 'paid' }, 'Sita Devi', SITE).to, 'provider');
+  assert.equal(bookingEmail({ status: 'completed' }, 'Sita Devi', SITE), null);
 });
 
 test('a run emails each change once, to the right person, and remembers it', async () => {
