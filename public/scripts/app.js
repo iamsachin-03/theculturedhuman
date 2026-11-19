@@ -78,6 +78,34 @@
     setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
   }
 
+  // Files shared from another app arrive through the service worker (public/sw.js).
+  function takeShared() {
+    return new Promise(function (resolve) {
+      var req = indexedDB.open('tch-shared', 1);
+      req.onupgradeneeded = function () { req.result.createObjectStore('files', { keyPath: 'id' }); };
+      req.onerror = function () { resolve({ files: [], text: '' }); };
+      req.onsuccess = function () {
+        var tx = req.result.transaction('files', 'readwrite');
+        var os = tx.objectStore('files');
+        var all = os.getAll();
+        all.onsuccess = function () {
+          var rows = all.result || [];
+          os.clear();
+          resolve({
+            files: rows.map(function (r) {
+              try { return new File([r.blob], r.name, { type: r.type }); } catch (err) { var b = r.blob; b.name = r.name; return b; }
+            }),
+            text: rows.map(function (r) { return r.text; }).filter(Boolean).join(' '),
+          });
+        };
+        all.onerror = function () { resolve({ files: [], text: '' }); };
+      };
+    });
+  }
+
+  var installPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (ev) { ev.preventDefault(); installPrompt = ev; });
+
   // ---------- frame ----------
   var nav = h('nav', { class: 'app-nav', 'aria-label': 'Your archive' });
   var notice = h('p', { class: 'app-notice', hidden: true });
@@ -511,7 +539,7 @@
         });
         drawFiles();
       }
-      var picker = h('input', { type: 'file', multiple: true, accept: 'audio/*,video/*,image/*,application/pdf,.doc,.docx,.txt', onchange: function () { addFiles(picker.files); picker.value = ''; } });
+      var picker = h('input', { type: 'file', multiple: true, accept: 'audio/*,video/*,image/*,.opus,.ogg,.m4a,.amr,application/pdf,.doc,.docx,.txt', onchange: function () { addFiles(picker.files); picker.value = ''; } });
       var recordStatus = h('p', { class: 'field__hint', 'aria-live': 'polite' });
       var preview = h('div', { class: 'app-record__preview' });
       var recorder = null;
@@ -586,6 +614,17 @@
       });
       add(view, form);
       if (query.get('record') === 'audio') setTimeout(function () { var b = form.querySelector('[data-record="audio"]'); if (b) b.focus(); }, 0);
+      if (query.get('shared') && !existing) {
+        takeShared().then(function (got) {
+          if (query.get('shared') === 'failed' || !got.files.length) { say('Nothing arrived from the other app. Save the file to your phone, then attach it here.', true); return; }
+          addFiles(got.files);
+          var voice = got.files.some(function (f) { return core.mediaKind(f.type, f.name) === 'audio'; });
+          if (!title.value) title.value = voice ? 'A voice note' + (e.teller ? ' from ' + e.teller : '') : 'Shared ' + core.formatDate(new Date().toISOString());
+          if (got.text && !body.value) body.value = got.text;
+          say(plural(got.files.length, 'file') + ' arrived. Add who told it and a title, then keep it.');
+          teller.focus();
+        });
+      }
       return h1;
     });
   }
@@ -712,6 +751,15 @@
       elder.askedAt ? h('p', { class: 'field__hint' }, 'Asked on ' + core.formatDate(elder.askedAt) + '.') : null,
       actions,
       autoSendToggle(elder),
+      h('details', { class: 'app-howto' },
+        h('summary', null, 'When ' + elder.name + ' replies with a voice note'),
+        h('p', null, 'On Android, add The Cultured Human to your home screen once. Then, in WhatsApp, press and hold their voice note, tap Share, and choose The Cultured Human: it opens here, ready to keep.'),
+        h('p', null, 'On an iPhone or a computer, save the voice note, then tap "Keep their answer" and attach it.'),
+        installPrompt ? h('div', { class: 'btn-row' }, button('Add to my home screen', function () {
+          installPrompt.prompt();
+          installPrompt.userChoice.then(function () { installPrompt = null; render(); });
+        }, 'btn btn--small')) : null,
+      ),
       h('div', { class: 'btn-row' },
         button('They answered, next question', function () { store.saveElder({ id: elder.id, idx: elder.idx + 1, answered: elder.answered + 1, askedAt: null }).then(function () { render(); }).catch(fail); }, 'btn btn--ghost btn--small'),
         button('Skip this one', function () { store.saveElder({ id: elder.id, idx: elder.idx + 1, askedAt: null }).then(function () { render(); }).catch(fail); }, 'btn btn--ghost btn--small'),

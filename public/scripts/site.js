@@ -21,6 +21,9 @@
     if (e.key === STORAGE_KEY && e.newValue) applyTheme(e.newValue);
   });
 
+  // Lets the site receive voice notes and photographs shared from other apps once it is on the home screen.
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('/sw.js').catch(function () {});
+
   var account = document.querySelector('[data-account-link]');
   if (account) {
     try {

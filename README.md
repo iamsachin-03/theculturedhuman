@@ -96,6 +96,10 @@ The header has a **Sign in** button that becomes **My archive** once someone is 
 
 The home page opens with one question (`public/scripts/first-story.js`). Visitors can answer it in writing or with a voice note without an account; the answer is kept in their browser's IndexedDB (`tch-archive`) and turned into a keepsake card they can save or send. When they sign in, the archive offers to keep it. Entries already kept or declined are remembered by id in `localStorage` (`tch-imported-ids`), so later answers are still offered.
 
+## Sharing a voice note into the archive
+
+`public/site.webmanifest` declares a share target and `public/sw.js` receives it. On Android, once someone adds the site to their home screen, The Cultured Human appears in WhatsApp's share menu: a shared voice note, photograph or video is kept in IndexedDB (`tch-shared`) and the archive's editor opens with it attached (`#/entry/new?shared=N`). The service worker caches nothing, and `vercel.json` serves it with `no-cache`.
+
 ## Themes
 
 Marigold (the default), Haldi, Indigo, Gulmohar and Evening. Haldi takes its turmeric yellow, burnt orange and leaf green from the logo. Each theme is a set of CSS custom properties on `html[data-theme]`. The reader's choice is saved in `localStorage` under `tch-theme` and applied before the first paint, so pages never flash the wrong colours. All text colour pairs meet WCAG AA contrast.

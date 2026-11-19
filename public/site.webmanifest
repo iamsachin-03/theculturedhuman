@@ -1,12 +1,53 @@
 {
   "name": "The Cultured Human",
   "short_name": "Cultured Human",
-  "start_url": "/",
+  "start_url": "/app.html",
   "display": "standalone",
   "background_color": "#FFF5D9",
   "theme_color": "#FFF5D9",
   "icons": [
-    { "src": "/brand/logo-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/brand/logo-512.png", "sizes": "512x512", "type": "image/png" }
-  ]
+    {
+      "src": "/brand/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "description": "A private family archive for the stories, voices and photographs your family carries.",
+  "share_target": {
+    "action": "/share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "files": [
+        {
+          "name": "media",
+          "accept": [
+            "audio/*",
+            "video/*",
+            "image/*",
+            ".opus",
+            ".ogg",
+            ".m4a",
+            ".mp3",
+            ".aac",
+            ".amr",
+            ".wav",
+            ".mp4",
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp",
+            ".heic"
+          ]
+        }
+      ]
+    }
+  }
 }
