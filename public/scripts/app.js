@@ -1922,7 +1922,6 @@
   function signedOut() {
     state.user = null;
     state.people = null;
-    try { localStorage.removeItem('tch-signed-in'); } catch (e) {}
     if (parse().path) {
       location.hash = '#/';
       return Promise.resolve();
@@ -1941,13 +1940,7 @@
         store.touchSeen().then(function (l) { state.legacy = l; }),
         Promise.all([store.myListings(), store.myBookings()]).then(function (r) { state.market = r[0].length + r[1].length > 0; }, function () {}),
       ]);
-    }).then(function () {
-      try {
-        if (state.user) localStorage.setItem('tch-signed-in', '1');
-        else localStorage.removeItem('tch-signed-in');
-      } catch (e) {}
-      return render();
-    });
+    }).then(render);
   }
 
   drawNotice();

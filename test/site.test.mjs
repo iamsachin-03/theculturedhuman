@@ -38,10 +38,10 @@ test('the navigation is built around the platform and marks the current page', (
   const html = read('marketplace.html');
   const nav = html.match(/<nav class="primary-nav"[\s\S]*?<\/nav>/)[0];
   const labels = [...nav.matchAll(/<a [^>]*>([^<]+)<\/a>/g)].map((m) => m[1].replace('&amp;', '&'));
-  assert.deepEqual(labels, ['My Roots', 'Places', 'Stories', 'Keepsakes', 'Journeys', 'The Commons', 'Plans']);
-  assert.match(nav, /<a href="\/marketplace.html" aria-current="page">/);
+  assert.deepEqual(labels, ['What we offer', 'Places', 'Stories', 'The Commons', 'Plans']);
+  assert.match(nav, /<a href="\/offerings.html" aria-current="true">What we offer<\/a>/, 'a product page marks What we offer');
   assert.equal((nav.match(/aria-current/g) || []).length, 1);
-  assert.match(html, /<a class="account-link" href="\/app.html" data-account-link>Sign in<\/a>/);
+  assert.match(html, /<a class="account-link" href="\/app.html">My archive<\/a>/);
   assert.doesNotMatch(html, /class="product-nav"/);
 });
 
@@ -49,7 +49,7 @@ test('tracing and the archive are one product, My Roots, with its own menu on ea
   for (const page of ['roots.html', 'trace.html', 'archive.html', 'family-stories.html', 'roots-kit.html']) {
     const html = read(page);
     const nav = html.match(/<nav class="primary-nav"[\s\S]*?<\/nav>/)[0];
-    assert.match(nav, /<a href="\/roots.html" aria-current="(page|true)">My Roots<\/a>/, page);
+    assert.match(nav, /<a href="\/offerings.html" aria-current="true">What we offer<\/a>/, page);
     const sub = html.match(/<nav class="product-nav"[\s\S]*?<\/nav>/);
     assert.ok(sub, `${page}: has the My Roots menu`);
     for (const href of ['/roots.html', '/trace.html', '/archive.html', '/app.html']) assert.ok(sub[0].includes(`href="${href}"`), `${page}: ${href}`);

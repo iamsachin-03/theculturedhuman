@@ -90,7 +90,7 @@ Run `npm run build` after changing these settings.
 
 ## Accounts
 
-The header has a **Sign in** button that becomes **My archive** once someone is signed in on that device. Both lead to `/app.html`. To connect real accounts, create a Supabase project and fill in `backend` in `content/site.json`; [`backend/README.md`](backend/README.md) has the steps. Visitors who used the earlier on-device archive or weekly question are offered to bring them into their account the first time they sign in.
+The top menu is What we offer, Places, Stories, The Commons and Plans, with a **My archive** button that leads to `/app.html` (sign-in, if needed, happens there). Every offering is described once in `content/products.json`, which draws the What we offer page (`{{product-journey}}`). To connect real accounts, create a Supabase project and fill in `backend` in `content/site.json`; [`backend/README.md`](backend/README.md) has the steps. Visitors who used the earlier on-device archive or weekly question are offered to bring them into their account the first time they sign in.
 
 ## A first story before signing up
 

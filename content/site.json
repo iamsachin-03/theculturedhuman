@@ -15,14 +15,19 @@
   },
   "nav": [
     {
-      "label": "My Roots",
-      "href": "/roots.html",
+      "label": "What we offer",
+      "href": "/offerings.html",
       "match": [
+        "/roots.html",
         "/trace.html",
         "/archive.html",
         "/roots-kit.html",
         "/family-stories.html",
-        "/app.html"
+        "/marketplace.html",
+        "/commission.html",
+        "/gifting.html",
+        "/journeys.html",
+        "/for-organisations.html"
       ]
     },
     {
@@ -32,14 +37,6 @@
     {
       "label": "Stories",
       "href": "/journal/"
-    },
-    {
-      "label": "Keepsakes",
-      "href": "/marketplace.html"
-    },
-    {
-      "label": "Journeys",
-      "href": "/journeys.html"
     },
     {
       "label": "The Commons",
@@ -54,6 +51,10 @@
     {
       "title": "Explore",
       "links": [
+        {
+          "label": "What we offer",
+          "href": "/offerings.html"
+        },
         {
           "label": "My Roots",
           "href": "/roots.html"

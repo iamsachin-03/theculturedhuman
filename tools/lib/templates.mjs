@@ -76,7 +76,7 @@ export function headerBlock({ site, page }) {
 <a class="wordmark" href="/" aria-label="${e(site.name)} — home">${logo(44)}<span>${e(site.name)}</span></a>
 <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span class="menu-toggle__label">Menu</span></button>
 <nav class="primary-nav" id="primary-nav" aria-label="Main"><ul>${links}</ul></nav>
-<a class="account-link" href="/app.html" data-account-link${page.path === '/app.html' ? ' aria-current="page"' : ''}>Sign in</a>
+<a class="account-link" href="/app.html"${page.path === '/app.html' ? ' aria-current="page"' : ''}>My archive</a>
 <label class="theme-picker"><span class="theme-swatch" aria-hidden="true"></span><span>Theme</span>
 <select data-theme-picker aria-label="Colour theme">
 <option value="marigold">Marigold</option>
