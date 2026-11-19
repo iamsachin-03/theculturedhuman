@@ -718,6 +718,7 @@ p { margin: 0 0 1em; }
 .credits-list li { display: grid; grid-template-columns: 96px 1fr; gap: 1rem; align-items: center; padding: .75rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: .9rem; }
 .credits-list img { width: 96px; height: 72px; object-fit: cover; border-radius: 6px; }
 .credits-list a { color: var(--accent-ink); }
+.credits-heading { margin-top: var(--space-5); }
 
 /* ── 12. Footer ──────────────────────────────────────────────────────────── */
 

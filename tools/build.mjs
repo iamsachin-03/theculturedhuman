@@ -210,8 +210,8 @@ emit(
 emit(
   {
     path: '/credits.html',
-    title: `Image credits — ${site.name}`,
-    description: 'Credits and licences for every photograph and artwork used on The Cultured Human.',
+    title: `Our illustrations — ${site.name}`,
+    description: 'Every picture on The Cultured Human is an original illustration, made for the story it sits beside.',
   },
   t.creditsMain({ assets: register }),
 );

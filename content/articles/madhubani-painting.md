@@ -6,8 +6,8 @@ pillar: culture
 series: Living Heritage
 author: The Cultured Human editors
 date: 2026-11-16
-heroImage: madhubani-kohbar-arti-kumari
-heroCaption: A kohbar painting by Arti Kumari, built around a central lotus
+heroImage: kohbar-wall
+heroCaption: Two women painting a kohbar on the wall of a home
 related: [regional-food-cultures, indian-philosophical-traditions]
 offers: [commission, journeys, organisations]
 ---
@@ -19,7 +19,7 @@ Mithila is the old name for the plains of north Bihar and the neighbouring Tarai
 
 The kohbar wall carries a precise symbolic language. A ring of lotus blossoms stands for the bride and a stand of bamboo for the groom; fish, snakes and turtles, creatures that produce many offspring, express hopes for the couple's family.[^2] The lotus, adopted from the ponds that bloom across Mithila in the monsoon, is an emblem of fertility and abundance.[^5] Alongside the wall paintings, married women draw *aripan*, auspicious ritual designs, on the floor.[^2]
 
-{{figure madhubani-station-murals "Today Mithila painting covers public walls too, including the platforms of Madhubani railway station." wide}}
+{{figure madhubani-station "Today Mithila painting covers public walls too, including the platforms of Madhubani railway station." wide}}
 
 ## An earthquake and an Englishman
 
@@ -36,7 +36,7 @@ The turning point came with hardship. During the drought of the mid-1960s, Pupul
 
 The move to paper changed lives. Painting, once unpaid household work, became an income — and the painters became known by name. Ganga Devi and Mahasundari Devi, from Kayastha families, and Sita Devi and Jagdamba Devi, from Brahmin families, quickly gained acclaim. Sita Devi and Ganga Devi travelled abroad in the 1970s, and new places and experiences began to appear in their work.[^1]
 
-{{figure madhubani-krishna-radha "Krishna and Radha in a Mithila painting now in a museum collection in Japan."}}
+{{figure mithila-krishna-radha "A grandmother shows her granddaughter a Mithila painting of Krishna and Radha."}}
 
 ## Many hands, many styles
 
@@ -52,7 +52,7 @@ Ask for the artist's name and village, and whether the work is an original paint
 
 National honours followed. Jagdamba Devi received the National Award for Master Craftsmen in 1970, followed by Sita Devi in 1975 and Ganga Devi in 1976; by the late 1970s and 1980s, Mithila painters were receiving the Padma Shri.[^2] In 2003 the Ethnic Arts Foundation founded the Mithila Art Institute in Madhubani, a free art school taught by local painters.[^3] In 2007 "Madhubani Paintings" was registered as a Geographical Indication for Bihar — legal recognition that the name belongs to a place and its makers.[^4]
 
-{{figure madhubani-artist-dilli-haat "A Mithila painter at work at Dilli Haat, New Delhi."}}
+{{figure mithila-painter "A Mithila painter at work, brush in hand, with finished paintings drying behind her."}}
 
 Recognition has its own questions. The scholar Paula Richman notes that Mithila painting has been labelled ritual art, folk art, tourist art and handicraft, but rarely "modern" art — and that each label has been used to praise, constrain or appropriate it.[^2] Painters today take on climate change, a tsunami and city life as readily as gods and goddesses.[^2] To call the tradition "folk" and stop there is to miss what its artists are doing now.
 

@@ -101,7 +101,7 @@ export function footerBlock({ site }) {
 <div class="site-footer__brand"><a class="wordmark wordmark--footer" href="/">${logo(96)}<span>${e(site.name)}</span></a><p>${e(site.tagline)} ${e(site.supportingLine)}</p></div>
 ${cols}
 </div>
-<div class="container site-footer__bottom"><span>© ${new Date().getFullYear()} ${e(site.name)}. Rooted in India, curious about everywhere.</span><span class="site-footer__legal"><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/community-guidelines.html">Community guidelines</a><a href="/credits.html">Image credits</a></span></div>
+<div class="container site-footer__bottom"><span>© ${new Date().getFullYear()} ${e(site.name)}. Rooted in India, curious about everywhere.</span><span class="site-footer__legal"><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/community-guidelines.html">Community guidelines</a><a href="/credits.html">Illustrations</a></span></div>
 </footer>
 <script src="/scripts/site.js" defer></script>`;
 }
@@ -110,7 +110,10 @@ export function picture(asset, { sizes = '100vw', className = '', eager = false,
   return `<img src="${asset.files[1600]}" srcset="${asset.files[800]} 800w, ${asset.files[1600]} 1600w" sizes="${sizes}" width="${asset.width}" height="${asset.height}" alt="${e(alt ?? asset.alt)}"${className ? ` class="${className}"` : ''}${eager ? ' fetchpriority="high"' : ' loading="lazy" decoding="async"'}>`;
 }
 
+const isOriginal = (asset) => asset.source === 'Original illustration';
+
 export function creditLine(asset) {
+  if (isOriginal(asset)) return `<span class="credit">Illustration: <a href="/credits.html">${e(asset.creator)}</a></span>`;
   return `<span class="credit">${asset.kind === 'illustration' ? 'Illustration' : 'Photo'}: <a href="${e(asset.sourceUrl)}" rel="noopener">${e(asset.creator)}</a>, ${e(asset.licence)}${asset.licenceUrl ? ` (<a href="${e(asset.licenceUrl)}" rel="noopener">licence</a>)` : ''}</span>`;
 }
 
@@ -273,21 +276,26 @@ ${cards.join('\n')}
 }
 
 export function creditsMain({ assets }) {
-  const items = assets
-    .map((a) => `<li><img src="${a.files[800]}" alt="" width="96" height="72" loading="lazy" decoding="async"><div><strong>${e(a.subject)}</strong>${a.region ? ` · ${e(a.region)}` : ''}<br>${e(a.creator)} · <a href="${e(a.sourceUrl)}" rel="noopener">${e(a.source)}</a> · ${a.licenceUrl ? `<a href="${e(a.licenceUrl)}" rel="noopener">${e(a.licence)}</a>` : e(a.licence)}</div></li>`)
-    .join('\n');
+  const item = (a) => `<li><img src="${a.files[800]}" alt="" width="96" height="72" loading="lazy" decoding="async"><div><strong>${e(a.subject)}</strong>${a.region ? ` · ${e(a.region)}` : ''}<br>${isOriginal(a) ? 'Original illustration' : `${e(a.creator)} · <a href="${e(a.sourceUrl)}" rel="noopener">${e(a.source)}</a> · ${a.licenceUrl ? `<a href="${e(a.licenceUrl)}" rel="noopener">${e(a.licence)}</a>` : e(a.licence)}`}</div></li>`;
+  const originals = assets.filter(isOriginal);
+  const others = assets.filter((a) => !isOriginal(a));
   return `<section class="page-hero">
 <div class="container">
-<p class="eyebrow">Image credits</p>
-<h1>The people behind <em>the pictures.</em></h1>
-<p class="lede">Every image on The Cultured Human is credited to its creator and used under the licence shown. If you are a creator and something here is wrong, please tell us.</p>
+<p class="eyebrow">Our illustrations</p>
+<h1>Drawn for <em>these stories.</em></h1>
+<p class="lede">Every picture on The Cultured Human is an original illustration, made for the page or story it sits beside. None of them shows a real, named person or copies a particular artist's work; where a story is about someone, we draw them as they are traditionally pictured.</p>
 </div>
 </section>
 <section class="section">
 <div class="container--narrow">
 <ul class="credits-list">
-${items}
+${originals.map(item).join('\n')}
 </ul>
+${others.length ? `<h2 class="credits-heading">Other images</h2>
+<p>Used under the licence shown. If you are a creator and something here is wrong, please tell us.</p>
+<ul class="credits-list">
+${others.map(item).join('\n')}
+</ul>` : ''}
 </div>
 </section>`;
 }

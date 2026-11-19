@@ -38,7 +38,7 @@ Node 18 or newer is all you need. There is nothing to `npm install`.
 | `public/scripts/theme-init.js` | Applies the saved theme in `<head>`, before the page paints. |
 | `public/scripts/site.js` | Theme picker, mobile menu, quiz and enquiry forms. |
 | `public/brand/` | The logo badge at several sizes, the favicon and the phone home-screen icon. `public/site.webmanifest` points to them. |
-| `tools/build.mjs` | Builds every page, the journal index, image credits, `sitemap.xml` and `robots.txt`, and checks links and images. |
+| `tools/build.mjs` | Builds every page, the journal index, the illustrations page, `sitemap.xml` and `robots.txt`, and checks links and images. |
 | `public/scripts/roots.js` | The "Trace your roots" tool: draws a family's places as a downloadable portrait. Everything stays in the reader's browser. |
 | `tools/roots-example.mjs` | Regenerates `public/brand/roots-example.svg`, the sample portrait shown on the homepage. Run it after changing `roots.js`. |
 | `tools/add-commons-asset.mjs` | Downloads a Wikimedia Commons image at two sizes and records its licence in the register. |
@@ -56,12 +56,9 @@ Every HTML file in `public/` is generated. Edit the source in `src/pages/` or `c
 
 ### A new image
 
-```bash
-node tools/add-commons-asset.mjs "File:Example.jpg" --id example-id --dir craft/pottery \
-  --alt "What the image shows, for screen readers" --subject "Short title" --region "State"
-```
+Every picture on the site is an original illustration in the house style: warm gouache and coloured pencil on cream paper. Save it in `public/assets/illustrations/` as `<id>-1600.jpg` (full size) and `<id>-800.jpg` (800px on the long side), then add an entry to `public/assets/register.json` with `"kind": "illustration"`, `"source": "Original illustration"`, a subject and alt text. Draw people as they are traditionally pictured rather than as a likeness of a real, named person, and do not copy a particular artist's work. The build refuses any image that is not in the register.
 
-Only use images whose licence allows reuse, and keep their credit. The build refuses any image that is not in the register.
+`tools/add-commons-asset.mjs` can still record a freely licensed photograph with its credit, but the site currently uses none.
 
 ### Inside a page
 
