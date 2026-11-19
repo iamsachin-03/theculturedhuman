@@ -102,7 +102,7 @@ The home page opens with one question (`public/scripts/first-story.js`). Visitor
 
 ## Birthdays, festivals and the family book
 
-The archive's home shows what is coming up within three weeks: the birthday of anyone you ask the weekly question (month and day only, `weekly_elders.birthday`), or a festival from `OCCASIONS` in `public/scripts/app-core.js`, each with a question to ask while the family is together. Fixed-day festivals repeat by themselves; **festivals that follow the moon (Holi, Eid, Diwali, Gurpurab) need next year's dates added each year**, and Eid's depend on the moon being sighted. The archive card fills towards `BOOK_GOAL` (20 entries), the point at which the archive is long enough to print as a family book.
+The archive's home shows what is coming up within three weeks: the birthday of anyone you ask the weekly question (month and day only, `weekly_elders.birthday`), or a festival from `OCCASIONS` in `public/scripts/app-core.js`, each with a question to ask while the family is together. Fixed-day festivals repeat by themselves; festivals that follow the moon list their dates as published for India: Diwali and Gurpurab to 2035, Holi and Eid to 2031 (further ahead, published dates disagree). Eid's are tentative until the moon is sighted. `npm test` fails a year before any festival runs out of dates, as the reminder to add more. The archive card fills towards `BOOK_GOAL` (20 entries), the point at which the archive is long enough to print as a family book.
 
 ## Themes
 

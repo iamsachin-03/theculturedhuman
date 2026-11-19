@@ -159,3 +159,11 @@ test('upcoming birthdays and festivals come soonest first, and only within the w
     else assert.match(o.md, /^\d{2}-\d{2}$/, o.name);
   }
 });
+
+test('every festival that follows the moon has dates listed at least a year ahead', () => {
+  const yearAhead = new Date(Date.now() + 365 * 86400000).toISOString().slice(0, 10);
+  for (const o of core.OCCASIONS.filter((x) => x.dates)) {
+    assert.ok(o.dates.every((d, i) => /^\d{4}-\d{2}-\d{2}$/.test(d) && (i === 0 || d > o.dates[i - 1])), `${o.name} dates are in order`);
+    assert.ok(o.dates.at(-1) >= yearAhead, `${o.name} needs dates beyond ${o.dates.at(-1)}: add the next years to OCCASIONS in app-core.js`);
+  }
+});

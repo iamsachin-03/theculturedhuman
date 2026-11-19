@@ -255,14 +255,15 @@
   }
 
   // Days families gather. Fixed days repeat each year (month-day). Festivals that follow the moon
-  // need their dates added each year; the dates of Eid depend on the moon being sighted.
+  // list their dates as published for India; Eid's are tentative until the moon is sighted.
+  // test/app-core.test.mjs fails a year before any of these runs out, as a reminder to add more.
   var OCCASIONS = [
     { name: 'Makar Sankranti, Pongal and Magh Bihu', md: '01-14', question: 'What did our family make and do for Sankranti, Pongal or Bihu when you were young?' },
-    { name: 'Holi', dates: ['2027-03-22', '2028-03-11'], question: 'What do you remember about Holi when you were a child? Who came, and what was cooked?' },
-    { name: 'Eid al-Fitr', dates: ['2027-03-10', '2028-02-27'], question: 'How did our family celebrate Eid when you were young? What was cooked, and who came to visit?' },
+    { name: 'Holi', dates: ['2027-03-22', '2028-03-11', '2029-03-01', '2030-03-20', '2031-03-09'], question: 'What do you remember about Holi when you were a child? Who came, and what was cooked?' },
+    { name: 'Eid al-Fitr', dates: ['2027-03-10', '2028-02-27', '2029-02-15', '2030-02-05', '2031-01-25'], question: 'How did our family celebrate Eid when you were young? What was cooked, and who came to visit?' },
     { name: 'Baisakhi, Vishu, Bihu and the spring new year', md: '04-14', question: 'How did our family welcome the new year in April: Baisakhi, Vishu, Bihu, Puthandu or Poila Baishakh?' },
-    { name: 'Diwali', dates: ['2027-10-29', '2028-10-17'], question: 'How did your family celebrate Diwali when you were a child? What was cooked, and who came?' },
-    { name: 'Guru Nanak Jayanti', dates: ['2026-11-24'], question: 'What do you remember about Gurpurab when you were young: the prabhat pheri, the langar, the people?' },
+    { name: 'Diwali', dates: ['2027-10-29', '2028-10-17', '2029-11-05', '2030-10-26', '2031-11-14', '2032-11-02', '2033-10-22', '2034-11-10', '2035-10-30'], question: 'How did your family celebrate Diwali when you were a child? What was cooked, and who came?' },
+    { name: 'Guru Nanak Jayanti', dates: ['2026-11-24', '2027-11-14', '2028-11-02', '2029-11-21', '2030-11-10', '2031-11-28', '2032-11-17', '2033-11-06', '2034-11-25', '2035-11-15'], question: 'What do you remember about Gurpurab when you were young: the prabhat pheri, the langar, the people?' },
     { name: 'Christmas', md: '12-25', question: 'What do you remember about Christmas when you were young: the food, the church, the people?' },
   ];
   var BIRTHDAY_QUESTION = 'What do you remember about your birthdays as a child? How were they marked, and by whom?';
