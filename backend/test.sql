@@ -179,6 +179,13 @@ insert into place_contributions (place_slug, kind, title, body, credit, consent,
 update place_contributions set body = 'changed' where title = 'Moderator word';
 select check_that((select status from place_contributions where title = 'Moderator word') = 'pending', 'a moderator''s own edits are read again too');
 delete from place_contributions where title = 'Moderator word';
+update place_contributions set featured_at = now() where title = 'Sasur';
+select as_user('00000000-0000-0000-0000-00000000000c');
+update place_contributions set featured_at = null where title = 'Sasur';
+select check_that((select featured_at is not null from place_contributions where title = 'Sasur'), 'only moderators choose what is featured');
+insert into place_contributions (place_slug, kind, title, body, credit, consent, featured_at) values ('mithila', 'Word', 'Self-featured', 'x', 'C.', true, now());
+select check_that((select featured_at is null from place_contributions where title = 'Self-featured'), 'nobody features their own contribution');
+delete from place_contributions where title = 'Self-featured';
 select as_user('00000000-0000-0000-0000-00000000000b');
 insert into contribution_reports (contribution_id, reason, note) select id, 'wrong', 'Sasur means father-in-law' from place_contributions;
 select check_that(fails($$insert into contribution_reports (contribution_id, reason) select id, 'spam' from place_contributions$$), 'one report per person per contribution');

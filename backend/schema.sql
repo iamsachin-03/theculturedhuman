@@ -142,6 +142,8 @@ create table place_contributions (
   review_note text check (review_note is null or length(review_note) <= 300),
   -- The last status the notifier emailed about (backend/notify), so nobody is told twice.
   notified_status review_status,
+  -- Set by a moderator to show it first on The Commons and its place page.
+  featured_at timestamptz,
   submitted_by uuid not null default auth.uid() references auth.users (id),
   created_at timestamptz not null default now(),
   check (place_slug is not null or suggested_place is not null)
@@ -442,6 +444,7 @@ begin
     new.status := 'pending';
     new.review_note := null;
     new.notified_status := null;
+    new.featured_at := null;
     return new;
   end if;
   if new.submitted_by <> old.submitted_by then raise exception 'This cannot be changed'; end if;
@@ -452,10 +455,12 @@ begin
     if changed and old.submitted_by = auth.uid() then
       new.status := 'pending';
       new.review_note := null;
+      new.featured_at := null;
     end if;
     return new;
   end if;
   new.notified_status := old.notified_status;
+  new.featured_at := case when changed then null else old.featured_at end;
   if changed then
     new.status := 'pending';
     new.review_note := null;

@@ -1489,8 +1489,9 @@
         add(view, h('p', null, 'Only moderators can read contributions before they are published.'));
         return h1;
       }
-      return Promise.all([loadPlaces(), store.pendingContributions(), store.pendingListings(), store.bookingsToSettle(), store.pendingReports(), store.suggestedPlaces()]).then(function (r) {
+      return Promise.all([loadPlaces(), store.pendingContributions(), store.pendingListings(), store.bookingsToSettle(), store.pendingReports(), store.suggestedPlaces(), store.recentlyPublished()]).then(function (r) {
         var places = r[0];
+        moderateFeatured(places, r[6]);
         moderateSuggestions(places, core.groupSuggestions(r[5], places));
         if (r[4].length) {
           add(view, h('h2', { class: 'app-sub' }, 'Reported'));
@@ -1544,6 +1545,26 @@
         return h1;
       });
     });
+  }
+
+  // What is featured shows first on The Commons, the home page and its place page.
+  function moderateFeatured(places, list) {
+    if (!list.length) return;
+    var featured = list.filter(function (c) { return c.featuredAt; });
+    var box = h('details', { class: 'app-more app-featured' },
+      h('summary', null, 'Featured on The Commons (' + featured.length + ')'),
+      h('p', { class: 'field__hint' }, 'Featured contributions are shown first on The Commons, the home page and their place\u2019s page. Choose one or two a week that others will want to answer.'));
+    add(box, h('ul', { class: 'app-featured__list' }, list.map(function (c) {
+      return h('li', null,
+        h('span', null, h('strong', null, c.title), ' \u00b7 ' + placeName(places, c) + ' \u00b7 ' + c.credit),
+        button(c.featuredAt ? 'Stop featuring' : 'Feature', function () {
+          store.featureContribution(c.id, !c.featuredAt).then(function () {
+            flash = c.featuredAt ? '"' + c.title + '" is no longer featured.' : '"' + c.title + '" is featured.';
+            return render();
+          }).catch(fail);
+        }, c.featuredAt ? 'btn btn--small' : 'btn btn--ghost btn--small'));
+    })));
+    add(view, box);
   }
 
   // ---------- makers, hosts and storytellers ----------

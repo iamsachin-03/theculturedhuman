@@ -43,7 +43,7 @@
   var archiveBox = document.querySelector('[data-question-archive]');
   var countBox = document.querySelector('[data-community-count]');
   if ((!feeds.length && !directories.length && !sharedBox && !archiveBox && !countBox) || !window.fetch) return;
-  var FIELDS = 'id,kind,title,body,credit,place_slug,suggested_place,script,pronunciation,prompt_week,created_at,status';
+  var FIELDS = 'id,kind,title,body,credit,place_slug,suggested_place,script,pronunciation,prompt_week,created_at,status,featured_at';
   var placesReady = getJson('/places/places.json').then(function (list) {
     var bySlug = {};
     (list || []).forEach(function (p) { bySlug[p.slug] = p; });
@@ -180,7 +180,8 @@
   }
 
   function card(c, places, onPlacePage) {
-    var n = el('article', 'carry-card carry-card--shared');
+    var n = el('article', 'carry-card carry-card--shared' + (c.featured_at ? ' carry-card--featured' : ''));
+    if (c.featured_at) n.appendChild(el('p', 'featured-tag', 'Featured'));
     n.appendChild(el('p', 'eyebrow', c.kind));
     n.appendChild(titleLink('h3', null, c));
     var line = wordLine(c);
@@ -217,8 +218,8 @@
   Array.prototype.forEach.call(feeds, function (box) {
     if (!box.dataset.url) return;
     var q = 'select=' + FIELDS + '&status=eq.published';
-    if (box.dataset.place) q += '&place_slug=eq.' + encodeURIComponent(box.dataset.place) + '&order=created_at';
-    else q += '&order=created_at.desc';
+    if (box.dataset.place) q += '&place_slug=eq.' + encodeURIComponent(box.dataset.place) + '&order=featured_at.desc.nullslast,created_at';
+    else q += '&order=featured_at.desc.nullslast,created_at.desc';
     if (box.dataset.kind) q += '&kind=eq.' + encodeURIComponent(box.dataset.kind);
     q += '&limit=' + (Number(box.dataset.limit) || 6);
     Promise.all([getJson(box.dataset.url + '/rest/v1/place_contributions?' + q, headersFor(box)), placesReady]).then(function (r) {

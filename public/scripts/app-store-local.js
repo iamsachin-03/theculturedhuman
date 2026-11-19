@@ -389,6 +389,8 @@
     isModerator: function () { return Promise.resolve(false); },
     pendingContributions: function () { return Promise.resolve([]); },
     reviewContribution: function () { return Promise.reject(new Error('Reviewing needs the real backend.')); },
+    recentlyPublished: function () { return Promise.resolve([]); },
+    featureContribution: function () { return Promise.reject(new Error('Featuring needs the real backend.')); },
 
     myListings: function () {
       var owner = need();

@@ -87,7 +87,7 @@
     function contributionOut(c) {
       return {
         id: c.id, placeSlug: c.place_slug, suggestedPlace: c.suggested_place, kind: c.kind, title: c.title, body: c.body, credit: c.credit,
-        script: c.script, pronunciation: c.pronunciation, promptWeek: c.prompt_week, status: c.status, reviewNote: c.review_note, createdAt: c.created_at,
+        script: c.script, pronunciation: c.pronunciation, promptWeek: c.prompt_week, status: c.status, reviewNote: c.review_note, featuredAt: c.featured_at || null, createdAt: c.created_at,
       };
     }
     function contributionIn(c) {
@@ -431,6 +431,18 @@
 
       pendingContributions: function () {
         return rest('place_contributions?status=eq.pending&order=created_at').then(function (rows) { return rows.map(contributionOut); });
+      },
+
+      recentlyPublished: function () {
+        return rest('place_contributions?status=eq.published&order=featured_at.desc.nullslast,created_at.desc&limit=20').then(function (rows) { return rows.map(contributionOut); });
+      },
+
+      featureContribution: function (id, on) {
+        return rest('place_contributions?id=eq.' + enc(id), { method: 'PATCH', json: { featured_at: on ? new Date().toISOString() : null }, headers: { prefer: 'return=representation' } })
+          .then(function (rows) {
+            if (!rows.length || !rows[0].featured_at !== !on) throw new Error('Only moderators can feature contributions.');
+            return contributionOut(rows[0]);
+          });
       },
 
       reviewContribution: function (id, status, note) {
