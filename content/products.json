@@ -78,6 +78,7 @@
       "trust": "Private by default. Never sold, never used for advertising, always yours to download.",
       "href": "/archive.html",
       "cta": { "label": "Start your family archive", "href": "/app.html" },
+      "sample": { "label": "Look inside a sample archive", "href": "/app.html?sample" },
       "image": "family-photo-album"
     },
     {

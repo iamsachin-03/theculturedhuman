@@ -79,7 +79,7 @@ test('the homepage has six sections, opens with one question, and leads to the a
   assert.equal((main.match(/<section\b/g) || []).length, 6);
   assert.match(main, /href="#first-story"[\s\S]*id="first-story"[\s\S]*data-first-story/);
   assert.match(main, /data-this-week[\s\S]*data-community-feed data-limit="3"/);
-  assert.ok(main.includes('href="/manch.html"') && main.includes('href="/roots.html"'));
+  assert.ok(main.includes('href="/manch.html"') && main.includes('href="/app.html?sample"') && main.includes('href="/offerings.html"'));
   assert.match(main, /href="\/app.html">Start your family archive/);
   for (const href of ['/trace.html', '/places/', '/journal/']) assert.ok(main.includes(`href="${href}"`), href);
 });
@@ -91,7 +91,7 @@ test('the app page carries its backend settings, loads its scripts in order and 
   assert.ok(meta, 'backend meta tag');
   assert.deepEqual(JSON.parse(meta[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&')), site.backend);
   const scripts = [...html.matchAll(/<script src="\/scripts\/([\w-]+)\.js" defer><\/script>/g)].map((m) => m[1]);
-  assert.deepEqual(scripts, ['site', 'roots-art', 'app-core', 'app-store-local', 'app-store-supabase', 'app']);
+  assert.deepEqual(scripts, ['site', 'roots-art', 'app-core', 'app-store-local', 'app-store-supabase', 'app-store-sample', 'app']);
   assert.match(html, /<meta name="robots" content="noindex/);
   assert.ok(!read('sitemap.xml').includes('/app.html'));
   assert.ok(!read('index.html').includes('tch-backend'), 'only the app page carries the settings');

@@ -1243,3 +1243,5 @@ button.text-link { background: none; border: 0; padding: 0; cursor: pointer; fon
 .offer-grid--few .product-card .offer-card__media { flex: 0 0 42%; }
 .offer-grid--few .product-card .offer-card__media img { height: 100%; aspect-ratio: auto; min-height: 220px; }
 @media (max-width: 560px) { .offer-grid--few .product-card { flex-direction: column; } .offer-grid--few .product-card .offer-card__media { flex: none; } .offer-grid--few .product-card .offer-card__media img { height: auto; aspect-ratio: 3 / 2; min-height: 0; } }
+.app-notice--sample { background: color-mix(in srgb, var(--accent-2) 22%, var(--surface)); border-color: var(--accent-2); }
+.app-notice--sample .btn { margin: .4rem .4rem 0 0; }

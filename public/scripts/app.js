@@ -21,7 +21,8 @@
     return cfg;
   }
   var cfg = backendConfig();
-  var store = cfg.url && cfg.anonKey ? TCH.stores.supabase(cfg) : TCH.stores.local;
+  var sample = /[?&]sample\b/.test(location.search);
+  var store = sample ? TCH.stores.sample : cfg.url && cfg.anonKey ? TCH.stores.supabase(cfg) : TCH.stores.local;
   var returnTo = location.origin + location.pathname + (store.mode === 'local' && location.search ? location.search : '');
   var MAX_BYTES = store.mode === 'supabase' ? 50 * 1024 * 1024 : 500 * 1024 * 1024;
 
@@ -140,7 +141,13 @@
   }
 
   function drawNotice() {
-    if (store.mode === 'local') {
+    if (sample) {
+      notice.hidden = false;
+      notice.textContent = '';
+      notice.className = 'app-notice app-notice--sample';
+      add(notice, [h('strong', null, 'A sample archive. '), 'The Mishra family is invented, so look around freely: nothing here can be changed. ',
+        link('/app.html', 'Start your own archive', 'btn btn--small'), ' ', link('/offerings.html', 'Back to what we offer', 'text-link')]);
+    } else if (store.mode === 'local') {
       notice.hidden = false;
       notice.textContent = '';
       add(notice, [h('strong', null, 'Preview mode. '), 'No account server is connected yet, so everything stays in this browser on this device, and the accounts here are pretend ones for trying out sharing. Keep a copy from Settings before clearing your browser.']);
@@ -170,6 +177,14 @@
     [/^offer$/, offer], [/^request$/, requestForm], [/^requests$/, requests], [/^echo$/, echo], [/^report$/, reportForm],
   ];
 
+  // In the sample archive, pages that only add or change things invite people to start their own instead.
+  var SAMPLE_STOPS = /^(entry\/new|entry\/[\w-]+\/edit|contribute|offer|request|echo|report|moderate)$/;
+  function sampleStop() {
+    var h1 = page('In your own archive, this is where you would add it', 'This sample belongs to an invented family, so nothing can be added or changed here. Your own archive is free to start, and private until you choose who sees each entry.');
+    add(view, h('div', { class: 'btn-row' }, link('/app.html', 'Start your own archive', 'btn'), link('#/archive', 'Keep looking around', 'btn btn--ghost')));
+    return h1;
+  }
+
   var rendering = 0;
   var flash = null;
   function render() {
@@ -182,6 +197,7 @@
       return signin();
     }
     drawNav(r.path);
+    if (sample && SAMPLE_STOPS.test(r.path)) return sampleStop();
     for (var i = 0; i < routes.length; i++) {
       var m = r.path.match(routes[i][0]);
       if (m) {
@@ -287,7 +303,9 @@
 
   // ---------- home ----------
   function home() {
-    var h1 = page('Welcome, ' + firstName(state.user.name) + '.');
+    var h1 = sample
+      ? page('Asha\u2019s family archive', 'Asha keeps her grandmother\u2019s stories here, and her brother Ravi adds his own. This is what an archive looks like after a few weeks.')
+      : page('Welcome, ' + firstName(state.user.name) + '.');
     return Promise.all([store.entries(), store.elders(), store.sharedWithMe(), store.roots()]).then(function (r) {
       var entries = r[0];
       var elders = r[1];
@@ -329,7 +347,7 @@
         add(view, h('h2', { class: 'app-sub' }, 'Recently kept'));
         add(view, h('div', { class: 'app-list' }, entries.slice(0, 4).map(entryCard)));
       }
-      return offerImport().then(function () { return h1; });
+      return (sample ? Promise.resolve() : offerImport()).then(function () { return h1; });
     });
   }
 
