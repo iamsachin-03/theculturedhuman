@@ -144,3 +144,18 @@ test('quotes are typed in rupees and kept in paise, with the fee added on top', 
   assert.equal(core.formatRupees(12345678), '₹1,23,456.78');
   assert.throws(() => core.bookingMessage('  '), /what you would like/);
 });
+
+test('upcoming birthdays and festivals come soonest first, and only within the window', () => {
+  const today = new Date(2026, 11, 20);
+  const list = core.upcoming(today, [{ name: 'Nani', birthday: '12-23' }, { name: 'Dada', birthday: '' }], 21);
+  assert.deepEqual(list.map((x) => [x.name, x.days]), [['Nani\u2019s birthday', 3], ['Christmas', 5]]);
+  const jan = core.upcoming(new Date(2027, 0, 1), [], 21);
+  assert.deepEqual(jan.map((x) => [x.name, x.days]), [['Makar Sankranti, Pongal and Magh Bihu', 13]]);
+  assert.equal(core.upcoming(new Date(2027, 2, 15), [], 10)[0].name, 'Holi', 'moon festivals use the next listed date');
+  assert.deepEqual(core.upcoming(new Date(2026, 11, 20), [{ name: 'Nani', birthday: '12-19' }], 21).filter((x) => x.kind === 'birthday'), [], 'a birthday just passed waits for next year');
+  for (const o of core.OCCASIONS) {
+    assert.ok(o.question.endsWith('?'), o.name);
+    if (o.dates) for (const d of o.dates) assert.match(d, /^\d{4}-\d{2}-\d{2}$/, o.name);
+    else assert.match(o.md, /^\d{2}-\d{2}$/, o.name);
+  }
+});

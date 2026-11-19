@@ -103,6 +103,8 @@ create table weekly_elders (
   sign_as text,
   -- The owner says this person agreed to get the question from the site's WhatsApp number.
   auto_send boolean not null default false,
+  -- Month and day only (MM-DD): many elders do not know the year they were born.
+  birthday text check (birthday is null or birthday = '' or birthday ~ '^[0-1][0-9]-[0-3][0-9]$'),
   created_at timestamptz not null default now()
 );
 

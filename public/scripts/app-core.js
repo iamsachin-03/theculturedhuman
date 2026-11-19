@@ -254,6 +254,54 @@
     return isNaN(d) ? '' : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
+  // Days families gather. Fixed days repeat each year (month-day). Festivals that follow the moon
+  // need their dates added each year; the dates of Eid depend on the moon being sighted.
+  var OCCASIONS = [
+    { name: 'Makar Sankranti, Pongal and Magh Bihu', md: '01-14', question: 'What did our family make and do for Sankranti, Pongal or Bihu when you were young?' },
+    { name: 'Holi', dates: ['2027-03-22', '2028-03-11'], question: 'What do you remember about Holi when you were a child? Who came, and what was cooked?' },
+    { name: 'Eid al-Fitr', dates: ['2027-03-10', '2028-02-27'], question: 'How did our family celebrate Eid when you were young? What was cooked, and who came to visit?' },
+    { name: 'Baisakhi, Vishu, Bihu and the spring new year', md: '04-14', question: 'How did our family welcome the new year in April: Baisakhi, Vishu, Bihu, Puthandu or Poila Baishakh?' },
+    { name: 'Diwali', dates: ['2027-10-29', '2028-10-17'], question: 'How did your family celebrate Diwali when you were a child? What was cooked, and who came?' },
+    { name: 'Guru Nanak Jayanti', dates: ['2026-11-24'], question: 'What do you remember about Gurpurab when you were young: the prabhat pheri, the langar, the people?' },
+    { name: 'Christmas', md: '12-25', question: 'What do you remember about Christmas when you were young: the food, the church, the people?' },
+  ];
+  var BIRTHDAY_QUESTION = 'What do you remember about your birthdays as a child? How were they marked, and by whom?';
+
+  function dayStart(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function daysUntil(from, md) {
+    var start = dayStart(from);
+    var parts = md.split('-').map(Number);
+    var next = new Date(start.getFullYear(), parts[0] - 1, parts[1]);
+    if (next < start) next = new Date(start.getFullYear() + 1, parts[0] - 1, parts[1]);
+    return { days: Math.round((next - start) / 86400000), date: next };
+  }
+  /** Birthdays of the people you ask, and festivals, coming within `within` days of `today`, soonest first. */
+  function upcoming(today, elders, within) {
+    within = within === undefined ? 21 : within;
+    var start = dayStart(today);
+    var list = [];
+    (elders || []).forEach(function (e) {
+      if (!/^\d{2}-\d{2}$/.test(e.birthday || '')) return;
+      var u = daysUntil(start, e.birthday);
+      list.push({ kind: 'birthday', name: e.name + '\u2019s birthday', elder: e, days: u.days, date: u.date, question: BIRTHDAY_QUESTION });
+    });
+    OCCASIONS.forEach(function (o) {
+      var u = null;
+      if (o.md) u = daysUntil(start, o.md);
+      else o.dates.forEach(function (iso) {
+        var p = iso.split('-').map(Number);
+        var d = new Date(p[0], p[1] - 1, p[2]);
+        var days = Math.round((d - start) / 86400000);
+        if (days >= 0 && (!u || days < u.days)) u = { days: days, date: d };
+      });
+      if (u) list.push({ kind: 'festival', name: o.name, days: u.days, date: u.date, question: o.question });
+    });
+    return list.filter(function (x) { return x.days <= within; }).sort(function (a, b) { return a.days - b.days || (a.kind === 'birthday' ? -1 : 1); });
+  }
+
+  // A printed family book needs enough in it to feel like one.
+  var BOOK_GOAL = 20;
+
   function safeFileName(name) {
     return String(name || 'file').toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'file';
   }
@@ -411,6 +459,7 @@
     newLegacy: newLegacy, legacyNext: legacyNext, legacySeen: legacySeen, legacyReport: legacyReport,
     question: question, message: message, whatsappLink: whatsappLink, reminder: reminder,
     mediaKind: mediaKind, formatBytes: formatBytes, formatDate: formatDate, safeFileName: safeFileName,
+    OCCASIONS: OCCASIONS, upcoming: upcoming, BOOK_GOAL: BOOK_GOAL,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = core;
   else (root.TCH = root.TCH || {}).core = core;

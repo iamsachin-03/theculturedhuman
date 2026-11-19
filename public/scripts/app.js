@@ -309,12 +309,7 @@
         h('p', null, elders[0] ? 'Send it, then keep their answer here.' : 'One question a week to someone you love. In a year, their life in their own words.'),
         link('#/weekly', elders[0] ? 'Open the weekly question' : 'Start with someone you love', 'text-link'),
       ));
-      grid.appendChild(h('section', { class: 'app-card' },
-        h('p', { class: 'eyebrow' }, 'Your archive'),
-        h('h2', null, mine.length ? plural(mine.length, 'entry', 'entries') + ', ' + plural(files, 'file') : 'Nothing kept yet'),
-        h('p', null, mine.length ? 'Stories, wisdom, things for hard days and letters to the future.' : 'Start with one question, one photograph or one saying.'),
-        link('#/archive', 'Open your archive', 'text-link'),
-      ));
+      grid.appendChild(bookCard(mine, files));
       grid.appendChild(h('section', { class: 'app-card' },
         h('p', { class: 'eyebrow' }, 'Shared with you'),
         h('h2', null, sharedList.length ? plural(sharedList.length, 'archive') : 'Nobody yet'),
@@ -327,6 +322,8 @@
         h('p', null, keptRoots ? 'The places your family has called home, drawn as a portrait.' : deviceHasRoots ? 'You made a roots portrait in this browser. Keep it in your archive.' : 'Draw the places your family has called home as roots, a tree, a river, rings or stars.'),
         link(keptRoots || deviceHasRoots ? '#/roots' : '/trace.html', keptRoots ? 'See your roots' : deviceHasRoots ? 'Keep your roots portrait' : 'Trace your roots', 'text-link'),
       ));
+      var soon = core.upcoming(new Date(), elders, 21)[0];
+      if (soon) add(view, occasionCard(soon));
       add(view, grid);
       if (entries.length) {
         add(view, h('h2', { class: 'app-sub' }, 'Recently kept'));
@@ -334,6 +331,39 @@
       }
       return offerImport().then(function () { return h1; });
     });
+  }
+
+  function inDays(n) { return n === 0 ? 'today' : n === 1 ? 'tomorrow' : 'in ' + n + ' days'; }
+  function occasionCard(o) {
+    var teller = o.elder ? '&teller=' + encodeURIComponent(o.elder.name) : '';
+    return h('section', { class: 'app-card app-occasion' },
+      h('p', { class: 'eyebrow' }, 'Coming up'),
+      h('h2', null, o.name + ' is ' + inDays(o.days) + '.'),
+      h('p', null, o.kind === 'birthday'
+        ? 'Record a birthday message for ' + o.elder.name + ', or ask them a question only they can answer:'
+        : 'Festivals are when families sit together. Ask someone while everyone is home:'),
+      h('p', { class: 'app-occasion__q' }, o.question),
+      h('div', { class: 'btn-row' },
+        link('#/entry/new?kind=story&record=audio' + teller + '&prompt=' + encodeURIComponent(o.question), 'Record their answer', 'btn'),
+        o.kind === 'birthday' ? link('#/entry/new?kind=letter&forWhom=' + encodeURIComponent(o.elder.name), 'Write ' + o.elder.name + ' a birthday letter', 'btn btn--ghost') : null),
+    );
+  }
+  function bookCard(mine, files) {
+    var n = mine.length;
+    var goal = core.BOOK_GOAL;
+    var ready = n >= goal;
+    return h('section', { class: 'app-card app-book' },
+      h('p', { class: 'eyebrow' }, 'Your archive'),
+      h('h2', null, n ? plural(n, 'entry', 'entries') + ', ' + plural(files, 'file') : 'Nothing kept yet'),
+      h('div', { class: 'app-book__bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(goal), 'aria-valuenow': String(Math.min(n, goal)), 'aria-label': 'Entries towards a printed family book' },
+        h('span', { style: 'width:' + Math.min(100, Math.round((n / goal) * 100)) + '%' })),
+      h('p', null, ready
+        ? 'Long enough for a family book. Print it at home, or have it bound to give at the next family gathering.'
+        : n ? plural(goal - n, 'more entry', 'more entries') + ' and it is long enough to print as a family book.' : 'Every story, saying and photograph you keep becomes a page of your family book.'),
+      ready
+        ? h('div', { class: 'btn-row' }, link('#/archive', 'Open and print it', 'text-link'), link('/plans.html', 'Have it bound', 'text-link'))
+        : link('#/archive', 'Open your archive', 'text-link'),
+    );
   }
 
   // ---------- archive ----------
@@ -548,7 +578,7 @@
       if (forOther && (!sharedRow || sharedRow.role !== 'family_edit')) {
         return page('Not available', 'You can only view this archive.');
       }
-      var e = existing || { kind: query.get('kind') || 'story', title: '', body: '', prompt: query.get('prompt') || '', teller: query.get('teller') || '', audience: forOther ? 'family' : 'private', audiencePeople: [], media: [] };
+      var e = existing || { kind: query.get('kind') || 'story', title: '', body: '', prompt: query.get('prompt') || '', teller: query.get('teller') || '', forWhom: query.get('forWhom') || '', audience: forOther ? 'family' : 'private', audiencePeople: [], media: [] };
       var h1 = page(existing ? 'Edit "' + e.title + '"' : forOther ? 'Add to ' + sharedRow.ownerName + '\'s archive' : 'Add to your archive');
       var form = h('form', { class: 'app-card app-editor' });
       var kind = options(h('select', { name: 'kind' }), core.KINDS, e.kind);
@@ -903,6 +933,10 @@
     var phone = h('input', { name: 'phone', type: 'tel', autocomplete: 'off' });
     var day = options(h('select', { name: 'day' }), DAYS.map(function (d, i) { return { id: String(i), label: d }; }), String(new Date().getDay()));
     var signAs = h('input', { name: 'signAs', value: firstName(state.user.name) });
+    var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var bMonth = options(h('select', { name: 'birthMonth', 'aria-label': 'Month' }), [{ id: '', label: 'Month' }].concat(MONTHS.map(function (m, i) { return { id: ('0' + (i + 1)).slice(-2), label: m }; })), '');
+    var bDay = options(h('select', { name: 'birthDay', 'aria-label': 'Day' }), [{ id: '', label: 'Day' }].concat(Array.from({ length: 31 }, function (_, i) { var d = ('0' + (i + 1)).slice(-2); return { id: d, label: String(i + 1) }; })), '');
+    var birthday = h('span', { class: 'app-inline' }, bDay, bMonth);
     add(form, [
       h('h2', null, open ? 'Who would you like to ask?' : 'Ask someone else too'),
       h('div', { class: 'app-form-grid' },
@@ -911,12 +945,13 @@
           ? 'With the country code. It stays in your archive. It opens WhatsApp on your phone, or, if you switch on sending for you, the question is sent to it.'
           : 'With the country code. It stays in your archive and is only used to open WhatsApp on your phone.'),
         field('Which day?', day), field('Sign the message as', signAs),
+        field('Their birthday (optional)', birthday, 'Just the day and month. We remind you a few days before.'),
       ),
       h('div', { class: 'btn-row' }, button('Start the weekly question', null, 'btn', 'submit')),
     ]);
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      store.saveElder({ name: name.value.trim(), relation: relation.value.trim(), phone: phone.value.trim(), day: Number(day.value), signAs: signAs.value.trim() })
+      store.saveElder({ name: name.value.trim(), relation: relation.value.trim(), phone: phone.value.trim(), day: Number(day.value), signAs: signAs.value.trim(), birthday: bMonth.value && bDay.value ? bMonth.value + '-' + bDay.value : '' })
         .then(function (e) { location.hash = '#/weekly?elder=' + e.id; }).catch(fail);
     });
     return open ? form : h('details', { class: 'app-more' }, h('summary', null, 'Ask someone else too'), form);
