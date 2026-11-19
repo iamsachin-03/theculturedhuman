@@ -68,5 +68,5 @@ AUTH_BIN=/path/to/auth PGRST_BIN=/path/to/postgrest PSQL="sudo -u postgres psql"
 
 It prints an anon key and saves it to `/tmp/tch-anon-key`. Then:
 
-- run the app against it by pasting this into the browser console on the site: `localStorage.setItem('tch-backend', JSON.stringify({ url: 'http://localhost:54321', anonKey: '<anon key>' }))` (remove the item to go back to preview mode);
+- run the app against it by pasting this into the browser console on the local site (the override only works on `localhost` or `127.0.0.1`, and only for a backend there): `localStorage.setItem('tch-backend', JSON.stringify({ url: 'http://localhost:54321', anonKey: '<anon key>' }))` (remove the item to go back to preview mode);
 - run the app's Supabase integration test: `TCH_DEV_BACKEND=http://localhost:54321 TCH_DEV_ANON_KEY=$(cat /tmp/tch-anon-key) npm test`.

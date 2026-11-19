@@ -1,7 +1,7 @@
 // The family archive app at /app.html: sign in, keep stories, voices, photographs, videos and
 // documents, share them with the people you choose, and decide what is passed on.
 // It talks to a Supabase project when one is configured (site.json "backend", or a developer
-// override in localStorage "tch-backend"); otherwise it runs in preview mode on this device.
+// override in localStorage "tch-backend", honoured on localhost only); otherwise it runs in preview mode on this device.
 (function () {
   var TCH = window.TCH;
   var core = TCH.core;
@@ -14,9 +14,12 @@
     var cfg = {};
     if (/[?&]preview\b/.test(location.search)) return cfg;
     try { cfg = JSON.parse(document.querySelector('meta[name="tch-backend"]').content || '{}'); } catch (e) {}
+    // The override is for local development only: on the real site, nothing left in localStorage
+    // can send someone's sign-in and stories to another server.
+    var local = /^(localhost|127\.0\.0\.1)$/;
     try {
       var override = JSON.parse(localStorage.getItem('tch-backend') || 'null');
-      if (override && override.url && override.anonKey) cfg = override;
+      if (local.test(location.hostname) && override && override.anonKey && typeof override.url === 'string' && local.test(new URL(override.url).hostname)) cfg = override;
     } catch (e) {}
     return cfg;
   }
