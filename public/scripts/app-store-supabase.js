@@ -403,6 +403,19 @@
         });
       },
 
+      /** Contributions waiting for a place page (moderators see every status but rejected). */
+      suggestedPlaces: function () {
+        return rest('place_contributions?select=id,suggested_place,status&place_slug=is.null&status=neq.rejected&order=created_at')
+          .then(function (rows) { return rows.map(function (c) { return { id: c.id, suggestedPlace: c.suggested_place, status: c.status }; }); });
+      },
+
+      /** Moves contributions onto a place's page. Moderators only, by the access rules. */
+      adoptSuggestion: function (ids, slug) {
+        if (!ids.length || !ids.every(function (id) { return /^[0-9a-f-]{36}$/i.test(id); })) return Promise.reject(new Error('Nothing to move.'));
+        return rest('place_contributions?id=in.(' + ids.join(',') + ')', { method: 'PATCH', json: { place_slug: slug, suggested_place: null }, headers: { prefer: 'return=representation' } })
+          .then(function (rows) { if (!rows.length) throw new Error('Only moderators can move contributions.'); return rows.length; });
+      },
+
       resolveReports: function (contributionId) {
         return rest('contribution_reports?contribution_id=eq.' + enc(contributionId) + '&resolved=is.false', { method: 'PATCH', json: { resolved: true }, headers: { prefer: 'return=minimal' } });
       },

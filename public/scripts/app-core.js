@@ -291,6 +291,36 @@
     return c;
   }
 
+  // "Jorhat, Assam", " jorhat " and "JORHAT" are the same suggestion.
+  function placeKey(name) {
+    return String(name || '').split(',')[0].toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  }
+  function placeSlug(name) {
+    return placeKey(name).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+  /**
+   * Contributions for places that have no page yet, grouped by place, most suggested first.
+   * A suggestion that matches a place's aliases (Jorhat is in Assam) names that place.
+   */
+  function groupSuggestions(rows, places) {
+    var byKey = {};
+    var out = [];
+    rows.forEach(function (c) {
+      var key = placeKey(c.suggestedPlace);
+      if (!key) return;
+      if (!byKey[key]) {
+        var match = (places || []).filter(function (p) { return placeKey(p.name) === key || (p.aliases || []).some(function (a) { return placeKey(a) === key; }); })[0];
+        byKey[key] = { key: key, name: String(c.suggestedPlace).split(',')[0].trim(), names: [], ids: [], published: 0, slug: placeSlug(key), match: match ? match.slug : null };
+        out.push(byKey[key]);
+      }
+      var g = byKey[key];
+      g.ids.push(c.id);
+      if (c.status === 'published') g.published++;
+      if (g.names.indexOf(c.suggestedPlace) < 0) g.names.push(c.suggestedPlace);
+    });
+    return out.sort(function (a, b) { return b.ids.length - a.ids.length || (a.key < b.key ? -1 : 1); });
+  }
+
   // The same reasons as contribution_reports in backend/schema.sql.
   var REPORT_REASONS = [
     { id: 'private', label: 'It shares something private about a person' },
@@ -375,6 +405,7 @@
     LISTING_ROLES: LISTING_ROLES, listingRole: listingRole, listing: listing, bookingMessage: bookingMessage, quote: quote,
     platformFee: platformFee, formatRupees: formatRupees, BOOKING_STATUS: BOOKING_STATUS,
     CONTRIBUTION_KINDS: CONTRIBUTION_KINDS, contribution: contribution, REPORT_REASONS: REPORT_REASONS, report: report, reviewNote: reviewNote,
+    placeKey: placeKey, placeSlug: placeSlug, groupSuggestions: groupSuggestions,
     KINDS: KINDS, ROLES: ROLES, AUDIENCES: AUDIENCES, QUESTIONS: QUESTIONS, find: find,
     canSee: canSee, canAdd: canAdd, canEdit: canEdit, audienceLabel: audienceLabel,
     newLegacy: newLegacy, legacyNext: legacyNext, legacySeen: legacySeen, legacyReport: legacyReport,

@@ -63,7 +63,10 @@ const places = readdirSync(placesDir)
   .map((file) => {
     const where = `content/places/${file}`;
     const p = JSON.parse(readFileSync(join(placesDir, file), 'utf8'));
-    for (const key of ['name', 'region', 'image', 'intro']) if (!p[key]) throw new Error(`${where} needs "${key}"`);
+    // Pages started by families (tools/new-place.mjs) have no photograph until a licensed one is added.
+    const needs = p.startedBy === 'families' ? ['name', 'region', 'intro'] : ['name', 'region', 'image', 'intro'];
+    for (const key of needs) if (!p[key]) throw new Error(`${where} needs "${key}"`);
+    if (p.startedBy && p.startedBy !== 'families') throw new Error(`${where}: "startedBy" can only be "families"`);
     if (typeof p.lat !== 'number' || typeof p.lng !== 'number') throw new Error(`${where} needs numeric "lat" and "lng"`);
     if (!Array.isArray(p.aliases) || !p.aliases.length) throw new Error(`${where} needs "aliases" for matching typed place names`);
     for (const [i, c] of (p.carries || []).entries()) {
@@ -216,21 +219,23 @@ for (const place of places) {
     {
       path: place.path,
       title: `${place.name} — Places — ${site.name}`,
-      description: `What families from ${place.name} carry with them: ${carries.map((c) => c.title).join(', ')}. Add your family's words, dishes and memories.`,
+      description: carries.length
+        ? `What families from ${place.name} carry with them: ${carries.map((c) => c.title).join(', ')}. Add your family's words, dishes and memories.`
+        : `A page started by families from ${place.name}: the words, dishes, rituals and memories they carry. Add yours.`,
       script: 'community-live',
     },
     t.placeMain({
       site,
       place,
-      hero: asset(place.image, place.where),
+      hero: place.image ? asset(place.image, place.where) : null,
       carries,
       people: people.filter((p) => p.place === place.slug).map(withPlace),
       form: t.enquiryForm(site, offer('contribute', place.where), { place: place.name }),
     }),
-    place.image,
+    place.image || site.defaultImage,
   );
 }
-const placeCards = () => t.placeCards(places.map((p) => ({ ...p, hero: asset(p.image, p.where) })));
+const placeCards = () => t.placeCards(places.map((p) => ({ ...p, hero: p.image ? asset(p.image, p.where) : null })));
 const rootsMap = () => t.rootsMap(places);
 emit(
   {

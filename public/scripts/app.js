@@ -1231,6 +1231,34 @@
     return box;
   }
 
+  // Contributions for places without a page. Ones that belong to an existing place move in one click;
+  // a new place needs its page built, with the command shown.
+  function moderateSuggestions(places, groups) {
+    if (!groups.length) return;
+    add(view, h('h2', { class: 'app-sub' }, 'Places families have suggested'));
+    add(view, h('p', { class: 'field__hint' }, 'Contributions for places that have no page yet. Publishing them shows them in The Commons; moving them puts them on a place page.'));
+    add(view, h('div', { class: 'app-list' }, groups.map(function (g) {
+      var match = places.filter(function (p) { return p.slug === g.match; })[0];
+      function move(slug, label) {
+        return function () {
+          store.adoptSuggestion(g.ids, slug).then(function (n) {
+            flash = plural(n, 'contribution') + ' moved to ' + label + '.';
+            return render();
+          }).catch(fail);
+        };
+      }
+      var command = 'npm run new-place -- --name "' + g.name.replace(/"/g, '') + '" --region "…" --lat … --lng …';
+      return h('article', { class: 'app-card app-suggestion' },
+        h('p', { class: 'eyebrow' }, plural(g.ids.length, 'contribution') + ' · ' + g.published + ' published'),
+        h('h3', null, g.name),
+        g.names.length > 1 ? h('p', { class: 'field__hint' }, 'Written as ' + g.names.join(', ')) : null,
+        match
+          ? [h('p', null, g.name + ' is part of ' + match.name + '.'), h('div', { class: 'btn-row' }, button('Move to ' + match.name, move(match.slug, match.name)))]
+          : [h('p', null, 'To give ' + g.name + ' its own page, run this in the project, then deploy:'), h('pre', { class: 'app-command' }, h('code', null, command)),
+            h('p', { class: 'field__hint' }, 'It writes content/places/' + g.slug + '.json and, with the service key set, moves these contributions to the new page.')]);
+    })));
+  }
+
   function moderate() {
     var h1 = page('To read', 'Publish what families and makers have sent so it appears on the site, or leave it unpublished with a reason. Check it is theirs to share and contains nothing private about someone else.');
     return store.isModerator().then(function (yes) {
@@ -1238,8 +1266,9 @@
         add(view, h('p', null, 'Only moderators can read contributions before they are published.'));
         return h1;
       }
-      return Promise.all([loadPlaces(), store.pendingContributions(), store.pendingListings(), store.bookingsToSettle(), store.pendingReports()]).then(function (r) {
+      return Promise.all([loadPlaces(), store.pendingContributions(), store.pendingListings(), store.bookingsToSettle(), store.pendingReports(), store.suggestedPlaces()]).then(function (r) {
         var places = r[0];
+        moderateSuggestions(places, core.groupSuggestions(r[5], places));
         if (r[4].length) {
           add(view, h('h2', { class: 'app-sub' }, 'Reported'));
           add(view, h('div', { class: 'app-list' }, r[4].map(function (item) {

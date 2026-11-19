@@ -321,7 +321,7 @@ export function directory(site, role, list) {
 
 export function placeCards(places) {
   return `<div class="place-grid">${places
-    .map((p) => `<a class="place-card" href="${p.path}"><div class="place-card__media">${picture(p.hero, { sizes: '(max-width: 700px) 100vw, 320px', alt: '' })}</div><span class="eyebrow">${e(p.region)}</span><h3>${e(p.name)}</h3><p>${((n) => `${n} ${n === 1 ? 'thing' : 'things'} families carry`)(p.carries.length + p.contributions.length)}</p></a>`)
+    .map((p) => `<a class="place-card${p.hero ? '' : ' place-card--families'}" href="${p.path}"><div class="place-card__media">${p.hero ? picture(p.hero, { sizes: '(max-width: 700px) 100vw, 320px', alt: '' }) : `<span class="place-card__initial" aria-hidden="true">${e(p.name.slice(0, 1))}</span>`}</div><span class="eyebrow">${e(p.region)}</span><h3>${e(p.name)}</h3><p>${p.startedBy === 'families' ? 'Started by families' : ((n) => `${n} ${n === 1 ? 'thing' : 'things'} families carry`)(p.carries.length + p.contributions.length)}</p></a>`)
     .join('')}</div>`;
 }
 
@@ -457,12 +457,12 @@ export function placeMain({ site, place, hero, carries, people, form }) {
 <div class="btn-row"><a class="btn" href="#contribute">Add to ${e(place.name)}</a><a class="btn btn--ghost" href="/trace.html">Trace your roots</a></div>
 </div>
 </section>
-<figure class="place-hero container">${picture(hero, { eager: true, sizes: '(max-width: 1140px) 100vw, 1100px' })}<figcaption class="credit">${e(hero.subject)}. ${creditLine(hero).replace(/^<span class="credit">|<\/span>$/g, '')}</figcaption></figure>
+${hero ? `<figure class="place-hero container">${picture(hero, { eager: true, sizes: '(max-width: 1140px) 100vw, 1100px' })}<figcaption class="credit">${e(hero.subject)}. ${creditLine(hero).replace(/^<span class="credit">|<\/span>$/g, '')}</figcaption></figure>` : ''}
 <div class="editorial-content">
-<div class="section-head"><p class="eyebrow">What families from here carry</p><h2>A beginning, from our stories.</h2></div>
+${carries.length ? `<div class="section-head"><p class="eyebrow">What families from here carry</p><h2>A beginning, from our stories.</h2></div>
 <div class="carry-grid">${carries.map(carry).join('')}</div>
-<div class="section-gap"></div>
-<div class="section-head"><p class="eyebrow">Shared by families</p><h2>In their own words.</h2></div>
+<div class="section-gap"></div>` : ''}
+<div class="section-head"><p class="eyebrow">Shared by families</p><h2>In their own words.</h2>${place.startedBy === 'families' ? `<p>This page was started because families from ${e(place.name)} shared what they carry. Know a source, a photograph you have the rights to, or something we should add? <a href="#contribute">Tell us</a>.</p>` : ''}</div>
 <div class="community-feed" data-community-feed data-limit="100" data-place="${e(place.slug)}"${site.backend && site.backend.url ? ` data-url="${e(site.backend.url)}" data-key="${e(site.backend.anonKey)}"` : ''}>
 ${shared}
 </div>

@@ -997,6 +997,8 @@ p { margin: 0 0 1em; }
 .app-reasons .app-check { align-items: flex-start; }
 .app-reports { margin: .4rem 0 1rem; padding-left: 1.2rem; font-size: .95rem; }
 .app-reason { margin-top: .6rem; }
+.place-card__initial { display: grid; place-items: center; aspect-ratio: 4 / 3; background: var(--band); color: var(--band-accent); font: 500 4rem/1 var(--serif); }
+.app-command { background: var(--surface-2); padding: .7rem .9rem; border-radius: var(--radius-sm); overflow-x: auto; font-size: .85rem; white-space: pre-wrap; word-break: break-word; }
 .app-review__word { font-size: 1.15rem; color: var(--muted); margin-top: -.4rem; }
 
 /* ---------- My Roots: one product, two halves ---------- */

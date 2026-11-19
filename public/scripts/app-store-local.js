@@ -382,6 +382,8 @@
 
     report: function () { return Promise.reject(new Error('Reporting needs the real backend.')); },
     pendingReports: function () { return Promise.resolve([]); },
+    suggestedPlaces: function () { return Promise.resolve([]); },
+    adoptSuggestion: function () { return Promise.reject(new Error('Needs the real backend.')); },
     resolveReports: function () { return Promise.reject(new Error('Needs the real backend.')); },
 
     isModerator: function () { return Promise.resolve(false); },
