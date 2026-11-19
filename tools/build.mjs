@@ -82,6 +82,14 @@ const placeBySlug = new Map(places.map((p) => [p.slug, p]));
 const people = JSON.parse(readFileSync(join(ROOT, 'content/people.json'), 'utf8'));
 const prompts = JSON.parse(readFileSync(join(ROOT, 'content/prompts.json'), 'utf8'));
 if (new Date(prompts.start + 'T00:00:00Z').getUTCDay() !== 1) throw new Error('content/prompts.json: "start" must be a Monday');
+const communityExamples = JSON.parse(readFileSync(join(ROOT, 'content/community-examples.json'), 'utf8')).examples.map((x, i) => {
+  const where = `content/community-examples.json: examples[${i}]`;
+  for (const key of ['kind', 'title', 'body', 'place']) if (!x[key]) throw new Error(`${where} needs "${key}"`);
+  if (!prompts.prompts.some((p) => p.kind === x.kind)) throw new Error(`${where}: "${x.kind}" is not a contribution kind`);
+  const place = placeBySlug.get(x.place);
+  if (!place) throw new Error(`${where}: no place "${x.place}"`);
+  return { ...x, placeName: place.name, placePath: place.path };
+});
 for (const [i, person] of people.entries()) {
   const where = `content/people.json: entry ${i + 1}`;
   for (const key of ['id', 'name', 'role', 'place', 'summary']) if (!person[key]) throw new Error(`${where} needs "${key}"`);
@@ -302,11 +310,12 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
     .replace(/\{\{fee-example\s+(\d+)\}\}/g, (_, n) => t.feeExample(Number(n), site.platformFeePercent))
     .replace(/\{\{this-week\}\}/g, () => t.thisWeek(prompts))
     .replace(/\{\{shared-contribution\}\}/g, () => t.sharedContribution(site))
+    .replace(/\{\{community-count\}\}/g, () => t.communityCount(site))
     .replace(/\{\{question-archive\}\}/g, () => t.questionArchive(site))
     .replace(/\{\{community-feed([^}]*)\}\}/g, (_, rest) => {
       const opt = attrs(rest);
       if (opt.kind && !prompts.prompts.some((p) => p.kind === opt.kind)) problems.push(`${where}: community-feed kind "${opt.kind}" is not a contribution kind`);
-      return t.communityFeed({ site, limit: Number(opt.limit) || 6, kind: opt.kind, style: opt.style });
+      return t.communityFeed({ site, limit: Number(opt.limit) || 6, kind: opt.kind, style: opt.style, examples: communityExamples });
     });
   if (/\{\{/.test(main)) problems.push(`${where}: unrecognised {{…}} placeholder`);
 

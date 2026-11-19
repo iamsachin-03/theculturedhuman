@@ -41,7 +41,8 @@
   var directories = document.querySelectorAll('[data-listings]');
   var sharedBox = document.querySelector('[data-shared]');
   var archiveBox = document.querySelector('[data-question-archive]');
-  if ((!feeds.length && !directories.length && !sharedBox && !archiveBox) || !window.fetch) return;
+  var countBox = document.querySelector('[data-community-count]');
+  if ((!feeds.length && !directories.length && !sharedBox && !archiveBox && !countBox) || !window.fetch) return;
   var FIELDS = 'id,kind,title,body,credit,place_slug,suggested_place,script,pronunciation,prompt_week,created_at,status';
   var placesReady = getJson('/places/places.json').then(function (list) {
     var bySlug = {};
@@ -225,7 +226,7 @@
       var places = r[1];
       if (!rows || !rows.length) return;
       var words = box.classList.contains('community-feed--words');
-      var grid = box.querySelector('.carry-grid, .word-wall');
+      var grid = box.querySelector(':scope > .carry-grid, :scope > .word-wall');
       if (!grid) {
         box.textContent = '';
         grid = el('div', words ? 'word-wall' : 'carry-grid');
@@ -235,6 +236,17 @@
       wireEchoes(box);
     });
   });
+
+  if (countBox && countBox.dataset.url) {
+    getJson(countBox.dataset.url + '/rest/v1/place_contributions?select=place_slug,suggested_place&status=eq.published&limit=5000', headersFor(countBox)).then(function (rows) {
+      if (!rows || !rows.length) return;
+      var places = {};
+      rows.forEach(function (r) { places[r.place_slug || String(r.suggested_place).toLowerCase()] = true; });
+      var n = Object.keys(places).length;
+      countBox.textContent = rows.length + (rows.length === 1 ? ' thing' : ' things') + ' shared by families so far, from ' + n + (n === 1 ? ' place.' : ' places.');
+      countBox.hidden = false;
+    });
+  }
 
   // ---------- one contribution, with sharing ----------
   function cssVar(name, fallback) {

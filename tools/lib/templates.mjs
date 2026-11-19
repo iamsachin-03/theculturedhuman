@@ -378,8 +378,22 @@ export function thisWeek(prompts) {
 </div>`;
 }
 
+/**
+ * Labelled examples of what belongs in a feed, shown until something is published. community-live.js
+ * replaces the whole empty state, examples included, with real contributions as soon as there are any.
+ */
+function feedExamples(examples, { words, kind, limit }) {
+  const chosen = examples.filter((x) => (kind ? x.kind === kind : words ? x.kind === 'A word or saying' : x.kind !== 'A word or saying')).slice(0, Math.min(limit, 3));
+  if (!chosen.length) return '';
+  const place = (x) => `<a class="community-place" href="${e(x.placePath)}">${e(x.placeName)}</a>`;
+  const items = chosen.map((x) => words
+    ? `<article class="word-chip word-chip--example"><p class="example-tag">Example</p><p class="word-chip__word">${e(x.title)}</p>${x.script ? `<p class="word-chip__script">${e(x.script)}</p>` : ''}<p class="word-chip__meaning">${e(x.body)}</p><p class="word-chip__from">${place(x)}</p></article>`
+    : `<article class="carry-card carry-card--example"><p class="example-tag">Example</p><p class="eyebrow">${e(x.kind)}</p><h3>${e(x.title)}</h3>${x.script ? `<p class="word-line"><span class="word-line__script">${e(x.script)}</span></p>` : ''}<p>${e(x.body)}</p><p class="carry-card__credit">${place(x)}</p></article>`);
+  return `<div class="community-examples"><p class="community-examples__note">Examples of what belongs here, written by The Cultured Human, not shared by families. They make way for real contributions as they're published.</p><div class="${words ? 'word-wall' : 'carry-grid'}">${items.join('')}</div></div>`;
+}
+
 /** What families have shared and moderators have published, read live by community-live.js. */
-export function communityFeed({ site, limit = 6, kind, style = 'cards', place }) {
+export function communityFeed({ site, limit = 6, kind, style = 'cards', place, examples = [] }) {
   const words = style === 'words';
   const empty = words
     ? '<p><strong>The first words will appear here.</strong> Add a word from your family that has no translation, and where it comes from.</p><a class="text-link" href="/app.html#/contribute?kind=A%20word%20or%20saying">Add your word</a>'
@@ -387,7 +401,12 @@ export function communityFeed({ site, limit = 6, kind, style = 'cards', place })
   const backend = backendAttrs(site);
   return `<div class="community-feed community-feed--${words ? 'words' : 'cards'}" data-community-feed data-limit="${limit}"${kind ? ` data-kind="${e(kind)}"` : ''}${place ? ` data-place="${e(place)}"` : ''}${backend}>
 <div class="empty-state">${empty}</div>
-</div>`;
+${place ? '' : feedExamples(examples, { words, kind, limit })}</div>`;
+}
+
+/** "N things shared by families from M places", filled in by community-live.js only once there is at least one. */
+export function communityCount(site) {
+  return `<p class="community-count" data-community-count${backendAttrs(site)} hidden></p>`;
 }
 
 /** One contribution, large, with sharing; filled in by community-live.js from ?id=. */
