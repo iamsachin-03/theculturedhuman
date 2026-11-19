@@ -74,9 +74,10 @@ test('The Commons asks a weekly question, shows live contributions and a word wa
   }
 });
 
-test('the homepage has five sections and leads to the archive and The Commons', () => {
+test('the homepage has six sections, opens with one question, and leads to the archive and The Commons', () => {
   const main = read('index.html').match(/<main id="main">([\s\S]*)<\/main>/)[1];
-  assert.equal((main.match(/<section\b/g) || []).length, 5);
+  assert.equal((main.match(/<section\b/g) || []).length, 6);
+  assert.match(main, /href="#first-story"[\s\S]*id="first-story"[\s\S]*data-first-story/);
   assert.match(main, /data-this-week[\s\S]*data-community-feed data-limit="3"/);
   assert.ok(main.includes('href="/manch.html"') && main.includes('href="/roots.html"'));
   assert.match(main, /href="\/app.html">Start your family archive/);

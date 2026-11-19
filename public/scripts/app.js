@@ -204,6 +204,11 @@
     var h1 = why
       ? page(why[0], why[1])
       : page('Your family archive', 'Keep the stories, voices, photographs and wisdom of your family in one private place, and choose who receives each one, now or later.');
+    if (!why) waitingOnDevice().then(function (w) {
+      if (!w.old.length || !h1.isConnected) return;
+      var lede = view.querySelector('.app-head .lede');
+      if (lede) lede.textContent = (w.old.length === 1 ? 'Your story is' : 'Your ' + w.old.length + ' stories are') + ' waiting in this browser. Sign in to keep ' + (w.old.length === 1 ? 'it' : 'them') + ' safe in your private archive, where you can open ' + (w.old.length === 1 ? 'it' : 'them') + ' on any device.';
+    });
     var form = h('form', { class: 'app-card app-signin' });
     var email = h('input', { type: 'email', name: 'email', autocomplete: 'email', required: true });
     var name = h('input', { type: 'text', name: 'name', autocomplete: 'name' });
@@ -983,30 +988,61 @@
     }).catch(function () { return []; });
   }
 
-  function offerImport() {
-    var done = false;
-    try { done = localStorage.getItem('tch-imported') === '1'; } catch (e) {}
-    if (done) return Promise.resolve();
+  // Entries already brought over (or declined) are remembered by id, so stories answered on the
+  // home page later are still offered. Before ids were kept, one flag covered everything.
+  function handledIds() {
+    try { return JSON.parse(localStorage.getItem('tch-imported-ids') || 'null'); } catch (e) { return null; }
+  }
+  function markHandled(ids) {
+    try {
+      localStorage.setItem('tch-imported-ids', JSON.stringify(ids));
+      localStorage.setItem('tch-imported', '1');
+    } catch (e) {}
+  }
+  function waitingOnDevice() {
+    var legacyDone = false;
+    try { legacyDone = localStorage.getItem('tch-imported') === '1'; } catch (e) {}
     var weeklyOld = null;
-    try { weeklyOld = JSON.parse(localStorage.getItem('tch-weekly') || 'null'); } catch (e) {}
-    var elders = weeklyOld && Array.isArray(weeklyOld.elders) ? weeklyOld.elders : [];
+    if (!legacyDone) try { weeklyOld = JSON.parse(localStorage.getItem('tch-weekly') || 'null'); } catch (e) {}
     return readOldArchive().then(function (old) {
+      var handled = handledIds();
+      if (!handled) {
+        handled = legacyDone ? old.map(function (o) { return o.id; }) : [];
+        if (legacyDone) markHandled(handled);
+      }
+      return {
+        handled: handled,
+        old: old.filter(function (o) { return handled.indexOf(o.id) === -1; }),
+        elders: weeklyOld && Array.isArray(weeklyOld.elders) ? weeklyOld.elders : [],
+        from: weeklyOld && weeklyOld.from,
+      };
+    });
+  }
+
+  function offerImport() {
+    return waitingOnDevice().then(function (w) {
+      var old = w.old;
+      var elders = w.elders;
       if (!old.length && !elders.length) return;
+      var fromHome = old.length && old.every(function (o) { return /^home-/.test(o.id); });
+      var done = function () { markHandled(w.handled.concat(old.map(function (o) { return o.id; }))); };
       var card = h('section', { class: 'app-card app-import' },
-        h('h2', null, 'Bring over what you kept on this device'),
-        h('p', null, 'Before accounts, this browser kept ' + [old.length ? plural(old.length, 'archive entry', 'archive entries') : null, elders.length ? plural(elders.length, 'person', 'people') + ' you ask the weekly question' : null].filter(Boolean).join(' and ') + '. Add them to your archive? They will be private until you share them.'),
+        h('h2', null, fromHome ? (old.length === 1 ? 'Keep the story you wrote' : 'Keep the stories you wrote') : 'Bring over what you kept on this device'),
+        h('p', null, fromHome
+          ? 'You answered ' + plural(old.length, 'question') + ' on the home page in this browser. Add ' + (old.length === 1 ? 'it' : 'them') + ' to your archive? ' + (old.length === 1 ? 'It stays' : 'They stay') + ' private until you share ' + (old.length === 1 ? 'it' : 'them') + '.'
+          : 'Before accounts, this browser kept ' + [old.length ? plural(old.length, 'archive entry', 'archive entries') : null, elders.length ? plural(elders.length, 'person', 'people') + ' you ask the weekly question' : null].filter(Boolean).join(' and ') + '. Add them to your archive? They will be private until you share them.'),
       );
       var row = h('div', { class: 'btn-row' });
       add(row, [
-        button('Bring them over', function () {
+        button(fromHome ? 'Keep ' + (old.length === 1 ? 'it' : 'them') : 'Bring them over', function () {
           row.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
-          importOld(old, elders, weeklyOld && weeklyOld.from).then(function () {
-            try { localStorage.setItem('tch-imported', '1'); } catch (e) {}
-            say('Brought over. Nothing was deleted from this device.');
-            card.remove();
+          importOld(old, elders, w.from).then(function () {
+            done();
+            flash = fromHome ? 'Kept in your archive. Nothing was deleted from this device.' : 'Brought over. Nothing was deleted from this device.';
+            render();
           }).catch(fail);
         }),
-        button('Not now', function () { try { localStorage.setItem('tch-imported', '1'); } catch (e) {} card.remove(); }, 'btn btn--ghost'),
+        button('Not now', function () { done(); card.remove(); }, 'btn btn--ghost'),
       ]);
       add(card, row);
       view.insertBefore(card, view.children[1] || null);

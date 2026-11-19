@@ -92,6 +92,10 @@ Run `npm run build` after changing these settings.
 
 The header has a **Sign in** button that becomes **My archive** once someone is signed in on that device. Both lead to `/app.html`. To connect real accounts, create a Supabase project and fill in `backend` in `content/site.json`; [`backend/README.md`](backend/README.md) has the steps. Visitors who used the earlier on-device archive or weekly question are offered to bring them into their account the first time they sign in.
 
+## A first story before signing up
+
+The home page opens with one question (`public/scripts/first-story.js`). Visitors can answer it in writing or with a voice note without an account; the answer is kept in their browser's IndexedDB (`tch-archive`) and turned into a keepsake card they can save or send. When they sign in, the archive offers to keep it. Entries already kept or declined are remembered by id in `localStorage` (`tch-imported-ids`), so later answers are still offered.
+
 ## Themes
 
 Marigold (the default), Haldi, Indigo, Gulmohar and Evening. Haldi takes its turmeric yellow, burnt orange and leaf green from the logo. Each theme is a set of CSS custom properties on `html[data-theme]`. The reader's choice is saved in `localStorage` under `tch-theme` and applied before the first paint, so pages never flash the wrong colours. All text colour pairs meet WCAG AA contrast.

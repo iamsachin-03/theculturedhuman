@@ -363,6 +363,28 @@ p { margin: 0 0 1em; }
   .home-hero__art img { aspect-ratio: 1 / 1; object-position: 50% 30%; border-radius: 160px 160px var(--radius) var(--radius); }
 }
 
+button.text-link { background: none; border: 0; padding: 0; cursor: pointer; font-family: inherit; }
+
+/* One question, answered before signing up */
+.first-story { padding-block: var(--space-5); background: var(--band); color: var(--band-ink); }
+.first-story__grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+.first-story .eyebrow { color: var(--band-accent); }
+.first-story h2 { color: var(--band-ink); font-size: clamp(2.4rem, 1.6rem + 3vw, 4rem); line-height: 1; margin-bottom: 1rem; }
+.first-story__intro p { color: color-mix(in srgb, var(--band-ink) 88%, transparent); max-width: 34rem; }
+.first-story__promise { font: italic 500 var(--step-1)/1.35 var(--serif); }
+.first-story__waiting a { color: var(--band-ink); font-weight: 600; }
+.first-story__card { background: var(--surface); color: var(--ink); border-radius: var(--radius); padding: clamp(1.25rem, 3vw, 2.25rem); box-shadow: var(--shadow); }
+.first-story__card .eyebrow { color: var(--accent-ink); }
+.first-story__card form { display: grid; gap: .9rem; }
+.first-story__card .btn-row { margin-top: .25rem; }
+.first-story__question { font: 500 clamp(1.6rem, 1.2rem + 1.4vw, 2.2rem)/1.15 var(--serif); color: var(--primary); margin: 0; }
+.first-story__another { margin-top: 0; justify-self: start; font-size: .88rem; }
+.first-story__preview audio { width: 100%; }
+.first-story__done h3 { font-size: var(--step-3); color: var(--primary); }
+.first-story__img { display: block; width: min(100%, 300px); height: auto; margin-top: 1rem; border-radius: var(--radius-sm); box-shadow: var(--shadow); }
+.first-story__status:empty, .first-story [hidden] { display: none; }
+@media (max-width: 860px) { .first-story__grid { grid-template-columns: 1fr; } }
+
 /* ── 7. Editorial blocks ─────────────────────────────────────────────────── */
 
 /* Pillars: an editorial index, not a card wall. */
