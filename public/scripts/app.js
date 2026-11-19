@@ -1167,7 +1167,7 @@
     }
     return h('article', { class: 'app-card app-sent' },
       h('p', { class: 'eyebrow' }, c.kind + ' · ' + placeName(places, c)),
-      h('h3', null, c.status === 'published' && store.mode !== 'local' ? link('/shared.html?id=' + c.id, c.title) : c.title),
+      h('h3', null, c.status === 'published' && store.mode !== 'local' ? link('/s/' + c.id, c.title) : c.title),
       h('p', { class: 'app-sent__status app-sent__status--' + c.status }, REVIEW[c.status] || c.status),
       c.status === 'rejected' && c.reviewNote ? h('p', { class: 'app-sent__note' }, h('strong', null, 'Why: '), c.reviewNote) : null,
       c.status === 'rejected' ? h('p', { class: 'field__hint' }, 'You can change it and send it again.') : null,

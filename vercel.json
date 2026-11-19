@@ -3,26 +3,67 @@
   "buildCommand": "npm run build",
   "outputDirectory": "public",
   "crons": [
-    { "path": "/api/weekly-send", "schedule": "30 4 * * *" },
-    { "path": "/api/notify", "schedule": "30 12 * * *" }
+    {
+      "path": "/api/weekly-send",
+      "schedule": "30 4 * * *"
+    },
+    {
+      "path": "/api/notify",
+      "schedule": "30 12 * * *"
+    }
   ],
-  "functions": { "api/weekly-send.mjs": { "includeFiles": "public/scripts/app-core.js" } },
+  "functions": {
+    "api/weekly-send.mjs": {
+      "includeFiles": "public/scripts/app-core.js"
+    },
+    "api/shared.mjs": {
+      "includeFiles": "{public/shared.html,public/places/places.json,content/site.json}"
+    }
+  },
   "redirects": [
-    { "source": "/bazaar.html", "destination": "/marketplace.html", "permanent": true },
-    { "source": "/journal/index.html", "destination": "/journal/", "permanent": true }
+    {
+      "source": "/bazaar.html",
+      "destination": "/marketplace.html",
+      "permanent": true
+    },
+    {
+      "source": "/journal/index.html",
+      "destination": "/journal/",
+      "permanent": true
+    }
   ],
   "headers": [
     {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/s/:id",
+      "destination": "/api/shared?id=:id"
     }
   ]
 }

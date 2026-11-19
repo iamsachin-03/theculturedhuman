@@ -136,7 +136,8 @@
     });
   }
 
-  function permalink(c) { return '/shared.html?id=' + c.id; }
+  // Served by api/shared.mjs on the live site, so link previews show the contribution itself.
+  function permalink(c) { return '/s/' + c.id; }
   function reportLink(c) {
     var a = el('a', 'card-action', 'Report');
     a.href = '/app.html#/report?c=' + c.id + '&back=' + encodeURIComponent(location.pathname + location.search);
@@ -347,7 +348,8 @@
   }
 
   if (sharedBox && sharedBox.dataset.url) {
-    var sharedId = new URLSearchParams(location.search).get('id') || '';
+    var idMeta = document.querySelector('meta[name="tch-shared-id"]');
+    var sharedId = new URLSearchParams(location.search).get('id') || (location.pathname.match(/^\/s\/([^/]+)$/) || [])[1] || (idMeta && idMeta.content) || '';
     var empty = sharedBox.querySelector('[data-shared-empty]');
     var missing = function () {
       empty.querySelector('h1').textContent = 'We couldn\'t find that';

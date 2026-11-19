@@ -28,7 +28,7 @@ export function contributionEmail(c, placeName, siteUrl) {
     return {
       subject: `“${c.title}” is now on ${c.place_slug && placeName ? placeName : 'The Commons'}`,
       text: `Thank you for sharing “${c.title}”. It has been read and is now on ${where}:\n${link}\n\n`
-        + `Here is its own page, to send to your family:\n${siteUrl}/shared.html?id=${c.id}\n\n`
+        + `Here is its own page, to send to your family:\n${siteUrl}/s/${c.id}\n\n`
         + `This week's question is waiting at ${siteUrl}/manch.html#this-week${SIGN_OFF}`,
     };
   }

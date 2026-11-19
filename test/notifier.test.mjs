@@ -38,7 +38,7 @@ test('emails say what happened and where to go next', () => {
   const published = contributionEmail(contributions[0], 'Mithila', SITE);
   assert.match(published.subject, /Sasur.*Mithila/);
   assert.ok(published.text.includes(`${SITE}/places/mithila.html`));
-  assert.ok(published.text.includes(`${SITE}/shared.html?id=c1`));
+  assert.ok(published.text.includes(`${SITE}/s/c1`));
   const rejected = contributionEmail(contributions[1], undefined, SITE);
   assert.ok(rejected.text.includes('The reason: It names a living person.'));
   assert.ok(rejected.text.includes('/community-guidelines.html'));

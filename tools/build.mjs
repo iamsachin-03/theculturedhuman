@@ -260,7 +260,10 @@ on conflict (slug) do update set name = excluded.name, region = excluded.region,
 );
 outputs.set(
   join(PUBLIC, 'places/places.json'),
-  JSON.stringify(places.map((p) => ({ slug: p.slug, name: p.name, path: p.path, aliases: p.aliases }))) + '\n',
+  JSON.stringify(places.map((p) => {
+    const hero = p.image && asset(p.image, p.where);
+    return { slug: p.slug, name: p.name, path: p.path, aliases: p.aliases, ...(hero ? { image: hero.files[1600], imageAlt: hero.alt } : {}) };
+  })) + '\n',
 );
 
 // The page shows the first prompt; community-live.js swaps in this week's from this file.
