@@ -15,6 +15,6 @@ export default async function handler(req, res) {
     return res.status(result.failed.length && !result.sent.length ? 500 : 200).json(summary);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: 'Something went wrong. See the function logs.' });
+    return res.status(500).json({ error: err.message });
   }
 }
