@@ -351,7 +351,41 @@
     );
   }
 
+  function sameName(a, b) { return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase(); }
+  // Memories of someone are asked for with this question, so they gather on that person's page
+  // even when somebody else told them.
+  function memoryPrompt(name) { return 'What do you remember about ' + name + '?'; }
+  function rememberedName(e) {
+    var m = /^What do you remember about (.+)\?$/.exec(e.prompt || '');
+    return m ? m[1] : '';
+  }
+  function aboutPerson(e, name) { return sameName(e.teller, name) || sameName(rememberedName(e), name); }
+  function tellers(entries) {
+    var list = [];
+    entries.forEach(function (e) {
+      var name = String(rememberedName(e) || e.teller || '').trim();
+      if (!name) return;
+      var t = list.filter(function (x) { return sameName(x.name, name); })[0];
+      if (t) {
+        t.count++;
+        if (!/^\p{Lu}/u.test(t.name) && /^\p{Lu}/u.test(name)) t.name = name;
+      } else list.push({ name: name, count: 1 });
+    });
+    return list.sort(function (a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
+  }
+  function keptBy(entries) {
+    var names = [];
+    entries.forEach(function (e) {
+      var p = state.people.filter(function (x) { return x.userId && x.userId === e.createdBy; })[0];
+      var name = e.createdBy === state.user.id ? 'you' : p ? p.name : null;
+      if (name && names.indexOf(name) === -1) names.push(name);
+    });
+    return names.sort(function (a, b) { return (b === 'you') - (a === 'you'); });
+  }
+
   function archive(_, query) {
+    var who = query.get('teller');
+    if (who) return personPage(who);
     var h1 = page('My archive', 'Everything you have kept, and what others in your family have added to it.');
     var kind = query.get('kind') || '';
     return Promise.all([store.entries(), loadPeople()]).then(function (r) {
@@ -363,6 +397,13 @@
       });
       add(view, h('div', { class: 'app-toolbar' }, link('#/entry/new' + (kind ? '?kind=' + kind : ''), 'Add to the archive', 'btn'), entries.length ? button('Print as a book', function () { window.print(); }, 'btn btn--ghost') : null));
       add(view, filters);
+      var people = tellers(entries.filter(function (e) { return e.owner === state.user.id; }));
+      if (people.length) {
+        add(view, h('nav', { class: 'app-tellers', 'aria-label': 'The people in these stories' },
+          h('span', { class: 'eyebrow' }, 'The people in these stories'),
+          h('ul', null, people.map(function (t) { return h('li', null, h('a', { href: '#/archive?teller=' + encodeURIComponent(t.name) }, t.name, h('small', null, String(t.count)))); })),
+        ));
+      }
       var shown = kind ? entries.filter(function (e) { return e.kind === kind; }) : entries;
       if (!shown.length) {
         add(view, h('p', { class: 'empty-state' }, entries.length ? 'Nothing of this kind yet.' : 'Nothing kept yet. Start with one question, one photograph or one saying.'));
@@ -371,6 +412,66 @@
       }
       return h1;
     });
+  }
+
+  // Everything told by or about one person, and a way to ask the rest of the family for theirs.
+  function personPage(who) {
+    return Promise.all([store.entries(), loadPeople()]).then(function (r) {
+      var mine = r[0].filter(function (e) { return e.owner === state.user.id && aboutPerson(e, who); });
+      var name = mine.length ? tellers(mine).filter(function (t) { return sameName(t.name, who); }).concat([{ name: who }])[0].name : who;
+      var by = keptBy(mine);
+      var h1 = page(name, mine.length
+        ? plural(mine.length, 'story', 'stories') + ' and memories' + (by.length ? ', kept by ' + listNames(by) : '') + '.'
+        : 'Nothing kept about ' + name + ' yet.');
+      view.querySelector('.app-head').insertBefore(h('p', { class: 'eyebrow' }, h('a', { class: 'eyebrow--plain', href: '#/archive' }, 'My archive'), ' · A person'), h1);
+      add(view, h('div', { class: 'app-toolbar' },
+        link('#/entry/new?prompt=' + encodeURIComponent(memoryPrompt(name)), 'Add your memory of ' + name, 'btn'),
+        link('#/entry/new?teller=' + encodeURIComponent(name) + '&record=audio', 'Keep a story ' + name + ' told', 'btn btn--ghost'),
+      ));
+      if (mine.length) add(view, h('div', { class: 'app-list' }, mine.map(entryCard)));
+      add(view, askFamily(name, true));
+      return h1;
+    });
+  }
+  function listNames(names) {
+    return names.length < 2 ? names.join('') : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+  }
+
+  function askText(person, about, url) {
+    return firstName(person.name) + ', I am keeping ' + about + '’s stories in our family archive on The Cultured Human. ' +
+      'What do you remember about ' + about + '? A story, a saying, the way they laughed. Add yours here, it only takes a few minutes: ' + url;
+  }
+  /** A panel for asking relatives, by name, to add their own memory of someone. */
+  function askFamily(about, open) {
+    var url = returnTo + '#/entry/new?owner=' + state.user.id + '&prompt=' + encodeURIComponent(memoryPrompt(about));
+    var canAdd = state.people.filter(function (p) { return p.role === 'family_edit'; });
+    var viewOnly = state.people.filter(function (p) { return p.role === 'family_view'; });
+    var panel = h('section', { class: 'app-card app-ask' },
+      h('p', { class: 'eyebrow' }, 'Ask the family'),
+      h('h2', null, 'Who else remembers ' + about + '?'),
+      h('p', null, 'Every person remembers someone differently. Ask them by name; what they add appears here, with ' + about + '’s other stories.'),
+    );
+    if (canAdd.length) {
+      add(panel, h('ul', { class: 'app-ask__list' }, canAdd.map(function (p) {
+        var text = askText(p, about, url);
+        return h('li', null, h('strong', null, p.name),
+          h('span', { class: 'btn-row' },
+            h('a', { class: 'btn btn--small', href: 'https://wa.me/?text=' + encodeURIComponent(text), target: '_blank', rel: 'noopener' }, 'Ask on WhatsApp'),
+            h('a', { class: 'btn btn--ghost btn--small', href: 'mailto:' + p.email + '?subject=' + encodeURIComponent('Your memory of ' + about) + '&body=' + encodeURIComponent(text) }, 'Ask by email')));
+      })));
+    }
+    if (viewOnly.length) {
+      add(panel, h('p', { class: 'field__hint' }, listNames(viewOnly.map(function (p) { return p.name; })) + (viewOnly.length === 1 ? ' can' : ' can') + ' see what you share but not add to it yet. ',
+        button(viewOnly.length === 1 ? 'Let them add too' : 'Let them all add too', function (ev) {
+          ev.target.disabled = true;
+          viewOnly.reduce(function (pr, p) { return pr.then(function () { return store.savePerson({ id: p.id, name: p.name, email: p.email, role: 'family_edit' }); }); }, Promise.resolve())
+            .then(function () { state.people = null; flash = 'They can now add their own memories.'; render(); }).catch(fail);
+        }, 'text-link')));
+    }
+    if (!canAdd.length && !viewOnly.length) {
+      add(panel, h('p', null, link('#/people', 'Add a relative who can add their memories', 'text-link')));
+    }
+    return open ? panel : h('details', { class: 'app-more' }, h('summary', null, 'Ask the family for their memory of ' + about), panel);
   }
 
   // ---------- one entry ----------
@@ -424,7 +525,10 @@
         ]);
       }
       add(actions, link(mineArchive ? '#/archive' : '#/shared/' + e.owner, 'Back', 'text-link'));
+      var about = String(rememberedName(e) || e.teller || '').trim();
+      if (mineArchive && about) add(actions, link('#/archive?teller=' + encodeURIComponent(about), 'Everything about ' + about, 'text-link'));
       add(view, actions);
+      if (mineArchive && about) add(view, askFamily(about, false));
       return h1;
     });
   }
