@@ -303,6 +303,7 @@
       ctx.fillText('THE CULTURED HUMAN', P + (r[1] ? 112 : 0), y + 24);
       ctx.textBaseline = 'alphabetic';
       y += 170;
+      var top = y - 40;
       ctx.fillStyle = cssVar('--accent-ink', '#A5472A');
       ctx.font = '600 30px ' + sans;
       ctx.fillText(c.kind.toUpperCase(), P, y);
@@ -327,6 +328,14 @@
       ctx.font = '400 38px ' + sans;
       var room = Math.max(2, Math.floor((1070 - y) / 58));
       wrap(ctx, c.body, W - 2 * P, room).forEach(function (l) { ctx.fillText(l, P, y); y += 58; });
+      // Short entries sit in the middle of the space instead of leaving a gap above the credit.
+      var shift = Math.floor((1070 - y) / 2);
+      if (shift > 20) {
+        var block = ctx.getImageData(44, top, W - 88, y - top);
+        ctx.fillStyle = cssVar('--page', '#FBF4E8');
+        ctx.fillRect(44, top, W - 88, y - top);
+        ctx.putImageData(block, 44, top + shift);
+      }
       ctx.fillStyle = cssVar('--muted', '#6E6055');
       ctx.font = '400 32px ' + sans;
       wrap(ctx, 'Shared by ' + c.credit + (placeName ? ' · ' + placeName : ''), W - 2 * P, 1).forEach(function (l) { ctx.fillText(l, P, 1130); });

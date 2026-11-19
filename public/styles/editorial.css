@@ -793,7 +793,7 @@ p { margin: 0 0 1em; }
 .trace__places li a { display: inline-block; padding: .35rem .8rem; border-radius: 999px; background: var(--primary); color: var(--page); text-decoration: none; font-weight: 600; font-size: .9rem; }
 .trace__places p:last-child { margin: 0; font-size: .88rem; color: var(--muted); }
 
-.steps--five { grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); }
+.steps--five { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
 
 /* Plans. */
 .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); gap: 1.25rem; align-items: stretch; }
@@ -1110,7 +1110,6 @@ p { margin: 0 0 1em; }
 .role-card__body h2 { font-size: var(--step-2); }
 .role-card__body .btn { margin-top: auto; align-self: flex-start; }
 .role-card__body .check-list { margin: .4rem 0 1.2rem; }
-.steps--five { grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); }
 .fee-example { margin: 0; padding: clamp(1.25rem, 3vw, 2rem); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); display: grid; gap: .6rem; align-self: start; }
 .fee-example div { display: flex; justify-content: space-between; gap: 1rem; }
 .fee-example dt { color: var(--muted); }

@@ -109,6 +109,10 @@ The `firebase.json`, `.firebaserc` and `firestore.*` files belong to the earlier
 
 Each place page sends families to `/app.html#/contribute?place=<slug>` to write a word, a dish, a festival, a song or a memory and choose their credit. It waits as `pending` until a moderator publishes it at `/app.html#/moderate`; `public/scripts/places-live.js` then shows it on the place page without a rebuild. The enquiry form stays on the page, folded away, for people who would rather not sign in. The database needs `backend/places.sql`, which the build writes from `content/places/*.json` ([steps](backend/README.md#connecting-a-supabase-project)).
 
+When families suggest a place that has no page yet, the moderate page groups the suggestions. `npm run new-place -- --list` shows them; `npm run new-place -- --name "Jorhat" --region "Assam" --lat 26.75 --lng 94.2` writes `content/places/jorhat.json` (marked as started by families, with no photograph yet). With `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` set it also adds the place to the database and moves the waiting suggestions onto it; otherwise build, re-run `backend/places.sql`, and move them from the moderate page. Suggestions that match an existing place can be moved from the moderate page.
+
+Shared contributions live at `/s/<id>`, served by `api/shared.mjs` so WhatsApp, LinkedIn and others show the contribution in their link preview. Empty Commons and home feeds show a few examples from `content/community-examples.json`, always labelled as written by us; keep them factual.
+
 ## Weekly question sender
 
 `api/weekly-send.mjs` can send each person's weekly question on WhatsApp for their family member, once a day from a Vercel cron job. It is off until a WhatsApp Business number, an approved template and a few environment variables are in place; [`backend/weekly/README.md`](backend/weekly/README.md) has the steps.
