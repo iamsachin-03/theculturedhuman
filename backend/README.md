@@ -49,6 +49,17 @@ These mirror `public/scripts/app-core.js`, which the app uses to explain the sam
 8. For the daily emails, create a [Resend](https://resend.com) account, verify the site's domain, and set these in the Vercel project: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `EMAIL_FROM` (for example `The Cultured Human <hello@your-domain>`), `SITE_URL` and `CRON_SECRET`. The cron in `vercel.json` calls `/api/notify` once a day; open `/api/notify?dry=1` with the secret to see what it would send. Each email is sent once, and only for rows from the last 14 days.
 9. For online payments, create a [Razorpay](https://razorpay.com) account and set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` and `RAZORPAY_WEBHOOK_SECRET` in Vercel (start with the `rzp_test_` keys; no real money moves). In the Razorpay dashboard, add a webhook to `https://<your-site>/api/razorpay-webhook` for the events `order.paid` and `payment.captured`, with the same secret. Families then see "Pay securely" on an accepted quote (`api/razorpay-order.mjs` creates the order for the price plus the fee and checks Checkout's signature; the webhook confirms it independently). Without the keys nothing is charged and the moderator sends a payment link as before. To pay makers automatically, look at Razorpay Route later.
 
+## Keeping it locked down
+
+The code already does its part: every table has row-level security (tested by `test.sh`), privileged functions pin their `search_path`, the site sends a strict content security policy, payment and cron requests are checked against their secrets in constant time, and invite links are cleaned before they are drawn. These settings live outside the code, so check them when you connect the project:
+
+- **Redirect URLs.** Under Authentication → URL Configuration, list only the real site (`https://<your-site>/app.html`). A wildcard there lets a sign-in link send its token to someone else's address.
+- **Sign-up abuse.** Under Authentication → Rate Limits, keep email sends low (a few per hour per address) and turn on CAPTCHA under Attack Protection before launch.
+- **Secrets.** The service role key, `CRON_SECRET`, `RESEND_API_KEY` and the Razorpay secrets belong in Vercel's environment settings only, never in `content/site.json`, the repository or a chat. Make `CRON_SECRET` long and random (`openssl rand -hex 32`), and rotate any key that has been pasted somewhere it should not be.
+- **A new project URL.** The content security policy in `vercel.json` names the Supabase project. If you move to another project, change it there too; the site tests fail until you do.
+- **Accounts.** Turn on two-factor sign-in for the Supabase, Vercel, GitHub, Resend and Razorpay accounts. Whoever controls those controls the families' archives.
+- **Previews.** A tunnel (`cloudflared`, `localhost.run`) makes your local preview public to anyone with the address. Close it when you are done, and never point one at the local stand-in on port 54321.
+
 ## Running the tests
 
 With Postgres 15 or later installed locally:
@@ -60,7 +71,7 @@ PSQL="sudo -u postgres psql" backend/test.sh
 
 ## A local Supabase stand-in
 
-`dev/start.sh` starts a fresh database with `schema.sql`, Supabase Auth ([GoTrue](https://github.com/supabase/auth) binary), [PostgREST](https://postgrest.org) and `dev/dev-server.mjs`, all on `http://localhost:54321` like a Supabase project. The dev server stores files on disk with the same storage URLs as Supabase and the same access rules, and catches sign-in emails so links can be read at `http://localhost:54321/dev/mail`. It needs no Docker:
+`dev/start.sh` starts a fresh database with `schema.sql`, Supabase Auth ([GoTrue](https://github.com/supabase/auth) binary), [PostgREST](https://postgrest.org) and `dev/dev-server.mjs`, all on `http://localhost:54321` like a Supabase project. The dev server stores files on disk with the same storage URLs as Supabase and the same access rules, and catches sign-in emails so links can be read at `http://localhost:54321/dev/mail`. Because those links sign anyone in, it listens on this computer only and answers only pages on `localhost`. It needs no Docker:
 
 ```bash
 AUTH_BIN=/path/to/auth PGRST_BIN=/path/to/postgrest PSQL="sudo -u postgres psql" backend/dev/start.sh

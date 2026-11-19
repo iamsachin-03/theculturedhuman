@@ -17,6 +17,8 @@ npm test         # unit, site and app tests (node --test)
 
 Node 18 or newer is all you need. There is nothing to `npm install`.
 
+The local server only answers this computer and sends the same security headers as the live site (from `vercel.json`). To try the site on a phone on your Wi-Fi, run `HOST=0.0.0.0 npm run serve`; anyone on that network can then open it. The security settings to check when you connect Supabase are in `backend/README.md`, under "Keeping it locked down".
+
 ## How the site is organised
 
 | Path | What it is |
