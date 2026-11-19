@@ -97,6 +97,11 @@
   });
 
   function say(t) { status.textContent = t || ''; }
+  function track(name, data) { if (window.TCH && window.TCH.track) window.TCH.track(name, data); }
+  var started = false;
+  function start() { if (!started) { started = true; track('First story started'); } }
+  text.addEventListener('input', start);
+  recordBtn.addEventListener('click', start);
 
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
@@ -116,7 +121,7 @@
     };
     if (audio) entry.audio = audio;
     keep(entry).then(function () {
-      if (window.TCH.track) window.TCH.track('First story kept', { voice: !!audio });
+      track('First story kept', { voice: !!audio });
       form.hidden = true;
       waiting.hidden = true;
       done.hidden = false;
@@ -244,9 +249,10 @@
     var name = 'a-question-answered.png';
     var file = typeof File === 'function' ? new File([blob], name, { type: 'image/png' }) : null;
     if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file], text: entry.prompt + ' ' + location.origin + '/' }).catch(function () {});
+      navigator.share({ files: [file], text: entry.prompt + ' ' + location.origin + '/' }).then(function () { track('Keepsake card shared', { how: 'share' }); }, function () {});
       return;
     }
+    track('Keepsake card shared', { how: 'download' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = name;

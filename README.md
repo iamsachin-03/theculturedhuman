@@ -137,6 +137,16 @@ The site can count visits with [Vercel Web Analytics](https://vercel.com/docs/an
 
 Every public page then loads `/_vercel/insights/script.js`. Private pages (`noindex`, such as the archive app) never do, and the app's own addresses after `#` are never sent.
 
+## Measuring what matters
+
+Three numbers say whether families find the site and come back:
+
+1. **First-visit save rate**: home-page visitors who keep a first story. In Vercel Web Analytics, compare the `First story kept` event with visits to `/`. `First story started` shows how many begin, and `Keepsake card shared` shows how many send their card on (`how` is `share` or `download`). Custom events need a paid Vercel plan; on the free plan only visits are counted. Events never carry anything a visitor wrote.
+2. **Week-2 return**: archives where someone added something in the second week after the first entry.
+3. **Relatives per archive**: relatives added, relatives who have signed in, and relatives who have added something themselves.
+
+The second and third come from the database, not from tracking: run [`backend/metrics.sql`](backend/metrics.sql) in the Supabase SQL editor. It reads counts only. Week-2 return counts additions, not visits, which is the stronger signal and needs nothing extra in the archive app.
+
 ## Editorial rules
 
 - Never invent facts or quotations. Cite sources, and distinguish history from legend.
