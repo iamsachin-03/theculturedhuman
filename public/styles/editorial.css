@@ -662,14 +662,14 @@ button.text-link { background: none; border: 0; padding: 0; cursor: pointer; fon
 
 /* ── 9. Community & newsletter ───────────────────────────────────────────── */
 
-.invite { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.25rem, 3vw, 2.5rem); }
-.invite__card { padding: clamp(1.75rem, 4vw, 3rem); border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
+.invite { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.25rem, 3vw, 2.5rem); }
+.invite__card { min-width: 0; overflow-wrap: anywhere; padding: clamp(1.75rem, 4vw, 3rem); border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
 .invite__card--accent { background: var(--band); color: var(--band-ink); border-color: var(--band); }
 .invite__card--accent h2, .invite__card--accent h3 { color: var(--band-ink); }
 .invite__card--accent .eyebrow { color: var(--band-accent); }
 .invite__card h2, .invite__card h3 { font-size: var(--step-3); }
 .invite__card p { color: inherit; opacity: .88; }
-@media (max-width: 860px) { .invite { grid-template-columns: 1fr; } }
+@media (max-width: 860px) { .invite { grid-template-columns: minmax(0, 1fr); } }
 
 /* ── 10. Article ─────────────────────────────────────────────────────────── */
 
