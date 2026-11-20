@@ -16,7 +16,7 @@
     "api/weekly-send.mjs": {
       "includeFiles": "public/scripts/app-core.js"
     },
-    "api/shared.mjs": {
+    "api/shared.py": {
       "includeFiles": "{public/shared.html,public/places/places.json,content/site.json}"
     }
   },

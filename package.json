@@ -9,7 +9,8 @@
   "scripts": {
     "build": "node tools/build.mjs",
     "check": "node tools/build.mjs --check",
-    "test": "node --test test/*.test.mjs",
+    "test": "node --test test/*.test.mjs && npm run -s test:py",
+    "test:py": "python3 -m unittest discover -s test -p 'test_*.py'",
     "serve": "node tools/serve.mjs",
     "dev": "node tools/build.mjs && node tools/serve.mjs",
     "new-place": "node tools/new-place.mjs"
