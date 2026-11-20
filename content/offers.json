@@ -83,19 +83,17 @@
     "id": "gifting",
     "label": "Gifting",
     "title": "Gifts with a story",
-    "summary": "Festive and corporate gift boxes from named makers, each with a card that tells their story. Made to pre-order, never mass-stocked.",
+    "summary": "Gift boxes for family occasions from named makers, each with a card that tells their story. Made to pre-order, never mass-stocked.",
     "href": "/gifting.html",
     "image": "bankura-horses",
     "action": "Ask about gifting",
     "form": {
-      "organisation": true,
-      "organisationOptional": true,
       "choiceLabel": "What is the occasion?",
       "choices": [
         "Diwali",
         "Raksha Bandhan",
         "A wedding",
-        "Company gifting",
+        "A birthday or anniversary",
         "Something else"
       ],
       "messageLabel": "Tell us what you are looking for",
@@ -125,19 +123,18 @@
   {
     "id": "organisations",
     "label": "For organisations",
-    "title": "Culture sessions for teams",
-    "summary": "Painting hours with named artists, regional food stories and short introductions to Indian thought, for offsites, festival weeks and onboarding.",
+    "title": "Roots programmes for groups",
+    "summary": "Family-history projects for schools, recording afternoons for diaspora and community groups, and heritage partnerships, led by makers and storytellers on the platform.",
     "href": "/for-organisations.html",
     "image": "mithila-painter",
-    "action": "Plan a session",
+    "action": "Plan a programme",
     "form": {
       "organisation": true,
       "choiceLabel": "What are you interested in?",
       "choices": [
         "A family-history project for a school",
         "A programme for a diaspora or community group",
-        "A roots session or heritage month at work",
-        "Festive or corporate gifting",
+        "A heritage or craft partnership",
         "Something else"
       ],
       "messageLabel": "Tell us about your group and what you have in mind",

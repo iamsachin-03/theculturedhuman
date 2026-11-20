@@ -25,8 +25,8 @@
       "id": "groups",
       "step": "4",
       "eyebrow": "Together",
-      "title": "For schools, communities and teams.",
-      "intro": "The same tools and the same people, for a whole class, association or workplace."
+      "title": "For schools and communities.",
+      "intro": "The same tools and the same people, for a whole class or association."
     }
   ],
   "products": [
@@ -137,8 +137,8 @@
       "id": "gifting",
       "group": "give",
       "name": "Gifting",
-      "line": "Festive, wedding and company gifts from named makers, made to pre-order, each with a card that tells its story.",
-      "who": "Anyone sending gifts that should mean something, from one box to a whole company.",
+      "line": "Gifts for festivals, weddings and family occasions from named makers, made to pre-order, each with a card that tells its story.",
+      "who": "Anyone sending gifts that should mean something to the family receiving them.",
       "price": "Quoted per order, with the makers' prices shown.",
       "steps": ["Tell us who the gifts are for.", "We suggest makers and pieces.", "They are made to order and sent with their story."],
       "trust": "Made to pre-order, never mass-stocked, and every maker is named.",
@@ -163,8 +163,8 @@
       "id": "organisations",
       "group": "groups",
       "name": "For organisations",
-      "line": "Roots programmes for schools, diaspora and community groups and workplaces, led by makers and storytellers on the platform.",
-      "who": "Schools, associations and teams.",
+      "line": "Roots programmes for schools, diaspora and community groups, led by makers and storytellers on the platform.",
+      "who": "Schools, diaspora associations and community groups.",
       "price": "Quoted per programme, with the practitioner's fee shown separately.",
       "steps": ["Tell us about your group.", "We propose a session and a practitioner.", "Agree a clear quote before anything is booked."],
       "trust": "Everything is agreed in writing before it begins.",

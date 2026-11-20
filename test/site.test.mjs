@@ -232,6 +232,10 @@ test('the footer stays short', () => {
   assert.match(read('index.html'), /href="\/credits\.html"/);
 });
 
+test('nothing is offered to companies: no corporate gifting, team sessions or offsites', () => {
+  for (const page of pages) assert.doesNotMatch(read(page), /corporate|company gift|offsite|workplace|your team\b/i, page);
+});
+
 test('the retired lifestyle pages and the quiz are gone, and their old addresses lead somewhere useful', () => {
   const vercel = JSON.parse(readFileSync(join(ROOT, 'vercel.json'), 'utf8'));
   const redirects = Object.fromEntries(vercel.redirects.map((r) => [r.source, r.destination]));
