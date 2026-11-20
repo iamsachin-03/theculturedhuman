@@ -2,7 +2,7 @@
   "name": "theculturedhuman",
   "version": "1.0.0",
   "private": true,
-  "description": "The Cultured Human \u2014 an independent Indian cultural journal. Static site built with zero dependencies.",
+  "description": "The Cultured Human: a private family archive for the stories, voices and photographs a family wants to keep, with an open side for tracing where you come from. Static site built with Node, server functions in Python.",
   "engines": {
     "node": ">=18"
   },
