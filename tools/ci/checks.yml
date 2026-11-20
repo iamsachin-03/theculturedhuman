@@ -1,0 +1,50 @@
+# To switch these checks on, copy this file to .github/workflows/checks.yml in the repository
+# (on GitHub: Add file → Create new file, name it .github/workflows/checks.yml, paste this in).
+# It lives here because the tool that wrote it may not create workflow files.
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  site-and-functions:
+    name: Site, app and server functions
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: The built site matches its sources, with no broken links or unlicensed images
+        run: npm run check
+      - name: Node and Python tests
+        run: npm test
+
+  access-rules:
+    name: Database access rules
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every row-level security rule in backend/test.sql holds
+        env:
+          PGPASSWORD: postgres
+          PSQL: psql -h localhost -U postgres
+        run: backend/test.sh

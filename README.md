@@ -16,6 +16,8 @@ npm test         # unit, site and app tests (node --test), then the Python funct
 npm run test:py  # only the Python tests (python3 -m unittest)
 ```
 
+`tools/ci/checks.yml` runs `npm run check`, `npm test` and the database access rules on GitHub for every push and pull request once it is copied to `.github/workflows/checks.yml`.
+
 Node 18 or newer and Python 3.10 or newer are all you need: Node builds the site and serves it, and Python runs the server functions in `api/`. There is nothing to `npm install` or `pip install` (Vercel installs `requirements.txt`, which only adds time zone data).
 
 The local server only answers this computer and sends the same security headers as the live site (from `vercel.json`). To try the site on a phone on your Wi-Fi, run `HOST=0.0.0.0 npm run serve`; anyone on that network can then open it. The security settings to check when you connect Supabase are in `backend/README.md`, under "Keeping it locked down".
