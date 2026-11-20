@@ -81,7 +81,8 @@ PSQL="sudo -u postgres psql" backend/test.sh
 AUTH_BIN=/path/to/auth PGRST_BIN=/path/to/postgrest PSQL="sudo -u postgres psql" backend/dev/start.sh
 ```
 
-It prints an anon key and saves it to `/tmp/tch-anon-key`. Then:
+It prints an anon key and saves it to `/tmp/tch-anon-key`, and saves a service-role key to `/tmp/tch-service-key`. Then:
 
 - run the app against it by pasting this into the browser console on the local site (the override only works on `localhost` or `127.0.0.1`, and only for a backend there): `localStorage.setItem('tch-backend', JSON.stringify({ url: 'http://localhost:54321', anonKey: '<anon key>' }))` (remove the item to go back to preview mode);
-- run the app's Supabase integration test: `TCH_DEV_BACKEND=http://localhost:54321 TCH_DEV_ANON_KEY=$(cat /tmp/tch-anon-key) npm test`.
+- run the app's Supabase integration test: `TCH_DEV_BACKEND=http://localhost:54321 TCH_DEV_ANON_KEY=$(cat /tmp/tch-anon-key) npm test`;
+- run the payments test end to end (a real sign-in, an order, a signed webhook marking the booking paid): `TCH_DEV_BACKEND=http://localhost:54321 TCH_DEV_ANON_KEY=$(cat /tmp/tch-anon-key) TCH_DEV_SERVICE_KEY=$(cat /tmp/tch-service-key) npm run test:py`. The service key is saved by `start.sh` and, like Supabase's, bypasses the access rules, so keep it local.

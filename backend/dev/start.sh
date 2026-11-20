@@ -68,10 +68,15 @@ server-port = 3000
 CONF
 "$PGRST_BIN" /tmp/tch-postgrest.conf & REST=$!
 
-ANON=$(node -e '
+key() {
+  ROLE=$1 node -e '
 const c=require("crypto"),s=process.env.JWT_SECRET,b=o=>Buffer.from(JSON.stringify(o)).toString("base64url");
-const h=b({alg:"HS256",typ:"JWT"}),p=b({role:"anon",iss:"local",iat:Math.floor(Date.now()/1000),exp:Math.floor(Date.now()/1000)+31536000});
-console.log(h+"."+p+"."+c.createHmac("sha256",s).update(h+"."+p).digest("base64url"))')
+const h=b({alg:"HS256",typ:"JWT"}),p=b({role:process.env.ROLE,iss:"local",iat:Math.floor(Date.now()/1000),exp:Math.floor(Date.now()/1000)+31536000});
+console.log(h+"."+p+"."+c.createHmac("sha256",s).update(h+"."+p).digest("base64url"))'
+}
+ANON=$(key anon)
 echo "$ANON" > /tmp/tch-anon-key
-echo "Ready: http://localhost:54321  anon key: $ANON"
+# The service-role key bypasses the access rules, like Supabase's; only the server functions and tests use it.
+(umask 077; key service_role > /tmp/tch-service-key)
+echo "Ready: http://localhost:54321  anon key: $ANON  (service key in /tmp/tch-service-key)"
 wait
