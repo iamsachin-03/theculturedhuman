@@ -945,6 +945,19 @@ button.text-link { background: none; border: 0; padding: 0; cursor: pointer; fon
 .app-transcript h4 { margin: .5rem 0 0; font: 600 .8rem/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .app-transcript__text { margin: 0; white-space: pre-wrap; }
 .app-transcript__form { display: grid; gap: .75rem; }
+.app-gift-options { display: grid; gap: .8rem; margin-bottom: var(--space-3); }
+.app-gift-options h2 { margin: .5rem 0 0; font-size: var(--step-1); }
+.app-giftcard { max-width: 34rem; margin: 0 auto var(--space-3); padding: clamp(2rem, 6vw, 3.5rem) clamp(1.5rem, 5vw, 3rem); text-align: center; background: var(--surface); border: 1px solid var(--line); outline: 1px solid var(--accent-2); outline-offset: -12px; font-family: var(--serif); }
+.app-giftcard__eyebrow, .app-giftcard__label { font: 600 .78rem/1.2 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.app-giftcard h2 { font: 500 var(--step-5)/1 var(--serif); color: var(--primary); margin: 1rem 0 .3rem; }
+.app-giftcard__for { font-size: var(--step-2); font-style: italic; margin: 0 0 1.5rem; }
+.app-giftcard__how { font-size: 1.1rem; max-width: 24rem; margin: 0 auto 1.5rem; }
+.app-giftcard blockquote { font-size: var(--step-1); line-height: 1.4; margin: .5rem auto 1.5rem; max-width: 26rem; }
+.app-giftcard__from { font-size: var(--step-1); margin: 0; }
+@media print {
+  .app-gift-options, .app-giftcard-wrap ~ p { display: none !important; }
+  .app-giftcard { margin-top: 15vh; break-inside: avoid; }
+}
 .app-book-options { display: grid; gap: 1rem; margin-bottom: var(--space-3); }
 .app-book-options__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 1rem; }
 .app-book-options__kinds { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; }
@@ -979,7 +992,7 @@ button.text-link { background: none; border: 0; padding: 0; cursor: pointer; fon
 .fbook__english span, .fbook__note { color: var(--muted); }
 .fbook__colophon { font: .85rem var(--sans); color: var(--muted); text-align: center; border-top: 1px solid var(--line); padding-top: 1.5rem; }
 @media print {
-  .app-head, .app-book-options { display: none !important; }
+  .app-head:has(~ .app-book-options), .app-head:has(~ .app-gift-options), .app-book-options { display: none !important; }
   .fbook { max-width: none; font-size: 11.5pt; }
   .fbook__cover { min-height: 90vh; display: flex; flex-direction: column; justify-content: center; border: 0; break-after: page; }
   .fbook__contents { border: 0; break-after: page; }

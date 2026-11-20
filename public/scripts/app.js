@@ -177,7 +177,7 @@
 
   var routes = [
     [/^$/, home], [/^archive$/, archive], [/^entry\/new$/, editor], [/^entry\/([\w-]+)\/edit$/, editor],
-    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^interview$/, interview], [/^book$/, book], [/^people$/, people], [/^shared$/, shared],
+    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^interview$/, interview], [/^book$/, book], [/^gift$/, gift], [/^people$/, people], [/^shared$/, shared],
     [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings], [/^contribute$/, contribute], [/^moderate$/, moderate],
     [/^offer$/, offer], [/^request$/, requestForm], [/^requests$/, requests], [/^echo$/, echo], [/^report$/, reportForm],
   ];
@@ -1084,7 +1084,7 @@
         })));
       }
       if (current) add(view, questionCard(current));
-      add(view, elderForm(!current));
+      add(view, elderForm(!current, query.get('gift') === '1'));
       return h1;
     });
   }
@@ -1130,6 +1130,7 @@
       ),
       h('div', { class: 'btn-row' },
         button('They answered, next question', function () { store.saveElder({ id: elder.id, idx: elder.idx + 1, answered: elder.answered + 1, askedAt: null }).then(function () { render(); }).catch(fail); }, 'btn btn--ghost btn--small'),
+        link('#/gift?elder=' + elder.id, 'Give it as a gift', 'btn btn--ghost btn--small'),
         button('Skip this one', function () { store.saveElder({ id: elder.id, idx: elder.idx + 1, askedAt: null }).then(function () { render(); }).catch(fail); }, 'btn btn--ghost btn--small'),
         button('Add a weekly reminder to my calendar', function () {
           download('weekly-question-' + core.safeFileName(elder.name) + '.ics', core.reminder(elder, new Date(), returnTo + '#/weekly'), 'text/calendar');
@@ -1141,6 +1142,66 @@
       h('p', { class: 'field__hint' }, plural(elder.answered, 'answer') + ' kept so far, every ' + DAYS[elder.day] + '.'),
     ]);
     return card;
+  }
+
+  // ---------- the weekly question as a present ----------
+  function gift(_, query) {
+    var h1 = page('Give it as a gift', 'A year of questions makes a present for a birthday, an anniversary or a festival. Send the message that tells them it is coming, or print the card and give it by hand.');
+    return store.elders().then(function (elders) {
+      var elder = elders.filter(function (e) { return e.id === query.get('elder'); })[0] || (query.get('elder') ? null : elders[0]);
+      if (!elder) {
+        add(view, elderForm(true, true));
+        return h1;
+      }
+      var hi = elder.lang === 'hi';
+      var from = elder.signAs || firstName(state.user.name);
+      var occasion = options(h('select', { name: 'occasion', onchange: draw }), core.GIFT_OCCASIONS, query.get('occasion') || '');
+      var msg = h('pre', { class: 'app-message', lang: elder.lang });
+      var card = h('div', { class: 'app-giftcard-wrap' });
+      var actions = h('div', { class: 'btn-row' });
+      var text = '';
+      add(view, h('div', { class: 'app-card app-gift-options' },
+        elders.length > 1 ? h('div', { class: 'app-filters', role: 'group', 'aria-label': 'For' }, elders.map(function (e) {
+          return h('a', { href: '#/gift?elder=' + e.id, 'aria-current': e === elder ? 'true' : null }, e.name);
+        })) : null,
+        field('The occasion', occasion),
+        h('h2', null, 'The message'),
+        msg,
+        actions,
+        h('p', { class: 'field__hint' }, 'The card and message are in ' + (hi ? 'Hindi' : 'English') + ', the language you ask ' + elder.name + ' in. Change it on the weekly question.'),
+      ));
+      add(view, card);
+      add(view, h('p', null, link('#/weekly?elder=' + elder.id, 'Back to the weekly question', 'text-link')));
+      function draw() {
+        var o = core.find(core.GIFT_OCCASIONS, occasion.value) || core.GIFT_OCCASIONS[0];
+        text = core.giftMessage(elder, from, o.id);
+        msg.textContent = text;
+        actions.textContent = '';
+        if (elder.phone) add(actions, h('a', { class: 'btn', href: core.whatsappLink(elder.phone, text), target: '_blank', rel: 'noopener' }, 'Send it on WhatsApp'));
+        add(actions, [
+          button('Copy the message', function () {
+            (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { say('Copied. Paste it into any message.'); }, function () { say('Select the message above and copy it.'); });
+          }, elder.phone ? 'btn btn--ghost' : 'btn'),
+          button('Print the card', function () { window.print(); }, 'btn btn--ghost'),
+        ]);
+        var first = core.question(elder.idx, elder.lang);
+        var occasionLine = hi ? o.hi : o.en ? o.en.charAt(0).toUpperCase() + o.en.slice(1) : '';
+        card.textContent = '';
+        add(card, h('article', { class: 'app-giftcard', lang: elder.lang },
+          h('p', { class: 'app-giftcard__eyebrow' }, occasionLine || (hi ? 'एक तोहफ़ा' : 'A gift')),
+          h('h2', null, hi ? 'सवालों का एक साल' : 'A year of questions'),
+          h('p', { class: 'app-giftcard__for' }, hi ? elder.name + ' के लिए' : 'for ' + elder.name),
+          h('p', { class: 'app-giftcard__how' }, hi
+            ? 'हर ' + ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'][elder.day] + ' एक सवाल, WhatsApp पर। जवाब वॉइस नोट में, किसी भी भाषा में।'
+            : 'One question every ' + DAYS[elder.day] + ', on WhatsApp. Answer with a voice note, in any language.'),
+          h('p', { class: 'app-giftcard__label' }, hi ? 'पहला सवाल' : 'The first one'),
+          h('blockquote', null, first.text),
+          h('p', { class: 'app-giftcard__from' }, (hi ? 'प्यार सहित, ' : 'With love, ') + from),
+        ));
+      }
+      draw();
+      return h1;
+    });
   }
 
   // ---------- a sit-down interview ----------
@@ -1277,7 +1338,7 @@
     );
   }
 
-  function elderForm(open) {
+  function elderForm(open, asGift) {
     var form = h('form', { class: 'app-card' });
     var name = h('input', { name: 'name', required: true, maxlength: '40' });
     var relation = h('input', { name: 'relation', placeholder: 'Nani, Dad, my aunt…' });
@@ -1290,7 +1351,7 @@
     var birthday = h('span', { class: 'app-inline' }, bDay, bMonth);
     var lang = options(h('select', { name: 'lang' }), core.LANGUAGES, 'en');
     add(form, [
-      h('h2', null, open ? 'Who would you like to ask?' : 'Ask someone else too'),
+      h('h2', null, asGift ? 'Who is the gift for?' : open ? 'Who would you like to ask?' : 'Ask someone else too'),
       h('div', { class: 'app-form-grid' },
         field('Their name', name), field('Who are they to you? (optional)', relation),
         field('Their WhatsApp number (optional)', phone, cfg.weeklyAuto && store.mode === 'supabase'
@@ -1299,14 +1360,14 @@
         field('Which day?', day), field('Ask in', lang, 'They can answer in any language.'), field('Sign the message as', signAs),
         field('Their birthday (optional)', birthday, 'Just the day and month. We remind you a few days before.'),
       ),
-      h('div', { class: 'btn-row' }, button('Start the weekly question', null, 'btn', 'submit')),
+      h('div', { class: 'btn-row' }, button(asGift ? 'Next: the gift card' : 'Start the weekly question', null, 'btn', 'submit')),
     ]);
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       store.saveElder({ name: name.value.trim(), relation: relation.value.trim(), phone: phone.value.trim(), day: Number(day.value), signAs: signAs.value.trim(), lang: lang.value, birthday: bMonth.value && bDay.value ? bMonth.value + '-' + bDay.value : '' })
-        .then(function (e) { location.hash = '#/weekly?elder=' + e.id; }).catch(fail);
+        .then(function (e) { location.hash = (asGift ? '#/gift?elder=' : '#/weekly?elder=') + e.id; }).catch(fail);
     });
-    return open ? form : h('details', { class: 'app-more' }, h('summary', null, 'Ask someone else too'), form);
+    return open || asGift ? form : h('details', { class: 'app-more' }, h('summary', null, 'Ask someone else too'), form);
   }
 
   // ---------- people ----------

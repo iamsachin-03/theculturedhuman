@@ -172,3 +172,12 @@ test('every festival that follows the moon has dates listed at least a year ahea
     assert.ok(o.dates.at(-1) >= yearAhead, `${o.name} needs dates beyond ${o.dates.at(-1)}: add the next years to OCCASIONS in app-core.js`);
   }
 });
+
+test('the weekly question given as a gift says what is coming, on their day, in their language', () => {
+  const papa = { name: 'Papa', day: 0, lang: 'en' };
+  assert.equal(core.giftMessage(papa, 'Meera', 'birthday').split('\n')[0], 'Papa, for your birthday, I am giving you a year of questions.');
+  assert.match(core.giftMessage(papa, 'Meera'), /^Papa, I am giving you[\s\S]*Every Sunday,[\s\S]*With love,\nMeera$/);
+  assert.match(core.giftMessage({ ...papa, day: 3 }, ''), /Every Wednesday[\s\S]*own words\.$/);
+  assert.match(core.giftMessage({ name: 'नानी', day: 0, lang: 'hi' }, 'आशा', 'diwali'), /^नानी, दिवाली पर आपके लिए एक तोहफ़ा[\s\S]*हर रविवार[\s\S]*प्यार सहित,\nआशा$/);
+  assert.match(core.giftMessage(papa, 'Meera', 'not-an-occasion'), /^Papa, I am giving/);
+});

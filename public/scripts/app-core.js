@@ -273,6 +273,33 @@
       'Reply whenever you like with a voice note, in whichever language feels right. Take as long as you want.';
   }
 
+  // Giving the weekly question as a present: the message that tells them it is coming.
+  var GIFT_OCCASIONS = [
+    { id: '', label: 'No particular occasion', en: '', hi: '' },
+    { id: 'birthday', label: 'A birthday', en: 'for your birthday', hi: 'आपके जन्मदिन पर' },
+    { id: 'anniversary', label: 'An anniversary', en: 'for your anniversary', hi: 'आपकी सालगिरह पर' },
+    { id: 'diwali', label: 'Diwali', en: 'for Diwali', hi: 'दिवाली पर' },
+    { id: 'mothers', label: 'Mother\u2019s Day', en: 'for Mother\u2019s Day', hi: 'मदर्स डे पर' },
+    { id: 'fathers', label: 'Father\u2019s Day', en: 'for Father\u2019s Day', hi: 'फ़ादर्स डे पर' },
+  ];
+  var DAYS_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var DAYS_HI = ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'];
+  function giftMessage(elder, from, occasion) {
+    var o = find(GIFT_OCCASIONS, occasion || '') || GIFT_OCCASIONS[0];
+    var name = String(elder.name || '').trim();
+    var sender = String(from || '').trim();
+    if (elder.lang === 'hi') {
+      return (name ? name + ', ' : '') + (o.hi ? o.hi + ' ' : '') + 'आपके लिए एक तोहफ़ा: सवालों का एक साल।\n\n' +
+        'हर ' + DAYS_HI[elder.day] + ' आपकी ज़िंदगी के बारे में एक सवाल WhatsApp पर आएगा: आप कहाँ बड़े हुए, किन्हें चाहा, आप क्या जानते हैं। ' +
+        'जब मन करे, किसी भी भाषा में वॉइस नोट में जवाब दीजिए।\n\n' +
+        'एक साल में परिवार के पास आपकी ज़िंदगी आपके ही शब्दों में होगी।' + (sender ? '\n\nप्यार सहित,\n' + sender : '');
+    }
+    return (name ? name + ', ' : '') + (o.en ? o.en + ', ' : '') + 'I am giving you a year of questions.\n\n' +
+      'Every ' + DAYS_EN[elder.day] + ', one question about your life will come to you on WhatsApp: where you grew up, the people you loved, the things you know. ' +
+      'Answer with a voice note whenever you like, in any language.\n\n' +
+      'In a year, our family will have your life in your own words.' + (sender ? '\n\nWith love,\n' + sender : '');
+  }
+
   function whatsappLink(phone, text) {
     return 'https://wa.me/' + String(phone || '').replace(/[^\d]/g, '') + '?text=' + encodeURIComponent(text);
   }
@@ -529,7 +556,7 @@
     newLegacy: newLegacy, legacyNext: legacyNext, legacySeen: legacySeen, legacyReport: legacyReport,
     question: question, message: message, whatsappLink: whatsappLink, reminder: reminder,
     mediaKind: mediaKind, formatBytes: formatBytes, formatDate: formatDate, safeFileName: safeFileName,
-    OCCASIONS: OCCASIONS, upcoming: upcoming, BOOK_GOAL: BOOK_GOAL,
+    OCCASIONS: OCCASIONS, upcoming: upcoming, BOOK_GOAL: BOOK_GOAL, GIFT_OCCASIONS: GIFT_OCCASIONS, giftMessage: giftMessage,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = core;
   else (root.TCH = root.TCH || {}).core = core;

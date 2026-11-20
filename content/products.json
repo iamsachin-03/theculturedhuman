@@ -147,6 +147,19 @@
       "image": "kohbar-wall"
     },
     {
+      "id": "gift-a-year",
+      "group": "give",
+      "name": "A year of questions",
+      "line": "One question a week about their life, sent on WhatsApp to a parent or grandparent, with a card to give. Their voice notes are kept for the family.",
+      "who": "Anyone looking for a birthday, anniversary or festival present that will matter in twenty years.",
+      "price": "Free",
+      "steps": ["Make the card and send the message.", "A question goes out every week.", "Their answers are kept in your archive."],
+      "trust": "Our number only messages them once you tell us they have agreed.",
+      "href": "/gift-a-year.html",
+      "cta": { "label": "Make the gift card", "href": "/app.html#/gift" },
+      "image": "three-generations-story"
+    },
+    {
       "id": "gifting",
       "group": "give",
       "name": "Gifting",
