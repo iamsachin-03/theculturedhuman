@@ -4,13 +4,13 @@
 (function (root) {
   var core = root.TCH.core;
   var SESSION = 'tch-local-session';
-  var STORES = ['users', 'people', 'entries', 'media', 'legacy', 'elders', 'roots', 'contributions', 'listings'];
+  var STORES = ['users', 'people', 'entries', 'media', 'legacy', 'elders', 'roots', 'contributions', 'listings', 'remembrances'];
   var dbPromise = null;
 
   function db() {
     if (!dbPromise) {
       dbPromise = new Promise(function (resolve, reject) {
-        var req = indexedDB.open('tch-app', 4);
+        var req = indexedDB.open('tch-app', 5);
         req.onupgradeneeded = function () {
           STORES.forEach(function (name) {
             if (req.result.objectStoreNames.contains(name)) return;
@@ -344,6 +344,29 @@
       return get('elders', id).then(function (e) { if (e && e.owner === owner) return del('elders', id); });
     },
 
+    remembrances: function () {
+      var owner = need();
+      return all('remembrances').then(function (list) {
+        return list.filter(function (r) { return r.owner === owner; }).sort(function (a, b) { return a.createdAt.localeCompare(b.createdAt); });
+      });
+    },
+
+    saveRemembrance: function (fields) {
+      var owner = need();
+      var r = core.remembrance(fields);
+      var load = r.id ? get('remembrances', r.id) : Promise.resolve(null);
+      return load.then(function (existing) {
+        var row = existing && existing.owner === owner ? copy(existing) : { id: uid(), owner: owner, createdAt: now().toISOString() };
+        ['name', 'relation', 'diedOn', 'bornOn', 'bornYear', 'diedYear'].forEach(function (k) { row[k] = r[k]; });
+        return put('remembrances', row);
+      });
+    },
+
+    deleteRemembrance: function (id) {
+      var owner = need();
+      return get('remembrances', id).then(function (r) { if (r && r.owner === owner) return del('remembrances', id); });
+    },
+
     /** The roots portrait kept in this archive, in its saved form (TCHRootsArt.clean), or null. */
     roots: function () {
       var owner = need();
@@ -429,7 +452,7 @@
 
     deleteAccount: function () {
       var owner = need();
-      return Promise.all(['entries', 'media', 'people', 'elders', 'contributions', 'listings'].map(function (name) {
+      return Promise.all(['entries', 'media', 'people', 'elders', 'contributions', 'listings', 'remembrances'].map(function (name) {
         return all(name).then(function (list) {
           return Promise.all(list.filter(function (x) { return x.owner === owner || (name === 'people' && x.userId === owner); })
             .map(function (x) { return del(name, x.id); }));

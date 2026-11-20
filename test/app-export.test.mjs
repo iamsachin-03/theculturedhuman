@@ -13,6 +13,7 @@ const archive = {
   owner: { name: 'Asha Mishra', email: 'asha@example.org' },
   people: [{ id: 'p1', name: 'Ravi', role: 'family_edit' }],
   weekly: [], legacy: { quietMonths: 12, waitDays: 30 },
+  remembrances: [{ id: 'r1', name: 'Nanaji <3', relation: 'Grandfather', diedOn: '03-12', bornOn: '', bornYear: 1931, diedYear: 2011 }],
   exportedAt: '2026-11-20T10:00:00.000Z',
   entries: [
     {
@@ -74,6 +75,8 @@ test('the copy is a valid zip with a page to open, archive.json and every file t
   assert.match(page, /This file could not be copied: wall\.jpg/);
   assert.match(page, /Ravi — Family, can add/);
   assert.ok(page.includes('<p class="said">मछली &lt;i&gt;समुंदर&lt;/i&gt;</p><p class="note">In English: The fish, the sea</p>'), 'transcripts are on the page, escaped');
+  assert.ok(page.includes('<li><strong>Nanaji &lt;3</strong>, Grandfather (1931–2011). Remembered on 12 March.</li>'), 'the people remembered are on the page');
+  assert.equal(data.remembrances[0].diedOn, '03-12');
   assert.doesNotMatch(page, /<script|<b>/);
 });
 

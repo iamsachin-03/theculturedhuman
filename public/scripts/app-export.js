@@ -147,6 +147,13 @@
           (e.prompt ? '<p class="prompt">' + esc(e.prompt) + '</p>' : '') + body + media + '</article>';
       }).join('') + '</section>';
     }).join('');
+    var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var dayMonth = function (md) { var p = String(md || '').split('-'); return p.length === 2 ? Number(p[1]) + ' ' + MONTHS[Number(p[0]) - 1] : ''; };
+    var remembered = (archive.remembrances || []).length ? '<section><h2>Remembered</h2><ul>' + archive.remembrances.map(function (r) {
+      var years = core.lifeYears(r);
+      return '<li><strong>' + esc(r.name) + '</strong>' + (r.relation ? ', ' + esc(r.relation) : '') + (years ? ' (' + esc(years) + ')' : '') +
+        '. Remembered on ' + esc(dayMonth(r.diedOn)) + (r.bornOn ? '; born on ' + esc(dayMonth(r.bornOn)) : '') + '.</li>';
+    }).join('') + '</ul></section>' : '';
     var circle = people.length ? '<section><h2>The people in this archive</h2><ul>' + people.map(function (p) {
       var role = core.ROLES.filter(function (r) { return r.id === p.role; })[0];
       return '<li>' + esc(p.name) + (role ? ' — ' + esc(role.label) : '') + '</li>';
@@ -161,10 +168,10 @@
       '</style></head><body><main><h1>' + esc(owner) + '</h1>' +
       '<p class="note">Copied from The Cultured Human on ' + esc(core.formatDate(archive.exportedAt)) + '. This copy is yours. It opens without the internet, ' +
       'and every photograph, recording and document is in the files folder as itself. archive.json holds everything again, for moving it somewhere else.</p>' +
-      sections + circle + '</main></body></html>';
+      sections + remembered + circle + '</main></body></html>';
   }
 
-  // archive: { owner, people, weekly, legacy, entries, exportedAt }. fetched: path → Uint8Array, or nothing when a file could not be read.
+  // archive: { owner, people, weekly, remembrances, legacy, entries, exportedAt }. fetched: path → Uint8Array, or nothing when a file could not be read.
   function build(archive, files, fetched) {
     var copied = {};
     files.forEach(function (f) { copied[f.path] = !!fetched[f.path]; });
@@ -172,7 +179,7 @@
     files.forEach(function (f) { paths[f.mediaId] = f.path; });
     var data = {
       format: 'the-cultured-human-family-archive', version: 3, exportedAt: archive.exportedAt,
-      owner: archive.owner, legacy: archive.legacy, people: archive.people, weekly: archive.weekly,
+      owner: archive.owner, legacy: archive.legacy, people: archive.people, weekly: archive.weekly, remembrances: archive.remembrances || [],
       entries: archive.entries.slice().sort(byDate).map(function (e) {
         var out = {};
         Object.keys(e).forEach(function (k) { out[k] = e[k]; });

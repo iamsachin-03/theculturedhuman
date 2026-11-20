@@ -21,6 +21,11 @@
   var elders = [
     { id: 'el-nani', owner: ASHA, name: 'Nani', relation: 'Grandmother', phone: '', day: 0, idx: 6, answered: 5, askedAt: ago(3), birthday: '03-12', createdAt: ago(45) },
   ];
+  // Nanaji's remembrance day is always a few days away, so the sample shows how one comes round.
+  var soon = new Date(Date.now() + 9 * 86400000);
+  var remembered = [
+    { id: 'rm-nanaji', owner: ASHA, name: 'Nanaji', relation: 'Grandfather', diedOn: ('0' + (soon.getMonth() + 1)).slice(-2) + '-' + ('0' + soon.getDate()).slice(-2), bornOn: '', bornYear: 1931, diedYear: 2011, createdAt: ago(45) },
+  ];
   var memory = function (name) { return 'What do you remember about ' + name + '?'; };
   var voice = (function () {
     var el = root.document && root.document.getElementById('tch-sample-voice');
@@ -116,6 +121,7 @@
     mediaUrl: function (m) { return m.url ? Promise.resolve(m.url) : Promise.reject(new Error('This file is missing.')); },
     sharedWithMe: function () { return ok([{ owner: RAVI, ownerName: 'Ravi Mishra', role: 'family_edit', personId: 'r-asha', legacy: null }]); },
     elders: function () { return ok(elders); },
+    remembrances: function () { return ok(remembered); },
     roots: function () { return ok(roots); },
     myContributions: function () { return ok([]); },
     contribution: function () { return ok(null); },
@@ -133,7 +139,7 @@
     myEchoes: function () { return ok([]); },
   };
   ['signIn', 'handleRedirect', 'saveProfile', 'saveLegacy', 'savePerson', 'deletePerson', 'saveEntry', 'deleteEntry', 'addMedia', 'deleteMedia', 'saveTranscript',
-    'reportPassing', 'skipWaiting', 'saveElder', 'deleteElder', 'saveRoots', 'contribute', 'updateContribution', 'deleteContribution', 'report',
+    'reportPassing', 'skipWaiting', 'saveElder', 'deleteElder', 'saveRemembrance', 'deleteRemembrance', 'saveRoots', 'contribute', 'updateContribution', 'deleteContribution', 'report',
     'adoptSuggestion', 'resolveReports', 'reviewContribution', 'featureContribution', 'saveListing', 'deleteListing', 'requestBooking',
     'updateBooking', 'reviewListing', 'echo', 'deleteAccount'].forEach(function (name) { store[name] = no; });
 

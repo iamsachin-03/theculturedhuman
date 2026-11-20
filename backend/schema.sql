@@ -143,6 +143,21 @@ create table cards (
 );
 create index cards_entry on cards (entry_id);
 
+-- People the family remembers: the day they died, and their birthday if known, come round each year
+-- in the app as days to gather memories. Month and day (MM-DD), with the years optional.
+create table remembrances (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  name text not null check (length(name) between 1 and 80),
+  relation text check (length(relation) <= 80),
+  died_on text not null check (died_on ~ '^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'),
+  born_on text check (born_on is null or born_on = '' or born_on ~ '^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'),
+  born_year int check (born_year between 1800 and 2100),
+  died_year int check (died_year between 1800 and 2100),
+  created_at timestamptz not null default now(),
+  check (born_year is null or died_year is null or born_year <= died_year)
+);
+
 create table roots (
   owner_id uuid primary key default auth.uid() references auth.users (id) on delete cascade,
   data jsonb not null default '{}'
@@ -618,6 +633,7 @@ alter table weekly_elders enable row level security;
 alter table whatsapp_messages enable row level security;
 alter table cards enable row level security;
 alter table roots enable row level security;
+alter table remembrances enable row level security;
 alter table places enable row level security;
 alter table place_contributions enable row level security;
 alter table listings enable row level security;
@@ -662,6 +678,7 @@ create policy "owners make cards of their own recordings" on cards for insert wi
 create policy "owners withdraw their cards" on cards for update using (owner_id = auth.uid()) with check (owner_id = auth.uid());
 create policy "owners delete their cards" on cards for delete using (owner_id = auth.uid());
 create policy "owners only" on roots for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+create policy "owners only" on remembrances for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
 
 create policy "anyone reads places" on places for select using (true);
 create policy "moderators manage places" on places for all using (is_moderator()) with check (is_moderator());

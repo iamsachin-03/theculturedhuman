@@ -372,11 +372,55 @@
     if (next < start) next = new Date(start.getFullYear() + 1, parts[0] - 1, parts[1]);
     return { days: Math.round((next - start) / 86400000), date: next };
   }
-  /** Birthdays of the people you ask, and festivals, coming within `within` days of `today`, soonest first. */
-  function upcoming(today, elders, within) {
+  // Someone the family remembers: the day they died (and their birthday, if known) come round each
+  // year as days to gather memories. Month and day only, with the years optional.
+  var MD = /^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
+  function remembrance(f) {
+    var year = function (y) { var n = Number(String(y || '').trim()); return /^\d{4}$/.test(String(y || '').trim()) && n >= 1800 && n <= 2100 ? n : null; };
+    var r = {
+      id: f.id || undefined,
+      name: String(f.name || '').trim().slice(0, 80),
+      relation: String(f.relation || '').trim().slice(0, 80),
+      diedOn: String(f.diedOn || '').trim(),
+      bornOn: String(f.bornOn || '').trim(),
+      bornYear: year(f.bornYear),
+      diedYear: year(f.diedYear),
+    };
+    if (!r.name) throw new Error('Please add their name.');
+    if (!MD.test(r.diedOn)) throw new Error('Please choose the day and month they died.');
+    if (r.bornOn && !MD.test(r.bornOn)) r.bornOn = '';
+    if (r.bornYear && r.diedYear && r.bornYear > r.diedYear) throw new Error('The year they were born is after the year they died.');
+    return r;
+  }
+  function lifeYears(r) {
+    return r.bornYear || r.diedYear ? (r.bornYear || '?') + '\u2013' + (r.diedYear || '?') : '';
+  }
+  function remembranceText(r, from) {
+    var years = lifeYears(r);
+    return 'Today we remember ' + r.name + (years ? ' (' + years + ')' : '') + '.\n\n' +
+      'If you have a memory of ' + r.name + ', a story, a saying, or a photograph, send it to me as a message or a voice note. I am keeping them together in our family archive, so the children know who ' + r.name + ' was.' +
+      (from ? '\n\n' + from : '');
+  }
+
+  /** Birthdays of the people you ask, remembrance days, and festivals, coming within `within` days of `today`, soonest first. */
+  function upcoming(today, elders, within, remembered) {
     within = within === undefined ? 21 : within;
     var start = dayStart(today);
     var list = [];
+    (remembered || []).forEach(function (r) {
+      var question = 'What do you remember about ' + r.name + '?';
+      if (MD.test(r.diedOn || '')) {
+        var u = daysUntil(start, r.diedOn);
+        var years = r.diedYear ? u.date.getFullYear() - r.diedYear : 0;
+        list.push({ kind: 'remembrance', name: r.name + '\u2019s remembrance day', person: r, days: u.days, date: u.date, question: question,
+          detail: years > 0 ? years + (years === 1 ? ' year' : ' years') + ' since ' + r.name + ' died' : '' });
+      }
+      if (MD.test(r.bornOn || '')) {
+        var b = daysUntil(start, r.bornOn);
+        var age = r.bornYear ? b.date.getFullYear() - r.bornYear : 0;
+        list.push({ kind: 'remembrance', name: age > 0 ? r.name + ' would have turned ' + age : r.name + '\u2019s birthday', person: r, days: b.days, date: b.date, question: question, detail: '' });
+      }
+    });
     (elders || []).forEach(function (e) {
       if (!/^\d{2}-\d{2}$/.test(e.birthday || '')) return;
       var u = daysUntil(start, e.birthday);
@@ -393,7 +437,8 @@
       });
       if (u) list.push({ kind: 'festival', name: o.name, days: u.days, date: u.date, question: o.question });
     });
-    return list.filter(function (x) { return x.days <= within; }).sort(function (a, b) { return a.days - b.days || (a.kind === 'birthday' ? -1 : 1); });
+    var order = { remembrance: 0, birthday: 1, festival: 2 };
+    return list.filter(function (x) { return x.days <= within; }).sort(function (a, b) { return a.days - b.days || order[a.kind] - order[b.kind]; });
   }
 
   // A printed family book needs enough in it to feel like one.
@@ -557,6 +602,7 @@
     question: question, message: message, whatsappLink: whatsappLink, reminder: reminder,
     mediaKind: mediaKind, formatBytes: formatBytes, formatDate: formatDate, safeFileName: safeFileName,
     OCCASIONS: OCCASIONS, upcoming: upcoming, BOOK_GOAL: BOOK_GOAL, GIFT_OCCASIONS: GIFT_OCCASIONS, giftMessage: giftMessage,
+    remembrance: remembrance, lifeYears: lifeYears, remembranceText: remembranceText,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = core;
   else (root.TCH = root.TCH || {}).core = core;

@@ -181,3 +181,22 @@ test('the weekly question given as a gift says what is coming, on their day, in 
   assert.match(core.giftMessage({ name: 'नानी', day: 0, lang: 'hi' }, 'आशा', 'diwali'), /^नानी, दिवाली पर आपके लिए एक तोहफ़ा[\s\S]*हर रविवार[\s\S]*प्यार सहित,\nआशा$/);
   assert.match(core.giftMessage(papa, 'Meera', 'not-an-occasion'), /^Papa, I am giving/);
 });
+
+test('remembrance days come round each year, with how long it has been', () => {
+  const nanaji = core.remembrance({ name: ' Nanaji ', relation: 'Grandfather', diedOn: '03-12', diedYear: '2011', bornOn: '03-20', bornYear: '1931' });
+  assert.deepEqual([nanaji.name, nanaji.diedYear, nanaji.bornYear], ['Nanaji', 2011, 1931]);
+  assert.throws(() => core.remembrance({ name: 'X', diedOn: '13-01' }), /day and month/);
+  assert.throws(() => core.remembrance({ name: '', diedOn: '01-01' }), /name/);
+  assert.throws(() => core.remembrance({ name: 'X', diedOn: '01-01', bornYear: 2000, diedYear: 1990 }), /after/);
+  assert.equal(core.remembrance({ name: 'X', diedOn: '01-01', bornYear: 'about 1930' }).bornYear, null);
+  const soon = core.upcoming(new Date(2026, 2, 7), [], 21, [nanaji]);
+  assert.equal(soon[0].kind, 'remembrance');
+  assert.equal(soon[0].name, 'Nanaji’s remembrance day');
+  assert.equal(soon[0].days, 5);
+  assert.equal(soon[0].detail, '15 years since Nanaji died');
+  assert.equal(soon[0].question, 'What do you remember about Nanaji?');
+  assert.equal(soon.find((o) => o.days === 13).name, 'Nanaji would have turned 95');
+  assert.equal(core.lifeYears(nanaji), '1931–2011');
+  assert.equal(core.lifeYears({ diedYear: 2011 }), '?–2011');
+  assert.match(core.remembranceText(nanaji, 'Asha'), /^Today we remember Nanaji \(1931–2011\)\.[\s\S]*Asha$/);
+});

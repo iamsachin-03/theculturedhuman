@@ -317,6 +317,17 @@ select check_that(fails($$select * from cards$$), 'visitors cannot list cards');
 reset role;
 set role authenticated;
 
+-- Remembrance days are the owner's alone.
+select as_user('00000000-0000-0000-0000-00000000000a', 'asha@example.com');
+insert into remembrances (name, relation, died_on, born_year, died_year) values ('Nanaji', 'Grandfather', '03-12', 1931, 2009);
+select check_that((select count(*) from remembrances) = 1, 'an owner keeps a remembrance day');
+select check_that(fails($$insert into remembrances (name, died_on) values ('Someone', '13-40')$$), 'with a real day and month');
+select check_that(fails($$insert into remembrances (name, died_on, born_year, died_year) values ('Someone', '01-01', 2000, 1990)$$), 'and years in order');
+select as_user('00000000-0000-0000-0000-00000000000b', 'bina@example.com');
+select check_that((select count(*) from remembrances) = 0, 'nobody else sees it');
+select check_that(fails($$insert into remembrances (owner_id, name, died_on) values ('00000000-0000-0000-0000-00000000000a', 'X', '01-01')$$), 'or adds to it');
+set role authenticated;
+
 -- Leaving takes the whole archive with it.
 select as_user('00000000-0000-0000-0000-000000000012', 'quiet@example.com');
 insert into entries (kind, title, audience) values ('story', 'A quiet story', 'private');

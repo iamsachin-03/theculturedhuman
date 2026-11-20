@@ -177,7 +177,7 @@
 
   var routes = [
     [/^$/, home], [/^archive$/, archive], [/^entry\/new$/, editor], [/^entry\/([\w-]+)\/edit$/, editor],
-    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^interview$/, interview], [/^book$/, book], [/^gift$/, gift], [/^visit$/, visit], [/^people$/, people], [/^shared$/, shared],
+    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^interview$/, interview], [/^book$/, book], [/^gift$/, gift], [/^visit$/, visit], [/^remember$/, remember], [/^people$/, people], [/^shared$/, shared],
     [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings], [/^contribute$/, contribute], [/^moderate$/, moderate],
     [/^offer$/, offer], [/^request$/, requestForm], [/^requests$/, requests], [/^echo$/, echo], [/^report$/, reportForm],
   ];
@@ -311,9 +311,10 @@
     var h1 = sample
       ? page('Asha\u2019s family archive', 'Asha keeps her grandmother\u2019s stories here, and her brother Ravi adds his own. This is what an archive looks like after a few weeks.')
       : page('Welcome, ' + firstName(state.user.name) + '.');
-    return Promise.all([store.entries(), store.elders(), store.sharedWithMe(), store.roots()]).then(function (r) {
+    return Promise.all([store.entries(), store.elders(), store.sharedWithMe(), store.roots(), store.remembrances()]).then(function (r) {
       var entries = r[0];
       var elders = r[1];
+      var remembered = r[4];
       var sharedList = r[2];
       var keptRoots = hasRoots(r[3]) ? Art.clean(r[3]) : null;
       var deviceHasRoots = hasRoots(deviceRoots());
@@ -347,7 +348,7 @@
         h('p', null, keptRoots ? 'The places your family has called home, drawn as a portrait.' : deviceHasRoots ? 'You made a roots portrait in this browser. Keep it in your archive.' : 'Draw the places your family has called home as roots, a tree, a river, rings or stars.'),
         link(keptRoots || deviceHasRoots ? '#/roots' : '/trace.html', keptRoots ? 'See your roots' : deviceHasRoots ? 'Keep your roots portrait' : 'Trace your roots', 'text-link'),
       ));
-      var soon = core.upcoming(new Date(), elders, 21)[0];
+      var soon = core.upcoming(new Date(), elders, 21, remembered)[0];
       if (soon) add(view, occasionCard(soon));
       add(view, grid);
       if (entries.length) {
@@ -360,6 +361,19 @@
 
   function inDays(n) { return n === 0 ? 'today' : n === 1 ? 'tomorrow' : 'in ' + n + ' days'; }
   function occasionCard(o) {
+    if (o.kind === 'remembrance') {
+      var who = o.person.name;
+      return h('section', { class: 'app-card app-occasion app-occasion--remember' },
+        h('p', { class: 'eyebrow' }, 'Coming up'),
+        h('h2', null, o.name + (o.name.indexOf(' would have ') > 0 ? ' ' : ' is ') + inDays(o.days) + '.'),
+        o.detail ? h('p', { class: 'field__hint' }, o.detail + '.') : null,
+        h('p', null, 'A day to gather what the family remembers. Ask everyone for one memory, and keep your own:'),
+        h('p', { class: 'app-occasion__q' }, o.question),
+        h('div', { class: 'btn-row' },
+          link('#/entry/new?kind=memory&prompt=' + encodeURIComponent(o.question), 'Keep your memory', 'btn'),
+          link('#/archive?teller=' + encodeURIComponent(who), 'Remembering ' + who, 'btn btn--ghost')),
+      );
+    }
     var teller = o.elder ? '&teller=' + encodeURIComponent(o.elder.name) : '';
     return h('section', { class: 'app-card app-occasion' },
       h('p', { class: 'eyebrow' }, 'Coming up'),
@@ -457,7 +471,7 @@
         var n = k.id ? entries.filter(function (e) { return e.kind === k.id; }).length : entries.length;
         filters.appendChild(h('a', { href: '#/archive' + (k.id ? '?kind=' + k.id : ''), 'aria-current': kind === k.id ? 'true' : null }, k.heading + ' (' + n + ')'));
       });
-      add(view, h('div', { class: 'app-toolbar' }, link('#/entry/new' + (kind ? '?kind=' + kind : ''), 'Add to the archive', 'btn'), entries.length ? link('#/book', 'See it as a book', 'btn btn--ghost') : null));
+      add(view, h('div', { class: 'app-toolbar' }, link('#/entry/new' + (kind ? '?kind=' + kind : ''), 'Add to the archive', 'btn'), entries.length ? link('#/book', 'See it as a book', 'btn btn--ghost') : null, link('#/remember', 'Remembering someone', 'btn btn--ghost')));
       add(view, filters);
       var people = tellers(entries.filter(function (e) { return e.owner === state.user.id; }));
       if (people.length) {
@@ -493,7 +507,7 @@
 
   // Everything told by or about one person, and a way to ask the rest of the family for theirs.
   function personPage(who) {
-    return Promise.all([store.entries(), loadPeople()]).then(function (r) {
+    return Promise.all([store.entries(), loadPeople(), store.remembrances()]).then(function (r) {
       var mine = r[0].filter(function (e) { return e.owner === state.user.id && aboutPerson(e, who); });
       var name = mine.length ? tellers(mine).filter(function (t) { return sameName(t.name, who); }).concat([{ name: who }])[0].name : who;
       var by = keptBy(mine);
@@ -505,11 +519,84 @@
         link('#/entry/new?prompt=' + encodeURIComponent(memoryPrompt(name)), 'Add your memory of ' + name, 'btn'),
         link('#/entry/new?teller=' + encodeURIComponent(name) + '&record=audio', 'Keep a story ' + name + ' told', 'btn btn--ghost'),
       ));
+      add(view, remembrancePanel(name, r[2]));
       if (mine.length) add(view, h('div', { class: 'app-list' }, mine.map(entryCard)));
       add(view, askFamily(name, true));
       return h1;
     });
   }
+  // ---------- remembrance days ----------
+  var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  function dayMonth(md) { var p = String(md || '').split('-'); return p.length === 2 ? Number(p[1]) + ' ' + MONTH_NAMES[Number(p[0]) - 1] : ''; }
+  function mdPicker(name, value) {
+    var parts = String(value || '').split('-');
+    var month = options(h('select', { name: name + 'Month', 'aria-label': 'Month' }), [{ id: '', label: 'Month' }].concat(MONTH_NAMES.map(function (m, i) { return { id: ('0' + (i + 1)).slice(-2), label: m }; })), parts[0] || '');
+    var day = options(h('select', { name: name + 'Day', 'aria-label': 'Day' }), [{ id: '', label: 'Day' }].concat(Array.from({ length: 31 }, function (_, i) { var d = ('0' + (i + 1)).slice(-2); return { id: d, label: String(i + 1) }; })), parts[1] || '');
+    return { el: h('span', { class: 'app-inline' }, day, month), value: function () { return month.value && day.value ? month.value + '-' + day.value : ''; } };
+  }
+  function remembranceForm(r, name, done) {
+    var form = h('form', { class: 'app-remember__form' });
+    var nameIn = h('input', { name: 'name', required: true, maxlength: '80', value: r ? r.name : name || '' });
+    var relation = h('input', { name: 'relation', maxlength: '80', placeholder: 'Grandfather, my aunt\u2026', value: r ? r.relation : '' });
+    var died = mdPicker('died', r && r.diedOn);
+    var diedYear = h('input', { name: 'diedYear', inputmode: 'numeric', maxlength: '4', placeholder: '2011', value: r && r.diedYear ? String(r.diedYear) : '' });
+    var born = mdPicker('born', r && r.bornOn);
+    var bornYear = h('input', { name: 'bornYear', inputmode: 'numeric', maxlength: '4', placeholder: '1931', value: r && r.bornYear ? String(r.bornYear) : '' });
+    add(form, [
+      h('div', { class: 'app-form-grid' },
+        name ? null : field('Their name', nameIn), field('Who were they to you? (optional)', relation),
+        field('The day they died', died.el, 'We remind you a few days before, every year.'), field('The year (optional)', diedYear),
+        field('Their birthday (optional)', born.el), field('The year they were born (optional)', bornYear)),
+      h('div', { class: 'btn-row' }, button(r ? 'Save' : 'Remember ' + (name || 'them'), null, 'btn btn--small', 'submit'), done ? button('Cancel', function () { done(false); }, 'btn btn--ghost btn--small') : null),
+    ]);
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      store.saveRemembrance({ id: r && r.id, name: name || nameIn.value, relation: relation.value, diedOn: died.value(), diedYear: diedYear.value, bornOn: born.value(), bornYear: bornYear.value })
+        .then(function () { flash = 'We will remind you every year.'; if (done) done(true); else render(); }).catch(fail);
+    });
+    return form;
+  }
+  function remembranceSummary(r) {
+    var years = core.lifeYears(r);
+    var from = firstName(state.user.name);
+    var text = core.remembranceText(r, from);
+    return h('div', { class: 'app-remember__summary' },
+      h('p', null, h('strong', null, r.name), r.relation ? ', ' + r.relation : '', years ? ' (' + years + ')' : ''),
+      h('p', { class: 'field__hint' }, 'Remembered on ' + dayMonth(r.diedOn) + (r.bornOn ? '; born on ' + dayMonth(r.bornOn) : '') + '. You are reminded a few days before.'),
+      h('div', { class: 'btn-row' },
+        h('a', { class: 'btn btn--small', href: 'https://wa.me/?text=' + encodeURIComponent(text), target: '_blank', rel: 'noopener' }, 'Ask the family for memories'),
+        link('#/archive?teller=' + encodeURIComponent(r.name), 'Everything about ' + r.name, 'btn btn--ghost btn--small')));
+  }
+  function remembrancePanel(name, remembered) {
+    var r = (remembered || []).filter(function (x) { return sameName(x.name, name); })[0];
+    var panel = h('section', { class: 'app-card app-remember' });
+    function draw(editing) {
+      panel.textContent = '';
+      if (r && !editing) {
+        add(panel, [h('p', { class: 'eyebrow' }, 'Remembering'), remembranceSummary(r), h('div', { class: 'btn-row' },
+          button('Change', function () { draw(true); }, 'btn btn--ghost btn--small'),
+          button('Stop the reminder', function () {
+            if (confirm('Stop the yearly reminder for ' + r.name + '? What you kept stays in your archive.')) store.deleteRemembrance(r.id).then(function () { render(); }).catch(fail);
+          }, 'btn btn--ghost btn--small'))]);
+      } else if (r) {
+        add(panel, remembranceForm(r, r.name, function (saved) { if (saved) render(); else draw(false); }));
+      } else {
+        var more = h('details', null, h('summary', null, 'Has ' + name + ' died? Mark the day to remember them'), remembranceForm(null, name, null));
+        add(panel, more);
+      }
+    }
+    draw(false);
+    return panel;
+  }
+  function remember() {
+    var h1 = page('Remembering', 'The people your family has lost. Their days come round each year as a time to gather what everyone remembers, before it fades.');
+    return store.remembrances().then(function (list) {
+      list.forEach(function (r) { add(view, h('section', { class: 'app-card app-remember' }, remembranceSummary(r))); });
+      add(view, h('section', { class: 'app-card' }, h('h2', null, list.length ? 'Remember someone else' : 'Who would you like to remember?'), remembranceForm(null, '', null)));
+      return h1;
+    });
+  }
+
   function listNames(names) {
     return names.length < 2 ? names.join('') : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
   }
@@ -1714,9 +1801,9 @@
     if (exporting) return;
     exporting = true;
     say('Preparing your copy\u2026');
-    Promise.all([store.entries(), loadPeople(true), store.elders(), store.legacy()]).then(function (r) {
+    Promise.all([store.entries(), loadPeople(true), store.elders(), store.legacy(), store.remembrances()]).then(function (r) {
       var archive = {
-        owner: { name: state.user.name, email: state.user.email }, legacy: r[3], people: r[1], weekly: r[2],
+        owner: { name: state.user.name, email: state.user.email }, legacy: r[3], people: r[1], weekly: r[2], remembrances: r[4],
         entries: r[0].filter(function (e) { return e.owner === state.user.id; }), exportedAt: new Date().toISOString(),
       };
       var files = exporter.layout(archive.entries);

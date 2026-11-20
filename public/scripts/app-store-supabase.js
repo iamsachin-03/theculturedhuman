@@ -121,6 +121,7 @@
         media: (e.media || []).map(mediaOut).sort(function (a, b) { return a.createdAt.localeCompare(b.createdAt); }),
       };
     }
+    function remembranceOut(r) { return { id: r.id, owner: r.owner_id, name: r.name, relation: r.relation || '', diedOn: r.died_on, bornOn: r.born_on || '', bornYear: r.born_year, diedYear: r.died_year, createdAt: r.created_at }; }
     function elderOut(e) { return { id: e.id, owner: e.owner_id, name: e.name, relation: e.relation || '', phone: e.phone || '', day: e.day, idx: e.idx, answered: e.answered, askedAt: e.asked_at, signAs: e.sign_as || '', autoSend: !!e.auto_send, birthday: e.birthday || '', lang: e.lang || 'en', createdAt: e.created_at }; }
 
     function removeFiles(paths) {
@@ -341,6 +342,20 @@
       },
 
       deleteElder: function (id) { return rest('weekly_elders?id=eq.' + id, { method: 'DELETE' }); },
+
+      remembrances: function () {
+        return rest('remembrances?owner_id=eq.' + me() + '&order=created_at').then(function (rows) { return rows.map(remembranceOut); });
+      },
+      saveRemembrance: function (f) {
+        var r;
+        try { r = core.remembrance(f); } catch (err) { return Promise.reject(err); }
+        var row = { name: r.name, relation: r.relation || null, died_on: r.diedOn, born_on: r.bornOn || null, born_year: r.bornYear, died_year: r.diedYear };
+        var req = r.id
+          ? rest('remembrances?id=eq.' + enc(r.id), { method: 'PATCH', json: row, headers: { prefer: 'return=representation' } })
+          : rest('remembrances', { method: 'POST', json: row, headers: { prefer: 'return=representation' } });
+        return req.then(function (rows) { return remembranceOut(rows[0]); });
+      },
+      deleteRemembrance: function (id) { return rest('remembrances?id=eq.' + enc(id), { method: 'DELETE' }); },
 
       roots: function () {
         return rest('roots?select=data&owner_id=eq.' + me()).then(function (rows) { return rows[0] ? rows[0].data : null; });
