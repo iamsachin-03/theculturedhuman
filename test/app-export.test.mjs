@@ -21,7 +21,7 @@ const archive = {
       media: [
         { id: 'm1', name: 'Wall.jpg', kind: 'photo', mime: 'image/jpeg', url: 'blob:x' },
         { id: 'm2', name: 'wall.jpg', kind: 'photo', mime: 'image/jpeg' },
-        { id: 'm3', name: 'Nani sings.m4a', kind: 'audio', mime: 'audio/mp4' },
+        { id: 'm3', name: 'Nani sings.m4a', kind: 'audio', mime: 'audio/mp4', transcript: 'मछली <i>समुंदर</i>', translation: 'The fish, the sea' },
       ],
     },
     { id: 'e1', kind: 'story', title: 'नानी की कहानी', audience: 'private', audiencePeople: [], createdAt: '2026-09-01T00:00:00.000Z', body: 'Once.', media: [] },
@@ -73,6 +73,7 @@ test('the copy is a valid zip with a page to open, archive.json and every file t
   assert.match(page, /<audio controls preload="none" src="files\/002-nani-the-script-alert-1-script-wall\/nani-sings\.m4a"/);
   assert.match(page, /This file could not be copied: wall\.jpg/);
   assert.match(page, /Ravi — Family, can add/);
+  assert.ok(page.includes('<p class="said">मछली &lt;i&gt;समुंदर&lt;/i&gt;</p><p class="note">In English: The fish, the sea</p>'), 'transcripts are on the page, escaped');
   assert.doesNotMatch(page, /<script|<b>/);
 });
 

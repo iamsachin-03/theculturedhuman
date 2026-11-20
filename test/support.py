@@ -29,10 +29,15 @@ class FakeHttp:
         self.route = route
         self.calls = []
 
-    def __call__(self, url, method='GET', headers=None, body=None):
-        parsed = json.loads(body) if body else None
+    def __call__(self, url, method='GET', headers=None, body=None, timeout=None):
+        try:
+            parsed = json.loads(body) if body else None
+        except (ValueError, UnicodeDecodeError):
+            parsed = body
         self.calls.append({'url': url, 'method': method, 'headers': headers or {}, 'body': parsed})
         status, data = self.route(url, method, headers or {}, parsed)
+        if isinstance(data, bytes):
+            return Reply(status, data.decode('utf-8', 'replace'), data)
         return Reply(status, '' if data is None else json.dumps(data))
 
 

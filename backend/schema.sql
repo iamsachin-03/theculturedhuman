@@ -86,6 +86,11 @@ create table media (
   mime text not null,
   size bigint not null check (size >= 0),
   path text not null unique,
+  -- What is said in a voice note or video, and its English translation, typed by a person or
+  -- written by speech-to-text (api/transcribe.py) and then correctable by hand.
+  transcript text check (length(transcript) <= 100000),
+  translation text check (length(translation) <= 100000),
+  transcript_by text check (transcript_by in ('person', 'machine')),
   created_at timestamptz not null default now(),
   check (path like owner_id::text || '/' || entry_id::text || '/%')
 );
@@ -617,6 +622,7 @@ create policy "authors and owners delete" on entries for delete using (owner_id 
 create policy "media follows its entry" on media for select using (entry_visible(entry_id));
 create policy "authors and owners attach media" on media for insert with check (entry_editable(entry_id) and can_write_object(path));
 create policy "authors and owners remove media" on media for delete using (entry_editable(entry_id));
+create policy "authors and owners write transcripts" on media for update using (entry_editable(entry_id)) with check (entry_editable(entry_id));
 
 create policy "owners only" on weekly_elders for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
 create policy "owners only" on roots for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
@@ -666,7 +672,8 @@ grant usage on schema public to anon, authenticated;
 grant select on places, place_contributions, listings, contribution_echo_counts to anon;
 grant select, insert, update, delete on all tables in schema public to authenticated;
 revoke insert, update, delete on contacts, contribution_echo_counts from authenticated;
-revoke update on legacy, people from authenticated;
+revoke update on legacy, people, media from authenticated;
+grant update (transcript, translation, transcript_by) on media to authenticated;
 grant update (quiet_months, wait_days) on legacy to authenticated;
 grant update (name, email, role) on people to authenticated;
 grant execute on function claim_people(), touch_seen(), report_passing(uuid), legacy_for(uuid), delete_my_account(), booking_contacts(uuid) to authenticated;

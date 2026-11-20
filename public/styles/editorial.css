@@ -941,6 +941,10 @@ button.text-link { background: none; border: 0; padding: 0; cursor: pointer; fon
 .app-narrate { margin: 0 0 1rem; padding-left: 1.3rem; display: grid; gap: .4rem; color: var(--ink); }
 .app-interview__q { font: 500 var(--step-2)/1.25 var(--serif); color: var(--primary); margin: .25rem 0 1rem; }
 .app-interview [hidden] { display: none !important; }
+.app-transcript { margin-top: .75rem; display: grid; gap: .35rem; }
+.app-transcript h4 { margin: .5rem 0 0; font: 600 .8rem/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.app-transcript__text { margin: 0; white-space: pre-wrap; }
+.app-transcript__form { display: grid; gap: .75rem; }
 .app-files { list-style: none; margin: .75rem 0 0; padding: 0; display: grid; gap: .4rem; }
 .app-files li { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; font-size: .92rem; overflow-wrap: anywhere; }
 .btn--small { min-height: 36px; padding: .4rem .9rem; font-size: .85rem; }

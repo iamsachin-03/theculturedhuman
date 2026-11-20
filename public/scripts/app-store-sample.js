@@ -132,7 +132,7 @@
     bookingsToSettle: function () { return ok([]); },
     myEchoes: function () { return ok([]); },
   };
-  ['signIn', 'handleRedirect', 'saveProfile', 'saveLegacy', 'savePerson', 'deletePerson', 'saveEntry', 'deleteEntry', 'addMedia', 'deleteMedia',
+  ['signIn', 'handleRedirect', 'saveProfile', 'saveLegacy', 'savePerson', 'deletePerson', 'saveEntry', 'deleteEntry', 'addMedia', 'deleteMedia', 'saveTranscript',
     'reportPassing', 'skipWaiting', 'saveElder', 'deleteElder', 'saveRoots', 'contribute', 'updateContribution', 'deleteContribution', 'report',
     'adoptSuggestion', 'resolveReports', 'reviewContribution', 'featureContribution', 'saveListing', 'deleteListing', 'requestBooking',
     'updateBooking', 'reviewListing', 'echo', 'deleteAccount'].forEach(function (name) { store[name] = no; });

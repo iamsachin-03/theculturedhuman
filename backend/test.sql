@@ -64,6 +64,9 @@ insert into media (entry_id, owner_id, kind, name, mime, size, path) values
   ('eeeeeeee-0000-0000-0000-000000000001', auth.uid(), 'audio', 'nani.ogg', 'audio/ogg', 1000,
    '00000000-0000-0000-0000-00000000000a/eeeeeeee-0000-0000-0000-000000000001/nani.ogg');
 select check_that((select count(*) from entries) = 7, 'owners see every entry in their archive');
+update media set transcript = 'Nani sings', transcript_by = 'person' where name = 'nani.ogg';
+select check_that((select transcript from media where name = 'nani.ogg') = 'Nani sings', 'owners can write a transcript');
+select check_that(fails($$update media set path = 'x' where name = 'nani.ogg'$$), 'nobody can move a file by editing its row');
 select check_that(fails($$insert into entries (owner_id, kind, title, audience, audience_people) values (auth.uid(), 'story', 'x', 'people', '{00000000-0000-0000-0000-00000000000c}')$$), 'entries can only be shared with the owner''s own people');
 select check_that(fails($$insert into entries (owner_id, kind, title, audience) values (auth.uid(), 'story', 'x', 'date')$$), 'a dated entry needs a date and someone to receive it');
 select check_that(fails($$update legacy set state = 'passed'$$), 'owners cannot change the legacy state directly');
@@ -91,6 +94,8 @@ insert into entries (id, owner_id, kind, title, audience) values
 select check_that(can_write_object('00000000-0000-0000-0000-00000000000a/eeeeeeee-0000-0000-0000-000000000002/v.mp4'), 'family can attach files to their own entries');
 select check_that(not can_write_object('00000000-0000-0000-0000-00000000000a/eeeeeeee-0000-0000-0000-000000000001/v.mp4'), 'family cannot attach files to the owner''s entries');
 select check_that(fails($$insert into entries (owner_id, kind, title, audience) values ('00000000-0000-0000-0000-00000000000a', 'letter', 'x', 'passed')$$), 'only the owner can leave entries for later');
+update media set transcript = 'changed' where name = 'nani.ogg';
+select check_that((select transcript from media where name = 'nani.ogg') = 'Nani sings', 'family cannot change the owner''s transcripts');
 update entries set title = 'changed' where title = 'family-story';
 select check_that(titles() = 'bina-adds,family-story', 'family cannot edit the owner''s entries');
 select check_that(fails($$update people set role = 'legacy' where user_id = auth.uid()$$) or (select role from people where user_id = auth.uid()) = 'family_edit', 'family cannot change their own role');

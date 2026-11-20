@@ -133,6 +133,7 @@
     "url": "https://biaogexcislxxzxiifib.supabase.co",
     "anonKey": "sb_publishable_LOnHHRxeeeUMbVcWWhvPtw_X-0gGSnT",
     "google": false,
-    "weeklyAuto": false
+    "weeklyAuto": false,
+    "transcribe": false
   }
 }

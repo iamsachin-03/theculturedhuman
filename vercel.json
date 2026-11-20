@@ -18,6 +18,9 @@
     },
     "api/shared.py": {
       "includeFiles": "{public/shared.html,public/places/places.json,content/site.json}"
+    },
+    "api/transcribe.py": {
+      "maxDuration": 60
     }
   },
   "redirects": [

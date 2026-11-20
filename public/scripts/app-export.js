@@ -114,15 +114,20 @@
 
   function hrefFor(path) { return path.split('/').map(encodeURIComponent).join('/'); }
 
+  function transcriptHtml(m) {
+    return (m.transcript ? '<p class="said">' + esc(m.transcript).replace(/\n/g, '<br>') + '</p>' : '') +
+      (m.translation ? '<p class="note">In English: ' + esc(m.translation).replace(/\n/g, '<br>') + '</p>' : '');
+  }
+
   function mediaHtml(m, path, ok) {
-    if (!ok) return '<p class="missing">This file could not be copied: ' + esc(m.name) + '</p>';
+    if (!ok) return '<p class="missing">This file could not be copied: ' + esc(m.name) + '</p>' + transcriptHtml(m);
     var src = hrefFor(path);
     var kind = m.kind || core.mediaKind(m.mime || m.type, m.name);
     var caption = '<figcaption>' + esc(m.name) + '</figcaption>';
     switch (kind) {
       case 'photo': return '<figure><img src="' + src + '" alt="' + esc(m.name) + '" loading="lazy">' + caption + '</figure>';
-      case 'audio': return '<figure><audio controls preload="none" src="' + src + '"></audio>' + caption + '</figure>';
-      case 'video': return '<figure><video controls preload="metadata" src="' + src + '"></video>' + caption + '</figure>';
+      case 'audio': return '<figure><audio controls preload="none" src="' + src + '"></audio>' + caption + '</figure>' + transcriptHtml(m);
+      case 'video': return '<figure><video controls preload="metadata" src="' + src + '"></video>' + caption + '</figure>' + transcriptHtml(m);
       default: return '<p><a href="' + src + '">' + esc(m.name) + '</a></p>';
     }
   }
@@ -152,7 +157,7 @@
       'body{font:17px/1.6 Georgia,serif;color:#2a2420;background:#fbf7f0;margin:0}main{max-width:44rem;margin:0 auto;padding:2.5rem 1.25rem 4rem}' +
       'h1{font-size:2.2rem;line-height:1.15;margin:0 0 .5rem}h2{margin-top:3rem;border-bottom:1px solid #d9cfc0;padding-bottom:.3rem}' +
       'article{margin:2rem 0}h3{margin:0 0 .2rem}.meta,.note,figcaption{color:#6b6157;font:14px/1.5 system-ui,sans-serif}.prompt{font-style:italic}' +
-      'img,video{max-width:100%;height:auto;border-radius:6px}audio{width:100%}figure{margin:1rem 0}.missing{color:#9b2c2c}' +
+      '.said{white-space:pre-wrap;border-left:3px solid #d9cfc0;padding-left:.8rem}img,video{max-width:100%;height:auto;border-radius:6px}audio{width:100%}figure{margin:1rem 0}.missing{color:#9b2c2c}' +
       '</style></head><body><main><h1>' + esc(owner) + '</h1>' +
       '<p class="note">Copied from The Cultured Human on ' + esc(core.formatDate(archive.exportedAt)) + '. This copy is yours. It opens without the internet, ' +
       'and every photograph, recording and document is in the files folder as itself. archive.json holds everything again, for moving it somewhere else.</p>' +

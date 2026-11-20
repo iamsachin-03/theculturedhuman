@@ -266,6 +266,18 @@
       });
     },
 
+    saveTranscript: function (m, fields) {
+      var viewer = need();
+      return Promise.all([get('entries', m.entryId), get('media', m.id)]).then(function (r) {
+        if (!r[0] || !r[1] || !core.canEdit(r[0], viewer)) throw new Error('Only the person who added this can change it.');
+        var row = r[1];
+        row.transcript = String(fields.transcript || '').trim();
+        row.translation = String(fields.translation || '').trim();
+        row.transcriptBy = row.transcript || row.translation ? 'person' : null;
+        return put('media', row).then(function (saved) { var c = copy(saved); delete c.blob; return c; });
+      });
+    },
+
     deleteMedia: function (m) {
       var viewer = need();
       return get('entries', m.entryId).then(function (e) {

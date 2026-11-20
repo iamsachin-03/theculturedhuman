@@ -112,7 +112,7 @@
       if (!l || !l.owner_id) return null;
       return { owner: l.owner_id, quietMonths: l.quiet_months, waitDays: l.wait_days, lastSeenAt: l.last_seen_at, state: l.state, reportedBy: l.reported_by, waitEndsAt: l.wait_ends_at, passedAt: l.passed_at };
     }
-    function mediaOut(m) { return { id: m.id, entryId: m.entry_id, owner: m.owner_id, kind: m.kind, name: m.name, mime: m.mime, size: m.size, path: m.path, createdAt: m.created_at }; }
+    function mediaOut(m) { return { id: m.id, entryId: m.entry_id, owner: m.owner_id, kind: m.kind, name: m.name, mime: m.mime, size: m.size, path: m.path, transcript: m.transcript || '', translation: m.translation || '', transcriptBy: m.transcript_by || null, createdAt: m.created_at }; }
     function entryOut(e) {
       return {
         id: e.id, owner: e.owner_id, createdBy: e.created_by, kind: e.kind, title: e.title, prompt: e.prompt || '', teller: e.teller || '',
@@ -422,6 +422,16 @@
 
       myContributions: function () {
         return rest('place_contributions?submitted_by=eq.' + me() + '&order=created_at.desc').then(function (rows) { return rows.map(contributionOut); });
+      },
+
+      saveTranscript: function (m, f) {
+        var transcript = String(f.transcript || '').trim();
+        var translation = String(f.translation || '').trim();
+        return rest('media?id=eq.' + enc(m.id), { method: 'PATCH', json: { transcript: transcript, translation: translation, transcript_by: transcript || translation ? 'person' : null }, headers: { prefer: 'return=representation' } })
+          .then(function (rows) {
+            if (!rows || !rows.length) throw new Error('Only the person who added this can change it.');
+            return mediaOut(rows[0]);
+          });
       },
 
       /** For the site's own serverless functions (payments), which check it with Supabase. */

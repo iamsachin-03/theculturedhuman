@@ -19,11 +19,12 @@ TIMEOUT = 20
 
 
 class Reply:
-    """An HTTP response: status, body text, and .ok / .json() like fetch's Response."""
+    """An HTTP response: status, body text (and the raw bytes, .content), and .ok / .json() like fetch's Response."""
 
-    def __init__(self, status, text=''):
+    def __init__(self, status, text='', content=None):
         self.status = status
         self.text = text
+        self.content = content if content is not None else text.encode('utf-8')
 
     @property
     def ok(self):
@@ -33,15 +34,17 @@ class Reply:
         return json.loads(self.text) if self.text else None
 
 
-def http(url, method='GET', headers=None, body=None):
+def http(url, method='GET', headers=None, body=None, timeout=TIMEOUT):
     """Sends one request and returns a Reply; an HTTP error status is a Reply too, not an exception."""
     data = body.encode('utf-8') if isinstance(body, str) else body
     req = urllib.request.Request(url, data=data, method=method, headers=headers or {})
     try:
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as res:
-            return Reply(res.status, res.read().decode('utf-8'))
+        with urllib.request.urlopen(req, timeout=timeout) as res:
+            raw = res.read()
+            return Reply(res.status, raw.decode('utf-8', 'replace'), raw)
     except urllib.error.HTTPError as err:
-        return Reply(err.code, err.read().decode('utf-8', 'replace'))
+        raw = err.read()
+        return Reply(err.code, raw.decode('utf-8', 'replace'), raw)
 
 
 def supabase(url, service_key, http, error=RuntimeError):

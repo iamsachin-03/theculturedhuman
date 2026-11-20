@@ -552,7 +552,7 @@
   }
 
   // ---------- one entry ----------
-  function mediaBlock(m) {
+  function mediaBlock(m, editable) {
     var wrap = h('figure', { class: 'app-media app-media--' + m.kind });
     var caption = h('figcaption', null, m.name + ' · ' + core.formatBytes(m.size));
     store.mediaUrl(m).then(function (url) {
@@ -564,7 +564,61 @@
       wrap.insertBefore(el, caption);
     }).catch(function () { wrap.insertBefore(h('p', null, 'This file could not be loaded.'), caption); });
     wrap.appendChild(caption);
+    if (m.kind === 'audio' || m.kind === 'video') wrap.appendChild(transcriptBlock(m, editable));
     return wrap;
+  }
+
+  // What is said in a recording, and its English translation: typed by family, or written by
+  // speech-to-text (api/transcribe.py, once site.json backend.transcribe is on) and then corrected.
+  function transcriptBlock(m, editable) {
+    var box = h('div', { class: 'app-transcript' });
+    function draw() {
+      box.textContent = '';
+      if (m.transcript) add(box, [h('h4', null, 'What is said'), h('p', { class: 'app-transcript__text' }, m.transcript)]);
+      if (m.translation) add(box, [h('h4', null, 'In English'), h('p', { class: 'app-transcript__text' }, m.translation)]);
+      if (m.transcript || m.translation) add(box, h('p', { class: 'field__hint' }, m.transcriptBy === 'machine' ? 'Written by speech-to-text, so it may have mistakes. Correct it if you can.' : 'Typed by the family.'));
+      if (!editable) return;
+      var actions = h('div', { class: 'btn-row' });
+      if (cfg.transcribe && store.mode === 'supabase' && m.transcriptBy !== 'machine' && !m.transcript) {
+        add(actions, button('Transcribe and translate it', function (ev) {
+          ev.target.disabled = true;
+          say('Listening to the recording\u2026 this can take a minute.');
+          postJson('/api/transcribe', { media: m.id }, store.accessToken()).then(function (r) {
+            if (r.unavailable) throw new Error('Automatic transcripts are not switched on yet.');
+            m.transcript = r.transcript; m.translation = r.translation; m.transcriptBy = 'machine';
+            say('Done. Read it through and correct anything it misheard.');
+            draw();
+          }).catch(function (err) { ev.target.disabled = false; fail(err); });
+        }, 'btn btn--small'));
+      }
+      add(actions, button(m.transcript || m.translation ? 'Correct the transcript' : 'Type what is said', edit, 'btn btn--ghost btn--small'));
+      add(box, actions);
+    }
+    function edit() {
+      var form = h('form', { class: 'app-transcript__form' });
+      var said = h('textarea', { name: 'transcript', rows: '6', maxlength: '100000' });
+      said.value = m.transcript || '';
+      var english = h('textarea', { name: 'translation', rows: '6', maxlength: '100000' });
+      english.value = m.translation || '';
+      add(form, [
+        field('What is said, in the language it is said in', said, 'Write it as it was spoken, in any script.'),
+        field('In English (optional)', english, 'For the people in the family who don\u2019t speak the language.'),
+        h('div', { class: 'btn-row' }, button('Save', null, 'btn btn--small', 'submit'), button('Cancel', draw, 'btn btn--ghost btn--small')),
+      ]);
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        store.saveTranscript(m, { transcript: said.value, translation: english.value }).then(function (saved) {
+          m.transcript = saved.transcript || ''; m.translation = saved.translation || ''; m.transcriptBy = saved.transcriptBy;
+          say('Saved.');
+          draw();
+        }).catch(fail);
+      });
+      box.textContent = '';
+      box.appendChild(form);
+      said.focus();
+    }
+    draw();
+    return box;
   }
 
   function entryView(id) {
@@ -590,7 +644,8 @@
       ].filter(Boolean).join(' · ')));
       if (e.prompt) add(view, h('p', { class: 'app-prompt' }, e.prompt));
       if (e.body) add(view, h('div', { class: 'app-body' }, e.body.split(/\n{2,}/).map(function (p) { return h('p', null, p); })));
-      if (e.media.length) add(view, h('div', { class: 'app-media-list' }, e.media.map(mediaBlock)));
+      var editable = core.canEdit(e, state.user.id) && !sample;
+      if (e.media.length) add(view, h('div', { class: 'app-media-list' }, e.media.map(function (m) { return mediaBlock(m, editable); })));
       var actions = h('div', { class: 'btn-row' });
       if (core.canEdit(e, state.user.id)) {
         add(actions, [
