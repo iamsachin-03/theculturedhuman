@@ -939,6 +939,8 @@ button.text-link { background: none; border: 0; padding: 0; cursor: pointer; fon
 .app-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
 .app-upload:focus-within { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 .app-narrate { margin: 0 0 1rem; padding-left: 1.3rem; display: grid; gap: .4rem; color: var(--ink); }
+.app-interview__q { font: 500 var(--step-2)/1.25 var(--serif); color: var(--primary); margin: .25rem 0 1rem; }
+.app-interview [hidden] { display: none !important; }
 .app-files { list-style: none; margin: .75rem 0 0; padding: 0; display: grid; gap: .4rem; }
 .app-files li { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; font-size: .92rem; overflow-wrap: anywhere; }
 .btn--small { min-height: 36px; padding: .4rem .9rem; font-size: .85rem; }

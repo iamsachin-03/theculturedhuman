@@ -136,6 +136,11 @@
     'आज आपको किस चीज़ से शांति मिलती है?',
     'क्या कोई बात है जो आप हमेशा परिवार से कहना चाहते थे, पर कभी कह नहीं पाए?',
   ];
+  // Gentle follow-ups for a sit-down interview, so one answer becomes a story.
+  var FOLLOW_UPS = {
+    en: ['Who else was there?', 'What did it look, sound or smell like?', 'How did you feel then? And now?', 'What happened next?', 'Why do you think it stayed with you?'],
+    hi: ['वहाँ और कौन था?', 'वह कैसा दिखता था, कैसी आवाज़ें थीं, कैसी महक थी?', 'तब आपको कैसा लगा? और अब?', 'उसके बाद क्या हुआ?', 'आपको क्या लगता है, यह बात आपके मन में क्यों रह गई?'],
+  };
   var LANGUAGES = [{ id: 'en', label: 'English' }, { id: 'hi', label: 'हिन्दी (Hindi)' }];
 
   function find(list, id) {
@@ -519,7 +524,7 @@
     platformFee: platformFee, formatRupees: formatRupees, BOOKING_STATUS: BOOKING_STATUS,
     CONTRIBUTION_KINDS: CONTRIBUTION_KINDS, contribution: contribution, REPORT_REASONS: REPORT_REASONS, report: report, reviewNote: reviewNote,
     placeKey: placeKey, placeSlug: placeSlug, groupSuggestions: groupSuggestions,
-    KINDS: KINDS, ROLES: ROLES, AUDIENCES: AUDIENCES, QUESTIONS: QUESTIONS, QUESTIONS_HI: QUESTIONS_HI, LANGUAGES: LANGUAGES, find: find,
+    KINDS: KINDS, ROLES: ROLES, AUDIENCES: AUDIENCES, QUESTIONS: QUESTIONS, QUESTIONS_HI: QUESTIONS_HI, LANGUAGES: LANGUAGES, FOLLOW_UPS: FOLLOW_UPS, find: find,
     canSee: canSee, canAdd: canAdd, canEdit: canEdit, audienceLabel: audienceLabel,
     newLegacy: newLegacy, legacyNext: legacyNext, legacySeen: legacySeen, legacyReport: legacyReport,
     question: question, message: message, whatsappLink: whatsappLink, reminder: reminder,

@@ -177,7 +177,7 @@
 
   var routes = [
     [/^$/, home], [/^archive$/, archive], [/^entry\/new$/, editor], [/^entry\/([\w-]+)\/edit$/, editor],
-    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^people$/, people], [/^shared$/, shared],
+    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^interview$/, interview], [/^people$/, people], [/^shared$/, shared],
     [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings], [/^contribute$/, contribute], [/^moderate$/, moderate],
     [/^offer$/, offer], [/^request$/, requestForm], [/^requests$/, requests], [/^echo$/, echo], [/^report$/, reportForm],
   ];
@@ -324,6 +324,7 @@
         link('#/entry/new?kind=story&record=audio', 'Record a voice note', 'btn btn--ghost'),
         link('#/entry/new?kind=memory', 'Add photographs or video', 'btn btn--ghost'),
         link('#/entry/new?kind=memory&narrate=1', 'Narrate an old photo', 'btn btn--ghost'),
+        link('#/interview', 'Sit down for an interview', 'btn btn--ghost'),
       ));
       var grid = h('div', { class: 'app-grid' });
       var q = elders[0] ? core.question(elders[0].idx, elders[0].lang) : core.question(0);
@@ -938,6 +939,7 @@
         store.saveElder({ id: elder.id, askedAt: new Date().toISOString() });
       }, 'btn btn--ghost'),
       link('#/entry/new?kind=' + q.kind + '&prompt=' + encodeURIComponent(q.text) + '&teller=' + encodeURIComponent(elder.name) + '&record=audio', 'Keep their answer', 'btn btn--ghost'),
+      link('#/interview?elder=' + elder.id, 'Sitting with ' + elder.name + '? Interview them', 'btn btn--ghost'),
     ]);
     add(card, [
       h('p', { class: 'eyebrow' }, 'Week ' + (elder.idx + 1) + ' for ' + elder.name + (kind ? ' · ' + kind.heading : '')),
@@ -973,6 +975,121 @@
         }, 'btn btn--ghost btn--small'),
       ),
       h('p', { class: 'field__hint' }, plural(elder.answered, 'answer') + ' kept so far, every ' + DAYS[elder.day] + '.'),
+    ]);
+    return card;
+  }
+
+  // ---------- a sit-down interview ----------
+  // For when you are with them: one question at a time on screen, a recorder, follow-ups to keep
+  // them talking, and each answer kept as its own entry, private until you choose otherwise.
+  function interview(_, query) {
+    var h1 = page('An interview', 'Sit together somewhere quiet, put the phone between you, and let the questions do the work. Each answer is kept as its own entry, visible only to you until you share it.');
+    return store.elders().then(function (elders) {
+      var elder = elders.filter(function (e) { return e.id === query.get('elder'); })[0] || null;
+      var who = elder ? elder.name : query.get('teller') || '';
+      if (!who) return interviewSetup(elders, h1);
+      var lang = query.get('lang') || (elder && elder.lang) || 'en';
+      var at = Number(query.get('q'));
+      if (!(at >= 0)) at = elder ? elder.idx : 0;
+      add(view, interviewCard(who, lang, at, elder));
+      return h1;
+    });
+  }
+
+  function interviewSetup(elders, h1) {
+    var form = h('form', { class: 'app-card' });
+    var name = h('input', { name: 'teller', required: true, maxlength: '80', placeholder: 'Nani, Dad, my aunt\u2026' });
+    var lang = options(h('select', { name: 'lang' }), core.LANGUAGES, 'en');
+    add(form, [
+      h('h2', null, 'Who are you sitting with?'),
+      elders.length ? h('div', { class: 'app-filters', role: 'group', 'aria-label': 'People you ask every week' }, elders.map(function (e) {
+        return h('a', { href: '#/interview?elder=' + e.id }, e.name);
+      })) : null,
+      h('div', { class: 'app-form-grid' }, field('Their name', name), field('Ask in', lang, 'They can answer in any language.')),
+      h('div', { class: 'btn-row' }, button('Begin', null, 'btn', 'submit')),
+      h('details', { class: 'app-howto' }, h('summary', null, 'Before you begin'),
+        h('ul', null,
+          h('li', null, 'Ask if they are happy to be recorded, and tell them who will hear it.'),
+          h('li', null, 'Turn off the fan and the television, and sit close. The phone can lie flat between you.'),
+          h('li', null, 'Let silences run. People often say the best thing after a pause.'),
+          h('li', null, 'Twenty minutes is plenty for one sitting.'))),
+    ]);
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      location.hash = '#/interview?teller=' + encodeURIComponent(name.value.trim()) + '&lang=' + lang.value;
+    });
+    add(view, form);
+    return h1;
+  }
+
+  function interviewCard(who, lang, at, elder) {
+    var q = core.question(at, lang);
+    var base = '#/interview?' + (elder ? 'elder=' + elder.id : 'teller=' + encodeURIComponent(who)) + '&lang=' + lang + '&q=';
+    var card = h('section', { class: 'app-card app-card--accent app-interview' });
+    var status = h('p', { class: 'field__hint', 'aria-live': 'polite' });
+    var preview = h('div', { class: 'app-record__preview' });
+    var recording = null;
+    var take = null;
+    var recordBtn = button('Start recording', toggle, 'btn');
+    var keepBtn = button('Keep this answer', keep, 'btn');
+    var againBtn = button('Record again', function () { take = null; preview.textContent = ''; sync(); }, 'btn btn--ghost');
+    keepBtn.hidden = againBtn.hidden = true;
+
+    function sync() {
+      recordBtn.hidden = !!take;
+      keepBtn.hidden = againBtn.hidden = !take;
+      recordBtn.textContent = recording ? 'Stop recording' : 'Start recording';
+      status.textContent = recording ? 'Recording\u2026 Ask the question out loud, then listen.' : take ? 'Listen back if you like, then keep it.' : '';
+    }
+    function toggle() {
+      if (recording) { recording.stop(); return; }
+      if (!navigator.mediaDevices || !window.MediaRecorder) { say('Recording is not supported in this browser.', true); return; }
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+        var chunks = [];
+        var rec = new MediaRecorder(stream);
+        rec.ondataavailable = function (ev) { if (ev.data.size) chunks.push(ev.data); };
+        rec.onstop = function () {
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          var type = rec.mimeType || 'audio/webm';
+          var ext = /mp4/.test(type) ? 'm4a' : /ogg/.test(type) ? 'ogg' : 'webm';
+          var blob = new Blob(chunks, { type: type });
+          var fileName = core.safeFileName(who) + '-week-' + q.week + '.' + ext;
+          try { take = new File([blob], fileName, { type: type }); } catch (err) { take = blob; take.name = fileName; }
+          recording = null;
+          preview.textContent = '';
+          preview.appendChild(h('audio', { controls: true, src: URL.createObjectURL(blob), 'aria-label': 'Their answer' }));
+          sync();
+        };
+        rec.start();
+        recording = rec;
+        sync();
+      }).catch(function () { say('We could not use your microphone. Check the browser permission.', true); });
+    }
+    function keep() {
+      keepBtn.disabled = true;
+      store.saveEntry({ owner: state.user.id, kind: q.kind, title: q.text.length > 120 ? q.text.slice(0, 117) + '\u2026' : q.text, prompt: q.text, teller: who, body: '', audience: 'private', audiencePeople: [] })
+        .then(function (saved) {
+          say('Saving the recording\u2026');
+          return store.addMedia(saved, take, take.name).then(function () { return saved; });
+        })
+        .then(function () {
+          return elder ? store.saveElder({ id: elder.id, idx: at + 1, answered: elder.answered + 1, askedAt: null }) : null;
+        })
+        .then(function () { flash = 'Kept, visible only to you. Here is the next one.'; location.hash = base + (at + 1); })
+        .catch(fail).then(function () { keepBtn.disabled = false; });
+    }
+
+    add(card, [
+      h('p', { class: 'eyebrow' }, 'With ' + who + ' \u00b7 question ' + q.week + ' of ' + core.QUESTIONS.length),
+      h('h2', { class: 'app-interview__q', lang: q.lang }, q.text),
+      q.lang !== 'en' ? h('p', { class: 'field__hint' }, q.en) : null,
+      h('div', { class: 'btn-row' }, recordBtn, keepBtn, againBtn),
+      status, preview,
+      h('details', { class: 'app-howto' }, h('summary', null, 'If they stop, ask'),
+        h('ul', { lang: q.lang }, core.FOLLOW_UPS[q.lang].map(function (f) { return h('li', null, f); }))),
+      h('div', { class: 'btn-row' },
+        link(base + (at + 1), 'Skip to the next question', 'btn btn--ghost btn--small'),
+        link('#/archive?teller=' + encodeURIComponent(who), 'See what you kept from ' + who, 'text-link')),
     ]);
     return card;
   }
