@@ -1,4 +1,4 @@
-// The family archive app at /app.html: sign in, keep stories, voices, photographs, videos and
+// The family archive app at /app: sign in, keep stories, voices, photographs, videos and
 // documents, share them with the people you choose, and decide what is passed on.
 // It talks to a Supabase project when one is configured (site.json "backend", or a developer
 // override in localStorage "tch-backend", honoured on localhost only); otherwise it runs in preview mode on this device.
@@ -151,7 +151,7 @@
       notice.textContent = '';
       notice.className = 'app-notice app-notice--sample';
       add(notice, [h('strong', null, 'A sample archive. '), 'The Mishra family is invented, so look around freely: nothing here can be changed. ',
-        link('/app.html', 'Start your own archive', 'btn btn--small'), ' ', link('/offerings.html', 'Back to what we offer', 'text-link')]);
+        link('/app', 'Start your own archive', 'btn btn--small'), ' ', link('/offerings', 'Back to what we offer', 'text-link')]);
     } else if (store.mode === 'local') {
       notice.hidden = false;
       notice.textContent = '';
@@ -186,7 +186,7 @@
   var SAMPLE_STOPS = /^(entry\/new|entry\/[\w-]+\/edit|contribute|offer|request|echo|report|moderate)$/;
   function sampleStop() {
     var h1 = page('In your own archive, this is where you would add it', 'This sample belongs to an invented family, so nothing can be added or changed here. Your own archive is free to start, and private until you choose who sees each entry.');
-    add(view, h('div', { class: 'btn-row' }, link('/app.html', 'Start your own archive', 'btn'), link('#/archive', 'Keep looking around', 'btn btn--ghost')));
+    add(view, h('div', { class: 'btn-row' }, link('/app', 'Start your own archive', 'btn'), link('#/archive', 'Keep looking around', 'btn btn--ghost')));
     return h1;
   }
 
@@ -347,7 +347,7 @@
         h('p', { class: 'eyebrow' }, 'Your roots'),
         h('h2', null, keptRoots ? plural(Art.places(Art.fromSaved(keptRoots)).length, 'place') + ' kept' : deviceHasRoots ? 'Ready to keep' : 'Not traced yet'),
         h('p', null, keptRoots ? 'The places your family has called home, drawn as a portrait.' : deviceHasRoots ? 'You made a roots portrait in this browser. Keep it in your archive.' : 'Draw the places your family has called home as roots, a tree, a river, rings or stars.'),
-        link(keptRoots || deviceHasRoots ? '#/roots' : '/trace.html', keptRoots ? 'See your roots' : deviceHasRoots ? 'Keep your roots portrait' : 'Trace your roots', 'text-link'),
+        link(keptRoots || deviceHasRoots ? '#/roots' : '/trace', keptRoots ? 'See your roots' : deviceHasRoots ? 'Keep your roots portrait' : 'Trace your roots', 'text-link'),
       ));
       var soon = core.upcoming(new Date(), elders, 21, remembered)[0];
       if (soon) add(view, occasionCard(soon));
@@ -401,7 +401,7 @@
         ? 'Long enough for a family book. Print it at home, or have it bound to give at the next family gathering.'
         : n ? plural(goal - n, 'more entry', 'more entries') + ' and it is long enough to print as a family book.' : 'Every story, saying and photograph you keep becomes a page of your family book.'),
       ready
-        ? h('div', { class: 'btn-row' }, link('#/book', 'See it as a book', 'text-link'), link('/family-book.html', 'Have it bound', 'text-link'))
+        ? h('div', { class: 'btn-row' }, link('#/book', 'See it as a book', 'text-link'), link('/family-book', 'Have it bound', 'text-link'))
         : link(n ? '#/book' : '#/archive', n ? 'See it as a book so far' : 'Open your archive', 'text-link'),
     );
   }
@@ -856,7 +856,7 @@
           h('label', { class: 'app-check' }, englishBox, ' English translations of recordings')),
         h('div', { class: 'btn-row' },
           button('Print or save as PDF', function () { window.print(); }),
-          link('/family-book.html', 'Have it printed and bound', 'btn btn--ghost')),
+          link('/family-book', 'Have it printed and bound', 'btn btn--ghost')),
         h('p', { class: 'field__hint' }, 'Recordings appear as what is said in them. Type or transcribe a recording on its entry to have it in the book.'),
       ));
       var out = h('div', { class: 'fbook' });
@@ -1171,7 +1171,7 @@
 
   function openOnRootsPage(saved) {
     try { localStorage.setItem(ROOTS_DEVICE, JSON.stringify(saved)); } catch (e) {}
-    location.href = '/trace.html';
+    location.href = '/trace';
   }
 
   function roots() {
@@ -1218,7 +1218,7 @@
         add(view, h('section', { class: 'app-card' },
           h('h2', null, 'You have not traced your roots yet'),
           h('p', null, 'Add the places your family has called home, from you back to the oldest generation you know, and choose how to draw them: roots, a tree, a river, tree rings or a sky of stars.'),
-          link('/trace.html', 'Trace your roots', 'btn'),
+          link('/trace', 'Trace your roots', 'btn'),
         ));
       }
       return h1;
@@ -1784,7 +1784,7 @@
 
       var data = h('section', { class: 'app-card' }, h('h2', null, 'Your data'),
         h('p', null, 'One zip file with every story, photograph, recording and document, and a page that opens in any browser without the internet. Keep it anywhere.'),
-        h('div', { class: 'btn-row' }, button('Download everything', exportAll, 'btn'), link('/if-we-close.html', 'Our promise if we ever close', 'text-link')),
+        h('div', { class: 'btn-row' }, button('Download everything', exportAll, 'btn'), link('/if-we-close', 'Our promise if we ever close', 'text-link')),
         h('h3', null, 'Delete your account'),
         h('p', null, 'This deletes your archive, every file in it, and what you added to other people\'s archives. It cannot be undone.'),
         h('div', { class: 'btn-row' }, button('Delete my account', function () {
@@ -2017,12 +2017,12 @@
             field('How should we credit you?', credit, 'It appears with your words, for example "Anita, whose grandmother was from Jorhat".', true)),
           h('label', { class: 'app-check app-consent' }, consent,
             h('span', null, 'This is mine to share: my own words or my family\'s, with nothing private about someone who has not agreed. It follows the ',
-              h('a', { href: '/community-guidelines.html', target: '_blank', rel: 'noopener' }, 'community guidelines'), '.')),
+              h('a', { href: '/community-guidelines', target: '_blank', rel: 'noopener' }, 'community guidelines'), '.')),
           store.mode === 'local' ? h('p', { class: 'field__hint' }, 'Preview mode: this stays in this browser and nobody reads it.') : null,
           h('div', { class: 'btn-row' },
             h('button', { type: 'submit', class: 'btn' }, editing ? 'Save and send to be read' : 'Send it to be read'),
             editing ? link('#/contribute', 'Cancel', 'btn btn--ghost') : null),
-          h('p', { class: 'field__hint' }, 'You can change or delete it later. How we use what you share: ', link('/privacy.html', 'privacy'), '.'),
+          h('p', { class: 'field__hint' }, 'You can change or delete it later. How we use what you share: ', link('/privacy', 'privacy'), '.'),
         ]);
         kind.addEventListener('change', showWord);
         showWord();
@@ -2077,7 +2077,7 @@
 
   function reportForm(_, query) {
     var id = query.get('c') || '';
-    var back = safeBack(query.get('back'), '/manch.html');
+    var back = safeBack(query.get('back'), '/manch');
     var h1 = page('Report this', 'Tell us what is wrong. A moderator reads every report, and the person who shared it is not told who reported it.');
     var form = h('form', { class: 'app-card app-form' });
     var list = h('fieldset', { class: 'app-reasons' }, h('legend', null, 'What is wrong?'));
@@ -2331,7 +2331,7 @@
       var l = r[1];
       if (!l || l.status !== 'published') {
         var h0 = page('Send a request', null);
-        add(view, h('p', null, 'This listing is not available. ', link('/journeys.html', 'Find a host', 'text-link'), ' · ', link('/marketplace.html', 'Find a maker', 'text-link')));
+        add(view, h('p', null, 'This listing is not available. ', link('/journeys', 'Find a host', 'text-link'), ' · ', link('/marketplace', 'Find a maker', 'text-link')));
         return h0;
       }
       var h1 = page('Ask ' + l.name, 'Tell them what you would like. They reply with a price; the ' + FEE_PERCENT + '% platform fee is added on top and shown separately. Nothing is charged until you accept.');
@@ -2506,7 +2506,7 @@
       add(view, h('h2', { class: 'app-sub' }, 'Requests you sent'));
       add(view, sent.length
         ? h('div', { class: 'app-list' }, sent.map(function (b) { return bookingCard(b, places, {}); }))
-        : h('p', { class: 'app-empty' }, 'None yet. Find a ', link('/marketplace.html', 'maker', 'text-link'), ', a ', link('/journeys.html', 'host', 'text-link'), ' or a ', link('/family-stories.html', 'storyteller', 'text-link'), ' on the page of your family\'s place.'));
+        : h('p', { class: 'app-empty' }, 'None yet. Find a ', link('/marketplace', 'maker', 'text-link'), ', a ', link('/journeys', 'host', 'text-link'), ' or a ', link('/family-stories', 'storyteller', 'text-link'), ' on the page of your family\'s place.'));
       add(view, h('p', null, link('#/offer', r[2].length ? 'Your listings' : 'Are you a maker, host or storyteller? Offer your work', 'text-link')));
       return h1;
     });
@@ -2514,7 +2514,7 @@
 
   function echo(_, query) {
     var id = query.get('c') || '';
-    var back = safeBack(query.get('back'), '/manch.html');
+    var back = safeBack(query.get('back'), '/manch');
     var h1 = page('We have this too', null);
     return store.echo(id).then(function () {
       location.replace(back);

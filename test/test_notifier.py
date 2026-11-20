@@ -42,11 +42,11 @@ class Notifier(unittest.TestCase):
     def test_emails_say_what_happened_and_where_to_go_next(self):
         published = contribution_email(CONTRIBUTIONS[0], 'Mithila', SITE)
         self.assertRegex(published['subject'], r'Sasur.*Mithila')
-        self.assertIn(f'{SITE}/places/mithila.html', published['text'])
+        self.assertIn(f'{SITE}/places/mithila', published['text'])
         self.assertIn(f'{SITE}/s/c1', published['text'])
         rejected = contribution_email(CONTRIBUTIONS[1], None, SITE)
         self.assertIn('The reason: It names a living person.', rejected['text'])
-        self.assertIn('/community-guidelines.html', rejected['text'])
+        self.assertIn('/community-guidelines', rejected['text'])
         self.assertIsNone(contribution_email({**CONTRIBUTIONS[0], 'status': 'pending'}, 'Mithila', SITE))
         self.assertEqual(booking_email(BOOKINGS[0], 'Sita Devi', SITE)['to'], 'provider')
         self.assertEqual(booking_email(BOOKINGS[1], 'Sita Devi', SITE)['to'], 'family')

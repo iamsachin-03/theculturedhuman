@@ -32,7 +32,7 @@
       var tag = week.querySelector('[data-this-week-tag]');
       tag.textContent = p.hashtag ? '#' + p.hashtag : '';
       tag.hidden = !p.hashtag;
-      week.querySelector('[data-this-week-link]').href = '/app.html#/contribute?week=' + w;
+      week.querySelector('[data-this-week-link]').href = '/app#/contribute?week=' + w;
     });
   }
 
@@ -115,7 +115,7 @@
       b.addEventListener('click', function () {
         var now = session();
         if (!now) {
-          location.href = '/app.html#/echo?c=' + b.dataset.contribution + '&back=' + encodeURIComponent(location.pathname + location.search);
+          location.href = '/app#/echo?c=' + b.dataset.contribution + '&back=' + encodeURIComponent(location.pathname + location.search);
           return;
         }
         var on = b.getAttribute('aria-pressed') !== 'true';
@@ -141,7 +141,7 @@
   function permalink(c) { return '/s/' + c.id; }
   function reportLink(c) {
     var a = el('a', 'card-action', 'Report');
-    a.href = '/app.html#/report?c=' + c.id + '&back=' + encodeURIComponent(location.pathname + location.search);
+    a.href = '/app#/report?c=' + c.id + '&back=' + encodeURIComponent(location.pathname + location.search);
     return a;
   }
   function shareTitle(c) { return '"' + c.title + '", shared on The Cultured Human'; }
@@ -405,7 +405,7 @@
         if (c.prompt_week !== null && data && data.prompts.length) {
           var asked = el('p', 'shared-card__question', 'Answering the question: ');
           var qa = el('a', null, data.prompts[c.prompt_week % data.prompts.length].text);
-          qa.href = '/questions.html#week-' + c.prompt_week;
+          qa.href = '/questions#week-' + c.prompt_week;
           asked.appendChild(qa);
           art.appendChild(asked);
         }
@@ -449,7 +449,7 @@
         invite.appendChild(el('h2', null, 'Does your family have this too?'));
         invite.appendChild(el('p', null, 'Say so with "We have this too", or add your own version. Every family remembers it a little differently.'));
         var add = el('a', 'btn btn--light', 'Add yours');
-        add.href = '/app.html#/contribute?' + (c.prompt_week !== null ? 'week=' + c.prompt_week : 'kind=' + encodeURIComponent(c.kind) + (c.place_slug ? '&place=' + c.place_slug : ''));
+        add.href = '/app#/contribute?' + (c.prompt_week !== null ? 'week=' + c.prompt_week : 'kind=' + encodeURIComponent(c.kind) + (c.place_slug ? '&place=' + c.place_slug : ''));
         invite.appendChild(add);
         sharedBox.appendChild(invite);
         wireEchoes(sharedBox);
@@ -497,7 +497,7 @@
             sec.appendChild(grid);
           }
           var answer = el('a', w === now ? 'btn' : 'btn btn--ghost', w === now ? 'Answer this week\'s question' : 'Answer it');
-          answer.href = '/app.html#/contribute?week=' + w;
+          answer.href = '/app#/contribute?week=' + w;
           var row = el('div', 'btn-row');
           row.appendChild(answer);
           sec.appendChild(row);
@@ -530,7 +530,7 @@
     if (l.price_note) n.appendChild(el('p', 'person-card__meta', l.price_note));
     var row = el('div', 'person-card__actions');
     var ask = el('a', 'btn btn--small', (ROLES[l.role] || [0, 'Send a request'])[1]);
-    ask.href = '/app.html#/request?listing=' + l.id;
+    ask.href = '/app#/request?listing=' + l.id;
     row.appendChild(ask);
     if (/^https:\/\//.test(l.link || '')) {
       var work = el('a', 'text-link', 'See their work');

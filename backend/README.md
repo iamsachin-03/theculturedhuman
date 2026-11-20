@@ -1,6 +1,6 @@
 # Backend for family archives and the marketplace
 
-The family archive app at `/app.html` stores each person's archive in a [Supabase](https://supabase.com) project: Postgres for the data, Supabase Auth for sign-in, and Supabase Storage for voice notes, videos, photographs and documents. The browser talks to it directly with the public anon key; row-level security in the database decides what each person can see. Until a project is connected, the app runs in preview mode, keeping everything in the visitor's browser.
+The family archive app at `/app` stores each person's archive in a [Supabase](https://supabase.com) project: Postgres for the data, Supabase Auth for sign-in, and Supabase Storage for voice notes, videos, photographs and documents. The browser talks to it directly with the public anon key; row-level security in the database decides what each person can see. Until a project is connected, the app runs in preview mode, keeping everything in the visitor's browser.
 
 The few things that need a server (payments, the daily emails, the weekly WhatsApp question and link previews) are Python functions in `api/`, run by Vercel. They use the standard library only, share `web.py` for HTTP, the database and the cron secret, and are tested with `npm run test:py`. Locally, `npm run serve` runs them through `tools/run_function.py`, so you need Python 3.10 or newer.
 
@@ -39,10 +39,10 @@ These mirror `public/scripts/app-core.js`, which the app uses to explain the sam
 
 1. Create a project (choose the Mumbai region for users in India).
 2. In the SQL editor, run `schema.sql`. It also creates the private `archive` storage bucket and its rules.
-3. Under Authentication, set the Site URL to the site's address and add `https://<your-site>/app.html` to the redirect URLs. Email sign-in links work out of the box; set up your own SMTP sender before launch, because Supabase's built-in sender is rate-limited. To offer Google, enable the Google provider and set `"google": true` below.
+3. Under Authentication, set the Site URL to the site's address and add `https://<your-site>/app` to the redirect URLs. Email sign-in links work out of the box; set up your own SMTP sender before launch, because Supabase's built-in sender is rate-limited. To offer Google, enable the Google provider and set `"google": true` below.
 4. Under Storage, set the file size limit you want (the app warns above 50 MB).
 5. Schedule `select legacy_tick();` daily with the `pg_cron` extension, and send the reminders for archives that have just moved to `checking` or `asking` (an Edge Function or any email service).
-6. Run `places.sql` so families can add to each place, then make yourself a moderator: sign in to the app once, and run `insert into moderators select id from auth.users where email = 'you@example.org';`. Moderators read what families send at `/app.html#/moderate` and publish it to the place page, where it appears straight away. Run `places.sql` again whenever you add a place. The same page lists makers, hosts and storytellers waiting to be published, and accepted bookings: send the family a payment link for the total, then record the payment reference there, and mark the booking completed when the work is done.
+6. Run `places.sql` so families can add to each place, then make yourself a moderator: sign in to the app once, and run `insert into moderators select id from auth.users where email = 'you@example.org';`. Moderators read what families send at `/app#/moderate` and publish it to the place page, where it appears straight away. Run `places.sql` again whenever you add a place. The same page lists makers, hosts and storytellers waiting to be published, and accepted bookings: send the family a payment link for the total, then record the payment reference there, and mark the booking completed when the work is done.
 7. Put the project URL and the public anon key in `content/site.json` under `backend`, then rebuild:
 
    ```json
@@ -60,7 +60,7 @@ These mirror `public/scripts/app-core.js`, which the app uses to explain the sam
 
 The code already does its part: every table has row-level security (tested by `test.sh`), privileged functions pin their `search_path`, the site sends a strict content security policy, payment and cron requests are checked against their secrets in constant time, and invite links are cleaned before they are drawn. These settings live outside the code, so check them when you connect the project:
 
-- **Redirect URLs.** Under Authentication → URL Configuration, list only the real site (`https://<your-site>/app.html`). A wildcard there lets a sign-in link send its token to someone else's address.
+- **Redirect URLs.** Under Authentication → URL Configuration, list only the real site (`https://<your-site>/app`). A wildcard there lets a sign-in link send its token to someone else's address.
 - **Sign-up abuse.** Under Authentication → Rate Limits, keep email sends low (a few per hour per address) and turn on CAPTCHA under Attack Protection before launch.
 - **Secrets.** The service role key, `CRON_SECRET`, `RESEND_API_KEY` and the Razorpay secrets belong in Vercel's environment settings only, never in `content/site.json`, the repository or a chat. Make `CRON_SECRET` long and random (`openssl rand -hex 32`), and rotate any key that has been pasted somewhere it should not be.
 - **A new project URL.** The content security policy in `vercel.json` names the Supabase project. If you move to another project, change it there too; the site tests fail until you do.

@@ -53,7 +53,7 @@ function offer(id, where, { card = false } = {}) {
   return o;
 }
 
-// What we offer, grouped by the steps a family goes through. Drives /offerings.html and the
+// What we offer, grouped by the steps a family goes through. Drives /offerings and the
 // "at a glance" strip at the top of each product page.
 const productData = JSON.parse(readFileSync(join(ROOT, 'content/products.json'), 'utf8'));
 const productGroups = new Map(productData.groups.map((g) => [g.id, g]));
@@ -97,7 +97,7 @@ const places = readdirSync(placesDir)
     for (const [i, c] of (p.contributions || []).entries()) {
       if (!c.kind || !c.title || !c.text || !c.credit) throw new Error(`${where}: contributions[${i}] needs kind, title, text and credit`);
     }
-    return { ...p, slug: file.replace(/\.json$/, ''), where, carries: p.carries || [], contributions: p.contributions || [], path: `/places/${file.replace(/\.json$/, '')}.html` };
+    return { ...p, slug: file.replace(/\.json$/, ''), where, carries: p.carries || [], contributions: p.contributions || [], path: `/places/${file.replace(/\.json$/, '')}` };
   });
 const placeBySlug = new Map(places.map((p) => [p.slug, p]));
 
@@ -139,8 +139,11 @@ function walk(dir, ext) {
   });
 }
 
+// Pages have clean addresses (/about, /journal/x): the file is /about.html, which Vercel's cleanUrls
+// serves at /about and redirects /about.html to. A directory address (/journal/) is its index.html.
 function outFile(path) {
-  return join(PUBLIC, path.endsWith('/') ? path + 'index.html' : path);
+  if (path.endsWith('/')) return join(PUBLIC, path + 'index.html');
+  return join(PUBLIC, posix.extname(path) ? path : path + '.html');
 }
 
 function emit(page, main, imageId) {
@@ -159,7 +162,7 @@ const articles = readdirSync(articleDir)
     if (!site.pillars[data.pillar]) throw new Error(`${where}: pillar "${data.pillar}" is not in content/site.json`);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date)) throw new Error(`${where}: date must be YYYY-MM-DD`);
     const slug = file.replace(/\.md$/, '');
-    return { ...data, slug, where, body, path: `/journal/${slug}.html`, related: data.related || [], hero: asset(data.heroImage, where) };
+    return { ...data, slug, where, body, path: `/journal/${slug}`, related: data.related || [], hero: asset(data.heroImage, where) };
   })
   .filter((a) => a.draft !== 'true')
   .sort((a, b) => b.date.localeCompare(a.date));
@@ -231,7 +234,7 @@ emit(
 );
 emit(
   {
-    path: '/credits.html',
+    path: '/credits',
     title: `Our illustrations — ${site.name}`,
     description: 'Every picture on The Cultured Human is an original illustration, made for the story it sits beside.',
   },
@@ -318,7 +321,7 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
   const where = `src/pages/${file}`;
   const { data, body } = parseFrontMatter(readFileSync(join(pagesDir, file), 'utf8'));
   for (const key of ['title', 'description']) if (!data[key]) throw new Error(`${where}: front matter needs "${key}"`);
-  const path = file === 'index.html' ? '/' : `/${file}`;
+  const path = file === 'index.html' ? '/' : `/${file.replace(/\.html$/, '')}`;
 
   const main = body
     .replace(/\{\{(img|figure|credit)\s+([\w-]+)([^}]*)\}\}/g, (_, kind, id, rest) => {
@@ -360,7 +363,7 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
 // ---------- sitemap & robots ----------
 const indexable = [...outputs.entries()]
   .filter(([file, html]) => file.endsWith('.html') && !relative(PUBLIC, file).startsWith('..') && !html.includes('<meta name="robots" content="noindex'))
-  .map(([file]) => '/' + relative(PUBLIC, file).split('\\').join('/').replace(/(^|\/)index\.html$/, '$1'))
+  .map(([file]) => '/' + relative(PUBLIC, file).split('\\').join('/').replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, ''))
   .sort();
 outputs.set(
   join(PUBLIC, 'sitemap.xml'),
@@ -395,7 +398,9 @@ for (const [file, html] of outputs) {
         continue;
       }
       const target = posix.normalize(clean.startsWith('/') ? clean : base + clean);
-      const onDisk = outFile(target);
+      if (m[1] === 'href' && target.endsWith('.html')) problems.push(`${where}: link to ${raw} — use the clean address ${raw.replace(/(index)?\.html/, '')}`);
+      let onDisk = outFile(target);
+      if (!outputs.has(onDisk) && !existsSync(onDisk) && !posix.extname(target)) onDisk = outFile(target + '/');
       if (!outputs.has(onDisk) && !existsSync(onDisk)) problems.push(`${where}: broken link ${raw}`);
       else if (hash && !hash.startsWith('/') && outputs.has(onDisk) && !new RegExp(`id="${hash}"`).test(outputs.get(onDisk))) {
         problems.push(`${where}: link to missing anchor ${raw}`);

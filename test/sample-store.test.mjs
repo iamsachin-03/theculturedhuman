@@ -1,4 +1,4 @@
-// The sample archive (/app.html?sample) must answer everything the app asks of a real store,
+// The sample archive (/app?sample) must answer everything the app asks of a real store,
 // show a lived-in archive, and refuse every change.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

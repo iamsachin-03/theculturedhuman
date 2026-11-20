@@ -4,7 +4,7 @@
     "label": "Storytellers",
     "title": "Book a storyteller",
     "summary": "Rather not record an elder yourself? Book a trained storyteller from the platform to sit with them, record their stories and help turn them into a book.",
-    "href": "/family-stories.html",
+    "href": "/family-stories",
     "image": "palm-leaf-manuscript",
     "action": "Request a storyteller",
     "form": {
@@ -23,7 +23,7 @@
     "label": "The Roots Kit",
     "title": "Ask, record, keep",
     "summary": "Guided question cards, recording tips and a family-book template, so you can capture your elders' stories yourself, wherever you live.",
-    "href": "/roots-kit.html",
+    "href": "/roots-kit",
     "image": "warli-wall",
     "action": "Join the waitlist",
     "form": {
@@ -43,7 +43,7 @@
     "label": "The family book",
     "title": "Their words, on paper",
     "summary": "Your archive laid out as a book. Print it at home, or have it bound for every home in the family.",
-    "href": "/family-book.html",
+    "href": "/family-book",
     "image": "book-of-stories",
     "action": "Ask about a bound copy",
     "form": {
@@ -63,7 +63,7 @@
     "label": "Journeys",
     "title": "Roots journeys with local hosts",
     "summary": "Go back to where your family began with a host who knows the place, or spend a few days with a tradition and the people who keep it.",
-    "href": "/journeys.html",
+    "href": "/journeys",
     "image": "rani-ki-vav",
     "action": "Register interest",
     "form": {
@@ -84,7 +84,7 @@
     "label": "Commission a piece",
     "title": "Commission original work",
     "summary": "A painting of your family's home town, your family name in a folk art style, a gift for a wedding. Made by a named artist, who sets the price.",
-    "href": "/commission.html",
+    "href": "/commission",
     "image": "kohbar-wall",
     "action": "Start a commission",
     "form": {
@@ -104,7 +104,7 @@
     "label": "Gifting",
     "title": "Gifts with a story",
     "summary": "Gift boxes for family occasions from named makers, each with a card that tells their story. Made to pre-order, never mass-stocked.",
-    "href": "/gifting.html",
+    "href": "/gifting",
     "image": "bankura-horses",
     "action": "Ask about gifting",
     "form": {
@@ -125,7 +125,7 @@
     "label": "For organisations",
     "title": "Roots programmes for groups",
     "summary": "Family-history projects for schools, recording afternoons for diaspora and community groups, and heritage partnerships, led by makers and storytellers on the platform.",
-    "href": "/for-organisations.html",
+    "href": "/for-organisations",
     "image": "mithila-painter",
     "action": "Plan a programme",
     "form": {

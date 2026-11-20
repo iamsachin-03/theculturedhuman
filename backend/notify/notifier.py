@@ -29,28 +29,28 @@ def contribution_email(c, place_name, site_url):
     """The email for a contribution whose status changed, or None when there is nothing to say."""
     on_place = bool(c.get('place_slug') and place_name)
     where = f'the {place_name} page' if on_place else 'The Commons'
-    link = f"{site_url}/places/{c['place_slug']}.html" if c.get('place_slug') else f'{site_url}/manch.html'
+    link = f"{site_url}/places/{c['place_slug']}" if c.get('place_slug') else f'{site_url}/manch'
     if c['status'] == 'published':
         return {
             'subject': f"“{c['title']}” is now on {place_name if on_place else 'The Commons'}",
             'text': f"Thank you for sharing “{c['title']}”. It has been read and is now on {where}:\n{link}\n\n"
             f"Here is its own page, to send to your family:\n{site_url}/s/{c['id']}\n\n"
-            f"This week's question is waiting at {site_url}/manch.html#this-week{SIGN_OFF}",
+            f"This week's question is waiting at {site_url}/manch#this-week{SIGN_OFF}",
         }
     if c['status'] == 'rejected':
         return {
             'subject': f"About “{c['title']}”",
             'text': f"Thank you for sharing “{c['title']}”. We have not published it this time.\n\n"
             + (f"The reason: {c['review_note']}\n\n" if c.get('review_note') else '')
-            + f'You can change it and send it again from what you have shared:\n{site_url}/app.html#/contribute\n\n'
-            f'Our community guidelines: {site_url}/community-guidelines.html{SIGN_OFF}',
+            + f'You can change it and send it again from what you have shared:\n{site_url}/app#/contribute\n\n'
+            f'Our community guidelines: {site_url}/community-guidelines{SIGN_OFF}',
         }
     return None
 
 
 def booking_email(b, listing_name, site_url):
     """The email for a booking whose status changed: who it goes to, and what it says."""
-    requests = f'{site_url}/app.html#/requests'
+    requests = f'{site_url}/app#/requests'
     status = b.get('status')
     if status == 'requested':
         return {'to': 'provider', 'subject': f'A new request for {listing_name}', 'text': f'A family has sent a request to {listing_name}. Read it and reply with your price here:\n{requests}{SIGN_OFF}'}

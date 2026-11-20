@@ -187,5 +187,5 @@ def tell_owner(cfg, http, service, elder, entry):
              'from': cfg['from'], 'to': [email],
              'subject': f"{elder['name']} answered this week's question",
              'text': f"{elder['name']} sent an answer on WhatsApp. It is in your archive, visible only to you until you choose who sees it:\n"
-                     f"{cfg['site_url']}/app.html#/entry/{entry['id']}\n\nWith thanks,\nThe Cultured Human",
+                     f"{cfg['site_url']}/app#/entry/{entry['id']}\n\nWith thanks,\nThe Cultured Human",
          }))

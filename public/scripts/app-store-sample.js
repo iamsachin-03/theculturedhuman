@@ -1,4 +1,4 @@
-// A sample family archive, opened with /app.html?sample, so visitors can look around a lived-in
+// A sample family archive, opened with /app?sample, so visitors can look around a lived-in
 // archive before they start their own. The family is invented. Everything is read-only and kept
 // in memory; nothing is saved and nothing leaves the browser. The one real thing is an optional voice
 // note, recorded with its speaker's consent (content/sample-voice-note.json, tools/lib/sample-voice.mjs).
@@ -112,7 +112,7 @@
     mode: 'sample',
     session: function () { return ok({ user: user }); },
     accounts: function () { return ok([user]); },
-    signOut: function () { location.href = '/offerings.html'; return new Promise(function () {}); },
+    signOut: function () { location.href = '/offerings'; return new Promise(function () {}); },
     touchSeen: function () { return ok(core.newLegacy(ASHA, new Date())); },
     legacy: function () { return ok(core.newLegacy(ASHA, new Date())); },
     people: function () { return ok(people.slice().sort(function (a, b) { return a.name.localeCompare(b.name); })); },

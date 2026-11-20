@@ -45,10 +45,20 @@ test('nothing outside public/ can be read, however the path is written', async (
 test('pages only answer GET and HEAD, and carry the production security headers', async () => {
   assert.equal((await get('/', { method: 'POST' })).status, 405);
   assert.equal((await get('/', { method: 'DELETE' })).status, 405);
-  const res = await get('/app.html');
+  const res = await get('/app');
   assert.match(res.headers['content-security-policy'], /frame-ancestors 'none'/);
   assert.equal(res.headers['x-frame-options'], 'DENY');
   assert.equal(res.headers['x-content-type-options'], 'nosniff');
+});
+
+test('pages answer at clean addresses, and the old .html addresses redirect to them', async () => {
+  for (const path of ['/about', '/journal/madhubani-painting', '/places/bengal', '/journal/', '/journal']) assert.equal((await get(path)).status, 200, path);
+  for (const [from, to] of [['/about.html', '/about'], ['/app.html?sample', '/app?sample'], ['/journal/index.html', '/journal'], ['/index.html', '/'], ['/bazaar.html', '/bazaar']]) {
+    const res = await get(from);
+    assert.equal(res.status, 308, from);
+    assert.equal(res.headers.location, to, from);
+  }
+  assert.equal((await get('/bazaar')).headers.location, '/marketplace');
 });
 
 test('it listens on this computer only', async () => {

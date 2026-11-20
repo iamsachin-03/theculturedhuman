@@ -551,7 +551,7 @@
       toPng(function (blob) {
         navigator.share({
           files: [new File([blob], fileName(), { type: 'image/png' })],
-          text: 'Where I come from. Trace yours at ' + location.origin + '/trace.html #theculturedhuman',
+          text: 'Where I come from. Trace yours at ' + location.origin + '/trace #theculturedhuman',
         }).catch(function () {});
       });
     });
@@ -568,7 +568,7 @@
   var invitedBy = '';
 
   function inviteLink() {
-    return location.origin + '/trace.html#roots=' + Art.pack(snapshot(), fromInput.value.trim());
+    return location.origin + '/trace#roots=' + Art.pack(snapshot(), fromInput.value.trim());
   }
 
   function inviteMessage() {

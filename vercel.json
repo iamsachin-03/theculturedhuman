@@ -2,6 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "public",
+  "cleanUrls": true,
   "crons": [
     {
       "path": "/api/weekly-send",
@@ -29,42 +30,37 @@
   },
   "redirects": [
     {
-      "source": "/bazaar.html",
-      "destination": "/marketplace.html",
+      "source": "/bazaar",
+      "destination": "/marketplace",
       "permanent": true
     },
     {
-      "source": "/journal/index.html",
-      "destination": "/journal/",
-      "permanent": true
-    },
-    {
-      "source": "/culture.html",
+      "source": "/culture",
       "destination": "/places/",
       "permanent": true
     },
     {
-      "source": "/experiences.html",
+      "source": "/experiences",
       "destination": "/places/",
       "permanent": true
     },
     {
-      "source": "/proverbs.html",
-      "destination": "/manch.html",
+      "source": "/proverbs",
+      "destination": "/manch",
       "permanent": true
     },
     {
-      "source": "/music.html",
+      "source": "/music",
       "destination": "/journal/",
       "permanent": true
     },
     {
-      "source": "/conscious-living.html",
+      "source": "/conscious-living",
       "destination": "/",
       "permanent": true
     },
     {
-      "source": "/fitness.html",
+      "source": "/fitness",
       "destination": "/",
       "permanent": true
     }

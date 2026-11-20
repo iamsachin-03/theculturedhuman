@@ -1,6 +1,6 @@
 # Writing a journal article
 
-Each `.md` file in this folder becomes a page at `/journal/<file-name>.html`. Run `npm run build` to publish it locally, then commit both the Markdown file and the generated page.
+Each `.md` file in this folder becomes a page at `/journal/<file-name>`. Run `npm run build` to publish it locally, then commit both the Markdown file and the generated page.
 
 ## Front matter
 

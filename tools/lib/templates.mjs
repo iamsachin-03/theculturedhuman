@@ -36,7 +36,7 @@ export function headBlock({ site, page, image }) {
 }
 
 function isActive(href, path, match = []) {
-  if (href === '/') return path === '/' || path === '/index.html';
+  if (href === '/') return path === '/' || path === '/';
   if (href.endsWith('/')) return path.startsWith(href);
   return path === href || match.includes(path);
 }
@@ -46,13 +46,13 @@ const PRODUCT_NAV = {
   roots: {
     label: 'My Roots',
     links: [
-      ['/roots.html', 'How it works'],
-      ['/trace.html', 'Trace your roots'],
-      ['/archive.html', 'Family archive'],
-      ['/family-stories.html', 'Storytellers'],
-      ['/roots-kit.html', 'The Roots Kit'],
+      ['/roots', 'How it works'],
+      ['/trace', 'Trace your roots'],
+      ['/archive', 'Family archive'],
+      ['/family-stories', 'Storytellers'],
+      ['/roots-kit', 'The Roots Kit'],
     ],
-    action: ['/app.html', 'Open my archive'],
+    action: ['/app', 'Open my archive'],
   },
 };
 
@@ -76,7 +76,7 @@ export function headerBlock({ site, page }) {
 <a class="wordmark" href="/" aria-label="${e(site.name)} — home">${logo(44)}<span>${e(site.name)}</span></a>
 <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span class="menu-toggle__label">Menu</span></button>
 <nav class="primary-nav" id="primary-nav" aria-label="Main"><ul>${links}</ul></nav>
-<a class="account-link" href="/app.html"${page.path === '/app.html' ? ' aria-current="page"' : ''}>My archive</a>
+<a class="account-link" href="/app"${page.path === '/app' ? ' aria-current="page"' : ''}>My archive</a>
 <label class="theme-picker"><span class="theme-swatch" aria-hidden="true"></span><span>Theme</span>
 <select data-theme-picker aria-label="Colour theme">
 <option value="marigold">Marigold</option>
@@ -101,7 +101,7 @@ export function footerBlock({ site }) {
 <div class="site-footer__brand"><a class="wordmark wordmark--footer" href="/">${logo(96)}<span>${e(site.name)}</span></a><p>${e(site.tagline)} ${e(site.supportingLine)}</p></div>
 ${cols}
 </div>
-<div class="container site-footer__bottom"><span>© ${new Date().getFullYear()} ${e(site.name)}. Rooted in India, curious about everywhere.</span><span class="site-footer__legal"><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/community-guidelines.html">Community guidelines</a><a href="/if-we-close.html">If we close</a><a href="/credits.html">Illustrations</a></span></div>
+<div class="container site-footer__bottom"><span>© ${new Date().getFullYear()} ${e(site.name)}. Rooted in India, curious about everywhere.</span><span class="site-footer__legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/community-guidelines">Community guidelines</a><a href="/if-we-close">If we close</a><a href="/credits">Illustrations</a></span></div>
 </footer>
 <script src="/scripts/site.js" defer></script>`;
 }
@@ -113,7 +113,7 @@ export function picture(asset, { sizes = '100vw', className = '', eager = false,
 const isOriginal = (asset) => asset.source === 'Original illustration';
 
 export function creditLine(asset) {
-  if (isOriginal(asset)) return `<span class="credit">Illustration: <a href="/credits.html">${e(asset.creator)}</a></span>`;
+  if (isOriginal(asset)) return `<span class="credit">Illustration: <a href="/credits">${e(asset.creator)}</a></span>`;
   return `<span class="credit">${asset.kind === 'illustration' ? 'Illustration' : 'Photo'}: <a href="${e(asset.sourceUrl)}" rel="noopener">${e(asset.creator)}</a>, ${e(asset.licence)}${asset.licenceUrl ? ` (<a href="${e(asset.licenceUrl)}" rel="noopener">licence</a>)` : ''}</span>`;
 }
 
@@ -149,7 +149,7 @@ ${rest.length ? `<div class="offer-grid${rest.length < 3 ? ' offer-grid--few' : 
 export function atAGlance(p, group) {
   return `<section class="glance" aria-label="${e(p.name)} at a glance">
 <div class="container">
-<p class="glance__trail"><a href="/offerings.html">What we offer</a> · <a href="/offerings.html#${group.id}">${e(group.eyebrow)}</a></p>
+<p class="glance__trail"><a href="/offerings">What we offer</a> · <a href="/offerings#${group.id}">${e(group.eyebrow)}</a></p>
 <div class="glance__grid">
 <dl class="glance__facts">
 <div><dt>Who it is for</dt><dd>${e(p.who)}</dd></div>
@@ -284,13 +284,13 @@ ${cards.join('\n')}
 <p class="eyebrow">The Commons</p>
 <h2 id="your-story-title">Your family has a story too.</h2>
 <p>A word that doesn't translate, a dish made once a year, a song from every wedding. Answer this week's question, and it joins the page of the place it comes from.</p>
-<a class="btn btn--light" href="/manch.html#this-week">See this week's question</a>
+<a class="btn btn--light" href="/manch#this-week">See this week's question</a>
 </div>
 <div class="invite__card">
 <p class="eyebrow">My Roots</p>
 <h2>Keep the ones only your family knows.</h2>
 <p>Some stories aren't for everyone. Record them in your elders' own voices and keep them in a private family archive, shared only with the people you choose.</p>
-<a class="text-link" href="/roots.html">How My Roots works</a>
+<a class="text-link" href="/roots">How My Roots works</a>
 </div>
 </div>
 </section>`;
@@ -344,7 +344,7 @@ export function directory(site, role, list) {
   const r = ROLE_LABELS[role];
   const inner = list.length
     ? `<div class="person-grid">${list.map(personCard).join('')}</div>`
-    : `<div class="empty-state"><p><strong>${r.none}</strong> The first ${r.join} are being invited now.</p><a class="text-link" href="/app.html#/offer?role=${role}">List yourself as a ${r.one.toLowerCase()}</a></div>`;
+    : `<div class="empty-state"><p><strong>${r.none}</strong> The first ${r.join} are being invited now.</p><a class="text-link" href="/app#/offer?role=${role}">List yourself as a ${r.one.toLowerCase()}</a></div>`;
   return `<div class="directory" data-listings data-role="${role}"${backendAttrs(site)}>${inner}</div>`;
 }
 
@@ -375,7 +375,7 @@ export function rootsMap(places) {
 function contributeBox(site, slug, form) {
   if (!(site.backend && site.backend.url)) return form;
   return `<div class="contribute-cta">
-<a class="btn" href="/app.html#/contribute${slug ? `?place=${e(slug)}` : ''}">Write it now</a>
+<a class="btn" href="/app#/contribute${slug ? `?place=${e(slug)}` : ''}">Write it now</a>
 <p class="enquiry__note">Sign in with your email, write a few lines and choose how you are credited.</p>
 <details class="contribute-other"><summary>Rather not sign in? Send it to us instead</summary>
 ${form}
@@ -402,8 +402,8 @@ export function thisWeek(prompts) {
 <p class="eyebrow">This week's question</p>
 <p class="this-week__question" data-this-week-text>${e(p.text)}</p>
 <p class="this-week__tag" data-this-week-tag${p.hashtag ? '' : ' hidden'}>${p.hashtag ? `#${e(p.hashtag)}` : ''}</p>
-<div class="btn-row"><a class="btn btn--light" href="/app.html#/contribute?week=0" data-this-week-link>Answer it</a><a class="btn btn--light btn--outline" href="/questions.html">Read the answers</a></div>
-<p class="this-week__note">A new question every Monday. Answers are read before they appear, then added to the page of the place they come from, credited the way you choose. <a href="/questions.html">Past questions</a>.</p>
+<div class="btn-row"><a class="btn btn--light" href="/app#/contribute?week=0" data-this-week-link>Answer it</a><a class="btn btn--light btn--outline" href="/questions">Read the answers</a></div>
+<p class="this-week__note">A new question every Monday. Answers are read before they appear, then added to the page of the place they come from, credited the way you choose. <a href="/questions">Past questions</a>.</p>
 </div>`;
 }
 
@@ -425,8 +425,8 @@ function feedExamples(examples, { words, kind, limit }) {
 export function communityFeed({ site, limit = 6, kind, style = 'cards', place, examples = [] }) {
   const words = style === 'words';
   const empty = words
-    ? '<p><strong>The first words will appear here.</strong> Add a word from your family that has no translation, and where it comes from.</p><a class="text-link" href="/app.html#/contribute?kind=A%20word%20or%20saying">Add your word</a>'
-    : '<p><strong>Nothing shared yet.</strong> Be the first: answer this week\'s question, or add something to your place.</p><a class="text-link" href="/app.html#/contribute">Add to a place</a>';
+    ? '<p><strong>The first words will appear here.</strong> Add a word from your family that has no translation, and where it comes from.</p><a class="text-link" href="/app#/contribute?kind=A%20word%20or%20saying">Add your word</a>'
+    : '<p><strong>Nothing shared yet.</strong> Be the first: answer this week\'s question, or add something to your place.</p><a class="text-link" href="/app#/contribute">Add to a place</a>';
   const backend = backendAttrs(site);
   return `<div class="community-feed community-feed--${words ? 'words' : 'cards'}" data-community-feed data-limit="${limit}"${kind ? ` data-kind="${e(kind)}"` : ''}${place ? ` data-place="${e(place)}"` : ''}${backend}>
 <div class="empty-state">${empty}</div>
@@ -441,14 +441,14 @@ export function communityCount(site) {
 /** One contribution, large, with sharing; filled in by community-live.js from ?id=. */
 export function sharedContribution(site) {
   return `<div class="shared-item" data-shared${backendAttrs(site)}>
-<div class="shared-missing" data-shared-empty><p class="eyebrow">Shared on The Cultured Human</p><h1>Looking for it…</h1><p>If nothing appears, it may have been changed, or removed by the person who shared it.</p><a class="btn" href="/manch.html">Go to The Commons</a></div>
+<div class="shared-missing" data-shared-empty><p class="eyebrow">Shared on The Cultured Human</p><h1>Looking for it…</h1><p>If nothing appears, it may have been changed, or removed by the person who shared it.</p><a class="btn" href="/manch">Go to The Commons</a></div>
 </div>`;
 }
 
 /** Every week's question so far, newest first, with its published answers; filled in by community-live.js. */
 export function questionArchive(site) {
   return `<div class="question-archive" data-question-archive${backendAttrs(site)}>
-<div class="empty-state"><p><strong>The questions are loading.</strong> A new one arrives every Monday.</p><a class="text-link" href="/manch.html#this-week">This week's question</a></div>
+<div class="empty-state"><p><strong>The questions are loading.</strong> A new one arrives every Monday.</p><a class="text-link" href="/manch#this-week">This week's question</a></div>
 </div>`;
 }
 
@@ -458,7 +458,7 @@ export function placesIndexMain({ site, map, cards, form }) {
 <p class="eyebrow">Places</p>
 <h1>Every family comes <em>from a place.</em></h1>
 <p class="lede">Each place here is a page that grows as families add to it: the words, dishes, rituals and memories they carry. Find yours, or add it.</p>
-<div class="btn-row"><a class="btn" href="/trace.html">Trace your roots</a><a class="btn btn--ghost" href="#contribute">Add a place</a></div>
+<div class="btn-row"><a class="btn" href="/trace">Trace your roots</a><a class="btn btn--ghost" href="#contribute">Add a place</a></div>
 </div>
 </section>
 <div class="editorial-content">
@@ -471,7 +471,7 @@ ${cards}
 </section>
 <div class="section-gap"></div>
 <section aria-labelledby="latest-title">
-<div class="section-head"><p class="eyebrow">Latest from families</p><h2 id="latest-title">Added this week, and before.</h2><p>Everything here was read by a person before it appeared. This week's question is on <a href="/manch.html#this-week">The Commons</a>.</p></div>
+<div class="section-head"><p class="eyebrow">Latest from families</p><h2 id="latest-title">Added this week, and before.</h2><p>Everything here was read by a person before it appeared. This week's question is on <a href="/manch#this-week">The Commons</a>.</p></div>
 ${communityFeed({ site, limit: 6 })}
 </section>
 <div class="section-gap"></div>
@@ -496,13 +496,13 @@ export function placeMain({ site, place, hero, carries, people, form }) {
     : `<div class="empty-state"><p><strong>Nothing shared yet.</strong> Be the first family from ${e(place.name)} to add a word, a dish or a memory.</p><a class="text-link" href="#contribute">Add to ${e(place.name)}</a></div>`;
   const listed = people.length
     ? `<div class="person-grid">${people.map(personCard).join('')}</div>`
-    : `<div class="empty-state"><p><strong>No makers, hosts or storytellers from ${e(place.name)} are listed yet.</strong> If you make, guide or record here, you could be the first.</p><a class="text-link" href="/app.html#/offer">List yourself</a></div>`;
+    : `<div class="empty-state"><p><strong>No makers, hosts or storytellers from ${e(place.name)} are listed yet.</strong> If you make, guide or record here, you could be the first.</p><a class="text-link" href="/app#/offer">List yourself</a></div>`;
   return `<section class="page-hero">
 <div class="container">
 <p class="eyebrow"><a class="eyebrow--plain" href="/places/">Places</a> · ${e(place.region)}</p>
 <h1>${e(place.name)}</h1>
 <p class="lede">${e(place.intro)}</p>
-<div class="btn-row"><a class="btn" href="#contribute">Add to ${e(place.name)}</a><a class="btn btn--ghost" href="/trace.html">Trace your roots</a></div>
+<div class="btn-row"><a class="btn" href="#contribute">Add to ${e(place.name)}</a><a class="btn btn--ghost" href="/trace">Trace your roots</a></div>
 </div>
 </section>
 ${hero ? `<figure class="place-hero container">${picture(hero, { eager: true, sizes: '(max-width: 1140px) 100vw, 1100px' })}<figcaption class="credit">${e(hero.subject)}. ${creditLine(hero).replace(/^<span class="credit">|<\/span>$/g, '')}</figcaption></figure>` : ''}

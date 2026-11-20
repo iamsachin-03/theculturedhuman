@@ -1,4 +1,4 @@
-// A real voice for the sample archive (/app.html?sample). It is added only when
+// A real voice for the sample archive (/app?sample). It is added only when
 // content/sample-voice-note.json exists, records the speaker's consent, and the recording itself
 // is in public/assets/sample/. Without that file the sample archive simply has no voice note.
 import { readFileSync, existsSync, statSync } from 'node:fs';

@@ -39,8 +39,8 @@
       "price": "Free",
       "steps": ["Add the places you know, one generation at a time.", "Ask a relative to fill in the gaps.", "Keep the portrait, or have it painted."],
       "trust": "Everything you type stays in your browser until you choose to keep it in your archive.",
-      "href": "/trace.html",
-      "cta": { "label": "Trace your roots", "href": "/trace.html#trace-form-title" },
+      "href": "/trace",
+      "cta": { "label": "Trace your roots", "href": "/trace#trace-form-title" },
       "image": "warli-wall"
     },
     {
@@ -61,8 +61,8 @@
       "price": "Free",
       "steps": ["Read this week's question.", "Share a word, a dish or a memory.", "A person reads it before it appears."],
       "trust": "Nothing appears until a person has read it, and you choose the name it is credited to.",
-      "href": "/manch.html",
-      "cta": { "label": "Answer this week's question", "href": "/manch.html#this-week" },
+      "href": "/manch",
+      "cta": { "label": "Answer this week's question", "href": "/manch#this-week" },
       "image": "madhubani-station"
     },
     {
@@ -76,9 +76,9 @@
       "price": "Free to begin. A Family plan with more room and a printed book is coming.",
       "steps": ["Ask an elder one question a week.", "Keep their voice note or your own words.", "Share it, or leave it for later."],
       "trust": "Private by default. Never sold, never used for advertising, always yours to download.",
-      "href": "/archive.html",
-      "cta": { "label": "Start your family archive", "href": "/app.html" },
-      "sample": { "label": "Look inside a sample archive", "href": "/app.html?sample" },
+      "href": "/archive",
+      "cta": { "label": "Start your family archive", "href": "/app" },
+      "sample": { "label": "Look inside a sample archive", "href": "/app?sample" },
       "image": "family-photo-album"
     },
     {
@@ -90,8 +90,8 @@
       "price": "Waitlist. Priced before it opens.",
       "steps": ["Pick a card and ask.", "Record the answer on your phone.", "Keep it in your archive, or in the book."],
       "trust": "Joining the waitlist is one message. You will see the price before you decide.",
-      "href": "/roots-kit.html",
-      "cta": { "label": "Join the waitlist", "href": "/roots-kit.html#enquire" },
+      "href": "/roots-kit",
+      "cta": { "label": "Join the waitlist", "href": "/roots-kit#enquire" },
       "image": "ask-a-question"
     },
     {
@@ -103,8 +103,8 @@
       "price": "Free to print at home. Bound copies quoted per book, before you agree.",
       "steps": ["Open your archive as a book.", "Choose the chapters and print, or save a PDF.", "Send the PDF if you want it bound."],
       "trust": "Only what you choose goes in, and you see a proof before anything is printed.",
-      "href": "/family-book.html",
-      "cta": { "label": "Have it bound", "href": "/family-book.html#enquire" },
+      "href": "/family-book",
+      "cta": { "label": "Have it bound", "href": "/family-book#enquire" },
       "image": "book-of-stories"
     },
     {
@@ -116,8 +116,8 @@
       "price": "The storyteller's own price, plus a {{fee-percent}}% booking fee shown separately.",
       "steps": ["Tell us whose stories to keep.", "We introduce a storyteller who speaks their language.", "The recordings arrive in your archive."],
       "trust": "Everything recorded goes into your family's archive, and your family owns it.",
-      "href": "/family-stories.html",
-      "cta": { "label": "Request a storyteller", "href": "/family-stories.html#enquire" },
+      "href": "/family-stories",
+      "cta": { "label": "Request a storyteller", "href": "/family-stories#enquire" },
       "image": "three-generations-story"
     },
     {
@@ -129,8 +129,8 @@
       "price": "Each maker's own price, plus a {{fee-percent}}% fee shown separately.",
       "steps": ["Choose a maker.", "Tell them what it is for.", "It is made for you, with its story."],
       "trust": "Every piece is credited to the person who made it, and their price is never hidden in ours.",
-      "href": "/marketplace.html",
-      "cta": { "label": "See the keepsakes", "href": "/marketplace.html" },
+      "href": "/marketplace",
+      "cta": { "label": "See the keepsakes", "href": "/marketplace" },
       "image": "bankura-horses"
     },
     {
@@ -142,8 +142,8 @@
       "price": "The artist's own price, plus a {{fee-percent}}% fee shown separately.",
       "steps": ["Tell us what you would like made.", "The artist proposes, with a price.", "They make it, and it comes with their story."],
       "trust": "The artist is named, sets their own price and keeps all of it.",
-      "href": "/commission.html",
-      "cta": { "label": "Commission a piece", "href": "/commission.html#enquire" },
+      "href": "/commission",
+      "cta": { "label": "Commission a piece", "href": "/commission#enquire" },
       "image": "kohbar-wall"
     },
     {
@@ -155,8 +155,8 @@
       "price": "Free",
       "steps": ["Make the card and send the message.", "A question goes out every week.", "Their answers are kept in your archive."],
       "trust": "Our number only messages them once you tell us they have agreed.",
-      "href": "/gift-a-year.html",
-      "cta": { "label": "Make the gift card", "href": "/app.html#/gift" },
+      "href": "/gift-a-year",
+      "cta": { "label": "Make the gift card", "href": "/app#/gift" },
       "image": "three-generations-story"
     },
     {
@@ -168,8 +168,8 @@
       "price": "Quoted per order, with the makers' prices shown.",
       "steps": ["Tell us who the gifts are for.", "We suggest makers and pieces.", "They are made to order and sent with their story."],
       "trust": "Made to pre-order, never mass-stocked, and every maker is named.",
-      "href": "/gifting.html",
-      "cta": { "label": "Plan your gifts", "href": "/gifting.html#enquire" },
+      "href": "/gifting",
+      "cta": { "label": "Plan your gifts", "href": "/gifting#enquire" },
       "image": "keepsake-box"
     },
     {
@@ -181,8 +181,8 @@
       "price": "Each host's own price, plus a {{fee-percent}}% booking fee. The first hosts are being invited now.",
       "steps": ["Tell us what you know about the place.", "We introduce a host who lives there.", "Plan the visit together."],
       "trust": "Nothing is promised that can't be found, and hosts set their own prices.",
-      "href": "/journeys.html",
-      "cta": { "label": "Register interest", "href": "/journeys.html#enquire" },
+      "href": "/journeys",
+      "cta": { "label": "Register interest", "href": "/journeys#enquire" },
       "image": "rani-ki-vav"
     },
     {
@@ -194,8 +194,8 @@
       "price": "Quoted per programme, with the practitioner's fee shown separately.",
       "steps": ["Tell us about your group.", "We propose a session and a practitioner.", "Agree a clear quote before anything is booked."],
       "trust": "Everything is agreed in writing before it begins.",
-      "href": "/for-organisations.html",
-      "cta": { "label": "Plan a programme", "href": "/for-organisations.html#enquire" },
+      "href": "/for-organisations",
+      "cta": { "label": "Plan a programme", "href": "/for-organisations#enquire" },
       "image": "mithila-painter"
     }
   ]

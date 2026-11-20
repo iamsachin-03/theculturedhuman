@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { communityFeed, communityCount } from '../tools/lib/templates.mjs';
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
-const examples = JSON.parse(read('content/community-examples.json')).examples.map((x) => ({ ...x, placeName: x.place, placePath: `/places/${x.place}.html` }));
+const examples = JSON.parse(read('content/community-examples.json')).examples.map((x) => ({ ...x, placeName: x.place, placePath: `/places/${x.place}` }));
 const site = { backend: { url: 'https://db.example', anonKey: 'anon' } };
 
 test('empty feeds show examples, labelled as written by us and not by families', () => {
@@ -36,6 +36,6 @@ test('the built Commons and home pages carry the examples and entry points', () 
   const home = read('public/index.html');
   assert.match(manch, /data-community-count/);
   assert.match(manch, /word-chip--example/);
-  assert.match(home, /class="hero-commons" href="\/manch\.html"/);
+  assert.match(home, /class="hero-commons" href="\/manch"/);
   assert.match(home, /carry-card--example/);
 });

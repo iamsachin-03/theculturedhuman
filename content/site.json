@@ -16,20 +16,20 @@
   "nav": [
     {
       "label": "What we offer",
-      "href": "/offerings.html",
+      "href": "/offerings",
       "match": [
-        "/roots.html",
-        "/trace.html",
-        "/archive.html",
-        "/roots-kit.html",
-        "/family-book.html",
-        "/family-stories.html",
-        "/marketplace.html",
-        "/commission.html",
-        "/gifting.html",
-        "/gift-a-year.html",
-        "/journeys.html",
-        "/for-organisations.html"
+        "/roots",
+        "/trace",
+        "/archive",
+        "/roots-kit",
+        "/family-book",
+        "/family-stories",
+        "/marketplace",
+        "/commission",
+        "/gifting",
+        "/gift-a-year",
+        "/journeys",
+        "/for-organisations"
       ]
     },
     {
@@ -42,11 +42,11 @@
     },
     {
       "label": "The Commons",
-      "href": "/manch.html"
+      "href": "/manch"
     },
     {
       "label": "Plans",
-      "href": "/plans.html"
+      "href": "/plans"
     }
   ],
   "footer": [
@@ -55,11 +55,11 @@
       "links": [
         {
           "label": "What we offer",
-          "href": "/offerings.html"
+          "href": "/offerings"
         },
         {
           "label": "My Roots",
-          "href": "/roots.html"
+          "href": "/roots"
         },
         {
           "label": "Places",
@@ -71,15 +71,15 @@
         },
         {
           "label": "Keepsakes",
-          "href": "/marketplace.html"
+          "href": "/marketplace"
         },
         {
           "label": "Journeys",
-          "href": "/journeys.html"
+          "href": "/journeys"
         },
         {
           "label": "The Commons",
-          "href": "/manch.html"
+          "href": "/manch"
         }
       ]
     },
@@ -88,19 +88,19 @@
       "links": [
         {
           "label": "This week's question",
-          "href": "/manch.html#this-week"
+          "href": "/manch#this-week"
         },
         {
           "label": "Add to a place",
-          "href": "/app.html#/contribute"
+          "href": "/app#/contribute"
         },
         {
           "label": "Join the platform",
-          "href": "/join.html"
+          "href": "/join"
         },
         {
           "label": "For organisations",
-          "href": "/for-organisations.html"
+          "href": "/for-organisations"
         }
       ]
     },
@@ -109,11 +109,11 @@
       "links": [
         {
           "label": "Our story",
-          "href": "/about.html"
+          "href": "/about"
         },
         {
           "label": "Plans",
-          "href": "/plans.html"
+          "href": "/plans"
         },
         {
           "label": "Instagram",

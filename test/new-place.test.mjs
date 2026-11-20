@@ -54,7 +54,7 @@ test('adopting adds the place to the database and moves only its suggestions', a
 });
 
 test('a page started by families has no photograph or stories of ours, and says so', () => {
-  const place = { slug: 'udupi', name: 'Udupi', region: 'Coastal Karnataka', intro: 'Started by families.', startedBy: 'families', carries: [], contributions: [], path: '/places/udupi.html' };
+  const place = { slug: 'udupi', name: 'Udupi', region: 'Coastal Karnataka', intro: 'Started by families.', startedBy: 'families', carries: [], contributions: [], path: '/places/udupi' };
   const html = placeMain({ site: { backend: {} }, place, hero: null, carries: [], people: [], form: '' });
   assert.doesNotMatch(html, /place-hero|A beginning, from our stories/);
   assert.match(html, /started because families from Udupi shared/);

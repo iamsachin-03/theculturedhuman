@@ -121,8 +121,13 @@ async function handle(req, res) {
     res.setHeader('Allow', 'GET, HEAD');
     return plain(res, 405, 'Not allowed.');
   }
+  // Vercel's cleanUrls: /about.html and /journal/index.html redirect to /about and /journal.
+  if (path.endsWith('.html')) {
+    const clean = path.replace(/\/index\.html$/, '/').replace(/\.html$/, '').replace(/(.)\/$/, '$1');
+    return res.writeHead(308, { Location: clean + url.search }).end();
+  }
   if (REDIRECTS[path]) return res.writeHead(308, { Location: REDIRECTS[path] }).end();
-  const found = await resolve(path);
+  const found = (await resolve(path)) || (extname(path) ? null : await resolve(path + '.html'));
   const file = found || join(PUBLIC, '404.html');
   res.writeHead(found ? 200 : 404, { 'Content-Type': TYPES[extname(file)] || 'application/octet-stream' });
   res.end(req.method === 'HEAD' ? undefined : await readFile(file));

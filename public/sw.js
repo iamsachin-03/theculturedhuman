@@ -55,9 +55,9 @@ self.addEventListener('fetch', function (event) {
     var files = data.getAll('media').filter(isMedia).slice(0, MAX_FILES);
     var text = [data.get('title'), data.get('text')].filter(Boolean).join(' ').slice(0, 2000);
     return keepShared(files, text).then(function () {
-      return Response.redirect('/app.html#/entry/new?shared=' + files.length, 303);
+      return Response.redirect('/app#/entry/new?shared=' + files.length, 303);
     });
   }).catch(function () {
-    return Response.redirect('/app.html#/entry/new?shared=failed', 303);
+    return Response.redirect('/app#/entry/new?shared=failed', 303);
   }));
 });
