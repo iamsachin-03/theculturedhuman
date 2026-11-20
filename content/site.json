@@ -4,22 +4,31 @@
   "tagline": "Everyone comes from somewhere.",
   "supportingLine": "Trace where your family comes from, keep what they know, and pass it on.",
   "locale": "en_IN",
-  "defaultImage": "madhubani-kohbar-arti-kumari",
+  "defaultImage": "kohbar-wall",
   "instagram": "https://www.instagram.com/theculturedhuman/",
   "instagramHandle": "@theculturedhuman",
   "instagramDm": "https://ig.me/m/theculturedhuman",
+  "platformFeePercent": 10,
   "enquiries": {
     "endpoint": "",
     "email": ""
   },
   "nav": [
     {
-      "label": "Trace Your Roots",
-      "href": "/trace.html"
-    },
-    {
-      "label": "Family Archive",
-      "href": "/archive.html"
+      "label": "What we offer",
+      "href": "/offerings.html",
+      "match": [
+        "/roots.html",
+        "/trace.html",
+        "/archive.html",
+        "/roots-kit.html",
+        "/family-stories.html",
+        "/marketplace.html",
+        "/commission.html",
+        "/gifting.html",
+        "/journeys.html",
+        "/for-organisations.html"
+      ]
     },
     {
       "label": "Places",
@@ -28,14 +37,6 @@
     {
       "label": "Stories",
       "href": "/journal/"
-    },
-    {
-      "label": "Keepsakes",
-      "href": "/marketplace.html"
-    },
-    {
-      "label": "Journeys",
-      "href": "/journeys.html"
     },
     {
       "label": "The Commons",
@@ -48,74 +49,24 @@
   ],
   "footer": [
     {
-      "title": "Your roots",
+      "title": "Explore",
       "links": [
         {
-          "label": "My archive",
-          "href": "/app.html"
+          "label": "What we offer",
+          "href": "/offerings.html"
         },
         {
-          "label": "Begin here",
+          "label": "My Roots",
           "href": "/roots.html"
-        },
-        {
-          "label": "Trace your roots",
-          "href": "/trace.html"
-        },
-        {
-          "label": "Family archive",
-          "href": "/archive.html"
         },
         {
           "label": "Places",
           "href": "/places/"
         },
         {
-          "label": "Storytellers",
-          "href": "/family-stories.html"
-        },
-        {
-          "label": "The Roots Kit",
-          "href": "/roots-kit.html"
-        }
-      ]
-    },
-    {
-      "title": "Stories",
-      "links": [
-        {
-          "label": "All stories",
+          "label": "Stories",
           "href": "/journal/"
         },
-        {
-          "label": "Many cultures",
-          "href": "/culture.html"
-        },
-        {
-          "label": "Wisdom of the ages",
-          "href": "/proverbs.html"
-        },
-        {
-          "label": "Food & places",
-          "href": "/experiences.html"
-        },
-        {
-          "label": "Music & curious minds",
-          "href": "/music.html"
-        },
-        {
-          "label": "Conscious living",
-          "href": "/conscious-living.html"
-        },
-        {
-          "label": "The better self",
-          "href": "/fitness.html"
-        }
-      ]
-    },
-    {
-      "title": "On the platform",
-      "links": [
         {
           "label": "Keepsakes",
           "href": "/marketplace.html"
@@ -125,15 +76,24 @@
           "href": "/journeys.html"
         },
         {
-          "label": "Commission a piece",
-          "href": "/commission.html"
+          "label": "The Commons",
+          "href": "/manch.html"
+        }
+      ]
+    },
+    {
+      "title": "Take part",
+      "links": [
+        {
+          "label": "This week's question",
+          "href": "/manch.html#this-week"
         },
         {
-          "label": "Gifting",
-          "href": "/gifting.html"
+          "label": "Add to a place",
+          "href": "/app.html#/contribute"
         },
         {
-          "label": "Join as a maker, host or storyteller",
+          "label": "Join the platform",
           "href": "/join.html"
         },
         {
@@ -152,14 +112,6 @@
         {
           "label": "Plans",
           "href": "/plans.html"
-        },
-        {
-          "label": "The Commons",
-          "href": "/manch.html"
-        },
-        {
-          "label": "Image credits",
-          "href": "/credits.html"
         },
         {
           "label": "Instagram",
@@ -194,10 +146,14 @@
       "href": "/music.html"
     }
   },
+  "analytics": {
+    "vercel": false
+  },
   "backend": {
     "provider": "supabase",
     "url": "https://biaogexcislxxzxiifib.supabase.co",
     "anonKey": "sb_publishable_LOnHHRxeeeUMbVcWWhvPtw_X-0gGSnT",
-    "google": false
+    "google": false,
+    "weeklyAuto": false
   }
 }

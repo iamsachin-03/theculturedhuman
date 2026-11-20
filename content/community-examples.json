@@ -1,0 +1,44 @@
+{
+  "note": "Shown only while a feed has nothing published, and always labelled as examples written by The Cultured Human, never as something a family shared. Keep every fact checkable.",
+  "examples": [
+    {
+      "kind": "A word or saying",
+      "title": "Thakuma",
+      "script": "ঠাকুমা",
+      "body": "Bengali for a father's mother.",
+      "place": "bengal"
+    },
+    {
+      "kind": "A word or saying",
+      "title": "Aita",
+      "script": "আইতা",
+      "body": "Assamese for grandmother.",
+      "place": "assam"
+    },
+    {
+      "kind": "A word or saying",
+      "title": "Ammoomma",
+      "script": "അമ്മൂമ്മ",
+      "body": "Malayalam for grandmother.",
+      "place": "kerala"
+    },
+    {
+      "kind": "A dish or recipe",
+      "title": "Pitha for Bihu",
+      "body": "Rice cakes made at home in Assam for Bihu, above all for Magh Bihu in January. A family's version might be about who made them, which kind, and how.",
+      "place": "assam"
+    },
+    {
+      "kind": "A festival or ritual",
+      "title": "The Onam pookalam",
+      "body": "A carpet of flowers laid at the front of the house during Onam in Kerala. A family might share the pattern they repeat each year, or who started it.",
+      "place": "kerala"
+    },
+    {
+      "kind": "A memory of the place",
+      "title": "The painted kohbar",
+      "body": "In Mithila, the walls of the kohbar, the room prepared for a wedding couple, were traditionally painted by the women of the family. A family might share whose hands painted theirs.",
+      "place": "mithila"
+    }
+  ]
+}

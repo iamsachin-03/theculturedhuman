@@ -14,8 +14,8 @@ series: Living Heritage    # optional
 author: The Cultured Human editors
 date: 2026-11-16           # YYYY-MM-DD
 updated: 2026-12-01        # optional
-heroImage: madhubani-kohbar-arti-kumari   # an id from public/assets/register.json
-heroCaption: A kohbar painting by Arti Kumari
+heroImage: kohbar-wall   # an id from public/assets/register.json
+heroCaption: Two women painting a kohbar on the wall of a home
 related: [regional-food-cultures, indian-philosophical-traditions]   # optional, other file names
 offers: [commission, journeys]   # optional; ids from content/offers.json, shown under "Bring this home"
 draft: true                # optional; drafts are not published

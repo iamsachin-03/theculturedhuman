@@ -254,16 +254,213 @@
     return isNaN(d) ? '' : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
+  // Days families gather. Fixed days repeat each year (month-day). Festivals that follow the moon
+  // list their dates as published for India; Eid's are tentative until the moon is sighted.
+  // test/app-core.test.mjs fails a year before any of these runs out, as a reminder to add more.
+  var OCCASIONS = [
+    { name: 'Makar Sankranti, Pongal and Magh Bihu', md: '01-14', question: 'What did our family make and do for Sankranti, Pongal or Bihu when you were young?' },
+    { name: 'Holi', dates: ['2027-03-22', '2028-03-11', '2029-03-01', '2030-03-20', '2031-03-09'], question: 'What do you remember about Holi when you were a child? Who came, and what was cooked?' },
+    { name: 'Eid al-Fitr', dates: ['2027-03-10', '2028-02-27', '2029-02-15', '2030-02-05', '2031-01-25'], question: 'How did our family celebrate Eid when you were young? What was cooked, and who came to visit?' },
+    { name: 'Baisakhi, Vishu, Bihu and the spring new year', md: '04-14', question: 'How did our family welcome the new year in April: Baisakhi, Vishu, Bihu, Puthandu or Poila Baishakh?' },
+    { name: 'Diwali', dates: ['2027-10-29', '2028-10-17', '2029-11-05', '2030-10-26', '2031-11-14', '2032-11-02', '2033-10-22', '2034-11-10', '2035-10-30'], question: 'How did your family celebrate Diwali when you were a child? What was cooked, and who came?' },
+    { name: 'Guru Nanak Jayanti', dates: ['2026-11-24', '2027-11-14', '2028-11-02', '2029-11-21', '2030-11-10', '2031-11-28', '2032-11-17', '2033-11-06', '2034-11-25', '2035-11-15'], question: 'What do you remember about Gurpurab when you were young: the prabhat pheri, the langar, the people?' },
+    { name: 'Christmas', md: '12-25', question: 'What do you remember about Christmas when you were young: the food, the church, the people?' },
+  ];
+  var BIRTHDAY_QUESTION = 'What do you remember about your birthdays as a child? How were they marked, and by whom?';
+
+  function dayStart(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function daysUntil(from, md) {
+    var start = dayStart(from);
+    var parts = md.split('-').map(Number);
+    var next = new Date(start.getFullYear(), parts[0] - 1, parts[1]);
+    if (next < start) next = new Date(start.getFullYear() + 1, parts[0] - 1, parts[1]);
+    return { days: Math.round((next - start) / 86400000), date: next };
+  }
+  /** Birthdays of the people you ask, and festivals, coming within `within` days of `today`, soonest first. */
+  function upcoming(today, elders, within) {
+    within = within === undefined ? 21 : within;
+    var start = dayStart(today);
+    var list = [];
+    (elders || []).forEach(function (e) {
+      if (!/^\d{2}-\d{2}$/.test(e.birthday || '')) return;
+      var u = daysUntil(start, e.birthday);
+      list.push({ kind: 'birthday', name: e.name + '\u2019s birthday', elder: e, days: u.days, date: u.date, question: BIRTHDAY_QUESTION });
+    });
+    OCCASIONS.forEach(function (o) {
+      var u = null;
+      if (o.md) u = daysUntil(start, o.md);
+      else o.dates.forEach(function (iso) {
+        var p = iso.split('-').map(Number);
+        var d = new Date(p[0], p[1] - 1, p[2]);
+        var days = Math.round((d - start) / 86400000);
+        if (days >= 0 && (!u || days < u.days)) u = { days: days, date: d };
+      });
+      if (u) list.push({ kind: 'festival', name: o.name, days: u.days, date: u.date, question: o.question });
+    });
+    return list.filter(function (x) { return x.days <= within; }).sort(function (a, b) { return a.days - b.days || (a.kind === 'birthday' ? -1 : 1); });
+  }
+
+  // A printed family book needs enough in it to feel like one.
+  var BOOK_GOAL = 20;
+
   function safeFileName(name) {
     return String(name || 'file').toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'file';
   }
 
+  // The same limits as place_contributions in backend/schema.sql.
+  var CONTRIBUTION_KINDS = ['A word or saying', 'A dish or recipe', 'A festival or ritual', 'A song', 'A memory of the place', 'A correction'];
+  function contribution(f) {
+    var c = {
+      placeSlug: String(f.placeSlug || '').trim() || null,
+      suggestedPlace: String(f.suggestedPlace || '').trim().slice(0, 120) || null,
+      kind: CONTRIBUTION_KINDS.indexOf(f.kind) === -1 ? CONTRIBUTION_KINDS[0] : f.kind,
+      title: String(f.title || '').trim(),
+      body: String(f.body || '').trim(),
+      credit: String(f.credit || '').trim(),
+      script: null,
+      pronunciation: null,
+      promptWeek: /^\d+$/.test(String(f.promptWeek)) ? Number(f.promptWeek) : null,
+      consent: f.consent === true,
+    };
+    if (c.kind === CONTRIBUTION_KINDS[0]) {
+      c.script = String(f.script || '').trim() || null;
+      c.pronunciation = String(f.pronunciation || '').trim() || null;
+    }
+    if (c.placeSlug) c.suggestedPlace = null;
+    if (!c.placeSlug && !c.suggestedPlace) throw new Error('Please choose the place, or name it.');
+    if (!c.title) throw new Error('Please give it a title.');
+    if (c.title.length > 120) throw new Error('Please keep the title under 120 characters.');
+    if (!c.body) throw new Error('Please write a few lines about it.');
+    if (c.body.length > 5000) throw new Error('Please keep it under 5,000 characters.');
+    if (!c.credit) throw new Error('Please say how you would like to be credited.');
+    if (c.credit.length > 80) throw new Error('Please keep the credit under 80 characters.');
+    if (c.script && c.script.length > 120) throw new Error('Please keep the word in its own script under 120 characters.');
+    if (c.pronunciation && c.pronunciation.length > 120) throw new Error('Please keep how it is said under 120 characters.');
+    if (!c.consent) throw new Error('Please confirm it is yours to share and follows the community guidelines.');
+    return c;
+  }
+
+  // "Jorhat, Assam", " jorhat " and "JORHAT" are the same suggestion.
+  function placeKey(name) {
+    return String(name || '').split(',')[0].toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  }
+  function placeSlug(name) {
+    return placeKey(name).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+  /**
+   * Contributions for places that have no page yet, grouped by place, most suggested first.
+   * A suggestion that matches a place's aliases (Jorhat is in Assam) names that place.
+   */
+  function groupSuggestions(rows, places) {
+    var byKey = {};
+    var out = [];
+    rows.forEach(function (c) {
+      var key = placeKey(c.suggestedPlace);
+      if (!key) return;
+      if (!byKey[key]) {
+        var match = (places || []).filter(function (p) { return placeKey(p.name) === key || (p.aliases || []).some(function (a) { return placeKey(a) === key; }); })[0];
+        byKey[key] = { key: key, name: String(c.suggestedPlace).split(',')[0].trim(), names: [], ids: [], published: 0, slug: placeSlug(key), match: match ? match.slug : null };
+        out.push(byKey[key]);
+      }
+      var g = byKey[key];
+      g.ids.push(c.id);
+      if (c.status === 'published') g.published++;
+      if (g.names.indexOf(c.suggestedPlace) < 0) g.names.push(c.suggestedPlace);
+    });
+    return out.sort(function (a, b) { return b.ids.length - a.ids.length || (a.key < b.key ? -1 : 1); });
+  }
+
+  // The same reasons as contribution_reports in backend/schema.sql.
+  var REPORT_REASONS = [
+    { id: 'private', label: 'It shares something private about a person' },
+    { id: 'hostile', label: 'It is unkind or hateful about a person or a community' },
+    { id: 'wrong', label: 'It is wrong, and I can say why' },
+    { id: 'not-theirs', label: 'It is not theirs to share, for example my own work' },
+    { id: 'spam', label: 'It is advertising or spam' },
+    { id: 'other', label: 'Something else' },
+  ];
+  function report(f) {
+    var reason = REPORT_REASONS.filter(function (x) { return x.id === f.reason; })[0];
+    if (!reason) throw new Error('Please choose what is wrong.');
+    var note = String(f.note || '').trim();
+    if (note.length > 500) throw new Error('Please keep it under 500 characters.');
+    if ((reason.id === 'other' || reason.id === 'wrong') && !note) throw new Error('Please say a little more, so we can check it.');
+    return { reason: reason.id, note: note || null };
+  }
+  function reviewNote(note) {
+    var n = String(note || '').trim();
+    if (n.length > 300) throw new Error('Please keep the reason under 300 characters.');
+    return n || null;
+  }
+
+  // ---------- makers, hosts and storytellers ----------
+  var LISTING_ROLES = [
+    { id: 'maker', label: 'Maker', what: 'Paintings, crafts and keepsakes made to order', ask: 'Ask for a piece' },
+    { id: 'host', label: 'Host', what: 'Journeys back to a family\'s town or village', ask: 'Plan a journey' },
+    { id: 'storyteller', label: 'Storyteller', what: 'Recording an elder\'s stories, in their language', ask: 'Book a storyteller' },
+  ];
+  function listingRole(id) { return LISTING_ROLES.filter(function (r) { return r.id === id; })[0] || null; }
+  function listing(f) {
+    var l = {
+      role: String(f.role || ''),
+      placeSlug: String(f.placeSlug || '').trim(),
+      name: String(f.name || '').trim(),
+      summary: String(f.summary || '').trim(),
+      languages: String(f.languages || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 8),
+      link: String(f.link || '').trim() || null,
+      priceNote: String(f.priceNote || '').trim() || null,
+    };
+    if (!listingRole(l.role)) throw new Error('Please choose what you offer.');
+    if (!l.placeSlug) throw new Error('Please choose the place you work in.');
+    if (!l.name) throw new Error('Please add the name families will see.');
+    if (l.name.length > 80) throw new Error('Please keep the name under 80 characters.');
+    if (!l.summary) throw new Error('Please describe what you offer.');
+    if (l.summary.length > 600) throw new Error('Please keep the description under 600 characters.');
+    if (l.link && !/^https:\/\/\S+\.\S+$/.test(l.link)) throw new Error('Please give a link that starts with https://');
+    if (l.priceNote && l.priceNote.length > 80) throw new Error('Please keep the price guide under 80 characters.');
+    return l;
+  }
+  function bookingMessage(text) {
+    var m = String(text || '').trim();
+    if (!m) throw new Error('Please tell them what you would like.');
+    if (m.length > 5000) throw new Error('Please keep it under 5,000 characters.');
+    return m;
+  }
+  /** A quote in rupees as typed ("8,000" or "8000.50") becomes whole paise. */
+  function quote(f) {
+    var rupees = Number(String(f.rupees || '').replace(/[,\s₹]/g, ''));
+    if (!isFinite(rupees) || rupees <= 0) throw new Error('Please enter your price in rupees.');
+    if (rupees > 10000000) throw new Error('Please check the price.');
+    var reply = String(f.reply || '').trim();
+    if (reply.length > 2000) throw new Error('Please keep your note under 2,000 characters.');
+    return { pricePaise: Math.round(rupees * 100), reply: reply || null };
+  }
+  /** The same sum as platform_fee() in schema.sql. */
+  function platformFee(paise, percent) { return Math.round(paise * percent / 100); }
+  function formatRupees(paise) {
+    var r = paise / 100;
+    return '₹' + r.toLocaleString('en-IN', { minimumFractionDigits: r % 1 ? 2 : 0, maximumFractionDigits: 2 });
+  }
+  var BOOKING_STATUS = {
+    requested: { family: 'Waiting for a quote', provider: 'New request: send a quote' },
+    quoted: { family: 'Quote received: accept it to go ahead', provider: 'Quote sent: waiting for the family' },
+    accepted: { family: 'Accepted: we will email you a payment link', provider: 'Accepted: you will hear when it is paid' },
+    paid: { family: 'Paid', provider: 'Paid: you can begin' },
+    completed: { family: 'Completed', provider: 'Completed' },
+    cancelled: { family: 'Cancelled', provider: 'Cancelled' },
+  };
+
   var core = {
+    LISTING_ROLES: LISTING_ROLES, listingRole: listingRole, listing: listing, bookingMessage: bookingMessage, quote: quote,
+    platformFee: platformFee, formatRupees: formatRupees, BOOKING_STATUS: BOOKING_STATUS,
+    CONTRIBUTION_KINDS: CONTRIBUTION_KINDS, contribution: contribution, REPORT_REASONS: REPORT_REASONS, report: report, reviewNote: reviewNote,
+    placeKey: placeKey, placeSlug: placeSlug, groupSuggestions: groupSuggestions,
     KINDS: KINDS, ROLES: ROLES, AUDIENCES: AUDIENCES, QUESTIONS: QUESTIONS, find: find,
     canSee: canSee, canAdd: canAdd, canEdit: canEdit, audienceLabel: audienceLabel,
     newLegacy: newLegacy, legacyNext: legacyNext, legacySeen: legacySeen, legacyReport: legacyReport,
     question: question, message: message, whatsappLink: whatsappLink, reminder: reminder,
     mediaKind: mediaKind, formatBytes: formatBytes, formatDate: formatDate, safeFileName: safeFileName,
+    OCCASIONS: OCCASIONS, upcoming: upcoming, BOOK_GOAL: BOOK_GOAL,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = core;
   else (root.TCH = root.TCH || {}).core = core;

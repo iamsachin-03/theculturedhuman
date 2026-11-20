@@ -55,6 +55,30 @@ function offer(id, where, { card = false } = {}) {
   return o;
 }
 
+// What we offer, grouped by the steps a family goes through. Drives /offerings.html and the
+// "at a glance" strip at the top of each product page.
+const productData = JSON.parse(readFileSync(join(ROOT, 'content/products.json'), 'utf8'));
+const productGroups = new Map(productData.groups.map((g) => [g.id, g]));
+const products = new Map();
+for (const [i, p] of productData.products.entries()) {
+  const where = `content/products.json: product ${i + 1}`;
+  for (const key of ['id', 'group', 'name', 'line', 'price', 'href', 'image']) if (!p[key]) throw new Error(`${where} needs "${key}"`);
+  if (products.has(p.id)) throw new Error(`${where}: duplicate id "${p.id}"`);
+  if (!productGroups.has(p.group)) throw new Error(`${where}: unknown group "${p.group}"`);
+  if (p.steps && (p.steps.length !== 3 || !p.who || !p.trust || !p.cta?.href || !p.cta?.label)) {
+    throw new Error(`${where}: a product page needs exactly three steps, "who", "trust" and a "cta" with label and href`);
+  }
+  products.set(p.id, p);
+}
+function product(id, where) {
+  const p = products.get(id);
+  if (!p) throw new Error(`${where}: unknown product "${id}" — add it to content/products.json first`);
+  if (!p.steps) throw new Error(`${where}: product "${id}" has no steps, so it has no "at a glance" strip`);
+  return p;
+}
+const productJourney = (where) =>
+  t.productJourney(productData.groups.map((g) => ({ ...g, items: [...products.values()].filter((p) => p.group === g.id).map((p) => ({ ...p, asset: asset(p.image, where) })) })));
+
 const ROLES = ['maker', 'host', 'storyteller'];
 const placesDir = join(ROOT, 'content/places');
 const places = readdirSync(placesDir)
@@ -63,7 +87,10 @@ const places = readdirSync(placesDir)
   .map((file) => {
     const where = `content/places/${file}`;
     const p = JSON.parse(readFileSync(join(placesDir, file), 'utf8'));
-    for (const key of ['name', 'region', 'image', 'intro']) if (!p[key]) throw new Error(`${where} needs "${key}"`);
+    // Pages started by families (tools/new-place.mjs) have no photograph until a licensed one is added.
+    const needs = p.startedBy === 'families' ? ['name', 'region', 'intro'] : ['name', 'region', 'image', 'intro'];
+    for (const key of needs) if (!p[key]) throw new Error(`${where} needs "${key}"`);
+    if (p.startedBy && p.startedBy !== 'families') throw new Error(`${where}: "startedBy" can only be "families"`);
     if (typeof p.lat !== 'number' || typeof p.lng !== 'number') throw new Error(`${where} needs numeric "lat" and "lng"`);
     if (!Array.isArray(p.aliases) || !p.aliases.length) throw new Error(`${where} needs "aliases" for matching typed place names`);
     for (const [i, c] of (p.carries || []).entries()) {
@@ -77,6 +104,16 @@ const places = readdirSync(placesDir)
 const placeBySlug = new Map(places.map((p) => [p.slug, p]));
 
 const people = JSON.parse(readFileSync(join(ROOT, 'content/people.json'), 'utf8'));
+const prompts = JSON.parse(readFileSync(join(ROOT, 'content/prompts.json'), 'utf8'));
+if (new Date(prompts.start + 'T00:00:00Z').getUTCDay() !== 1) throw new Error('content/prompts.json: "start" must be a Monday');
+const communityExamples = JSON.parse(readFileSync(join(ROOT, 'content/community-examples.json'), 'utf8')).examples.map((x, i) => {
+  const where = `content/community-examples.json: examples[${i}]`;
+  for (const key of ['kind', 'title', 'body', 'place']) if (!x[key]) throw new Error(`${where} needs "${key}"`);
+  if (!prompts.prompts.some((p) => p.kind === x.kind)) throw new Error(`${where}: "${x.kind}" is not a contribution kind`);
+  const place = placeBySlug.get(x.place);
+  if (!place) throw new Error(`${where}: no place "${x.place}"`);
+  return { ...x, placeName: place.name, placePath: place.path };
+});
 for (const [i, person] of people.entries()) {
   const where = `content/people.json: entry ${i + 1}`;
   for (const key of ['id', 'name', 'role', 'place', 'summary']) if (!person[key]) throw new Error(`${where} needs "${key}"`);
@@ -84,7 +121,7 @@ for (const [i, person] of people.entries()) {
   if (!placeBySlug.has(person.place)) throw new Error(`${where}: place "${person.place}" has no file in content/places`);
 }
 const withPlace = (person) => ({ ...person, placeInfo: placeBySlug.get(person.place) });
-const directory = (role) => t.directory(role, people.filter((p) => p.role === role).map(withPlace));
+const directory = (role) => t.directory(site, role, people.filter((p) => p.role === role).map(withPlace));
 
 const problems = [];
 /** @type {Map<string, string>} absolute output path → file contents */
@@ -191,14 +228,14 @@ emit(
     title: `Stories — ${site.name}`,
     description: 'Researched essays and explainers on Indian art, philosophy, food, craft and conscious living from The Cultured Human.',
   },
-  t.journalMain({ cards: articles.map(card) }),
+  t.journalMain({ cards: articles.map(card), themes: Object.values(site.pillars) }),
   articles[0]?.heroImage,
 );
 emit(
   {
     path: '/credits.html',
-    title: `Image credits — ${site.name}`,
-    description: 'Credits and licences for every photograph and artwork used on The Cultured Human.',
+    title: `Our illustrations — ${site.name}`,
+    description: 'Every picture on The Cultured Human is an original illustration, made for the story it sits beside.',
   },
   t.creditsMain({ assets: register }),
 );
@@ -214,34 +251,55 @@ for (const place of places) {
     {
       path: place.path,
       title: `${place.name} — Places — ${site.name}`,
-      description: `What families from ${place.name} carry with them: ${carries.map((c) => c.title).join(', ')}. Add your family's words, dishes and memories.`,
+      description: carries.length
+        ? `What families from ${place.name} carry with them: ${carries.map((c) => c.title).join(', ')}. Add your family's words, dishes and memories.`
+        : `A page started by families from ${place.name}: the words, dishes, rituals and memories they carry. Add yours.`,
+      script: 'community-live',
     },
     t.placeMain({
       site,
       place,
-      hero: asset(place.image, place.where),
+      hero: place.image ? asset(place.image, place.where) : null,
       carries,
       people: people.filter((p) => p.place === place.slug).map(withPlace),
       form: t.enquiryForm(site, offer('contribute', place.where), { place: place.name }),
     }),
-    place.image,
+    place.image || site.defaultImage,
   );
 }
-const placeCards = () => t.placeCards(places.map((p) => ({ ...p, hero: asset(p.image, p.where) })));
+const placeCards = () => t.placeCards(places.map((p) => ({ ...p, hero: p.image ? asset(p.image, p.where) : null })));
 const rootsMap = () => t.rootsMap(places);
 emit(
   {
     path: '/places/',
     title: `Places — ${site.name}`,
     description: 'Every family comes from a place. Explore what families from each place carry with them, and add your own.',
+    script: 'community-live',
   },
-  t.placesIndexMain({ map: rootsMap(), cards: placeCards(), form: t.enquiryForm(site, offer('contribute', 'places index'), { place: 'A new place' }) }),
+  t.placesIndexMain({ site, map: rootsMap(), cards: placeCards(), form: t.enquiryForm(site, offer('contribute', 'places index'), { place: 'A new place' }) }),
   places[0]?.image,
+);
+// The places table must hold every place before families can add to it (backend/README.md).
+const sqlText = (s) => `'${String(s).replace(/'/g, "''")}'`;
+outputs.set(
+  join(ROOT, 'backend/places.sql'),
+  `-- Generated by tools/build.mjs from content/places/*.json. Run it after schema.sql, and again
+-- whenever a place is added. It only adds or updates places; it never deletes contributions.
+insert into places (slug, name, region, lat, lng) values
+${places.map((p) => `  (${[p.slug, p.name, p.region].map(sqlText).join(', ')}, ${Number(p.lat)}, ${Number(p.lng)})`).join(',\n')}
+on conflict (slug) do update set name = excluded.name, region = excluded.region, lat = excluded.lat, lng = excluded.lng;
+`,
 );
 outputs.set(
   join(PUBLIC, 'places/places.json'),
-  JSON.stringify(places.map((p) => ({ slug: p.slug, name: p.name, path: p.path, aliases: p.aliases }))) + '\n',
+  JSON.stringify(places.map((p) => {
+    const hero = p.image && asset(p.image, p.where);
+    return { slug: p.slug, name: p.name, path: p.path, aliases: p.aliases, ...(hero ? { image: hero.files[1600], imageAlt: hero.alt } : {}) };
+  })) + '\n',
 );
+
+// The page shows the first prompt; community-live.js swaps in this week's from this file.
+outputs.set(join(PUBLIC, 'community/prompts.json'), JSON.stringify(prompts) + '\n');
 
 // ---------- hand-written pages ----------
 function attrs(s) {
@@ -271,11 +329,24 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
     .replace(/\{\{enquiry\s+([\w-]+)\}\}/g, (_, id) => t.enquiryForm(site, offer(id, where)))
     .replace(/\{\{directory\s+(maker|host|storyteller)\}\}/g, (_, role) => directory(role))
     .replace(/\{\{place-cards\}\}/g, placeCards)
-    .replace(/\{\{roots-map\}\}/g, rootsMap);
+    .replace(/\{\{roots-map\}\}/g, rootsMap)
+    .replace(/\{\{product-journey\}\}/g, () => productJourney(where))
+    .replace(/\{\{at-a-glance\s+([\w-]+)\}\}/g, (_, id) => { const p = product(id, where); return t.atAGlance(p, productGroups.get(p.group)); })
+    .replace(/\{\{fee-percent\}\}/g, String(site.platformFeePercent))
+    .replace(/\{\{fee-example\s+(\d+)\}\}/g, (_, n) => t.feeExample(Number(n), site.platformFeePercent))
+    .replace(/\{\{this-week\}\}/g, () => t.thisWeek(prompts))
+    .replace(/\{\{shared-contribution\}\}/g, () => t.sharedContribution(site))
+    .replace(/\{\{community-count\}\}/g, () => t.communityCount(site))
+    .replace(/\{\{question-archive\}\}/g, () => t.questionArchive(site))
+    .replace(/\{\{community-feed([^}]*)\}\}/g, (_, rest) => {
+      const opt = attrs(rest);
+      if (opt.kind && !prompts.prompts.some((p) => p.kind === opt.kind)) problems.push(`${where}: community-feed kind "${opt.kind}" is not a contribution kind`);
+      return t.communityFeed({ site, limit: Number(opt.limit) || 6, kind: opt.kind, style: opt.style, examples: communityExamples });
+    });
   if (/\{\{/.test(main)) problems.push(`${where}: unrecognised {{…}} placeholder`);
 
   emit(
-    { path, title: data.title, description: data.description, noindex: data.noindex === 'true', script: data.script },
+    { path, title: data.title, description: data.description, noindex: data.noindex === 'true', script: data.script, product: data.product },
     main,
     data.image,
   );
@@ -283,7 +354,7 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
 
 // ---------- sitemap & robots ----------
 const indexable = [...outputs.entries()]
-  .filter(([, html]) => !html.includes('<meta name="robots" content="noindex'))
+  .filter(([file, html]) => file.endsWith('.html') && !relative(PUBLIC, file).startsWith('..') && !html.includes('<meta name="robots" content="noindex'))
   .map(([file]) => '/' + relative(PUBLIC, file).split('\\').join('/').replace(/(^|\/)index\.html$/, '$1'))
   .sort();
 outputs.set(

@@ -5,7 +5,7 @@
     "title": "Book a storyteller",
     "summary": "Rather not record an elder yourself? Book a trained storyteller from the platform to sit with them, record their stories and help turn them into a book.",
     "href": "/family-stories.html",
-    "image": "gita-palm-leaf-malayalam",
+    "image": "palm-leaf-manuscript",
     "action": "Request a storyteller",
     "form": {
       "choiceLabel": "Is this a gift?",
@@ -24,7 +24,7 @@
     "title": "Ask, record, keep",
     "summary": "Guided question cards, recording tips and a family-book template, so you can capture your elders' stories yourself, wherever you live.",
     "href": "/roots-kit.html",
-    "image": "warli-house-wall",
+    "image": "warli-wall",
     "action": "Join the waitlist",
     "form": {
       "choiceLabel": "Which version would you use?",
@@ -65,7 +65,7 @@
     "title": "Commission original work",
     "summary": "A painting of your family's home town, your family name in a folk art style, a gift for a wedding. Made by a named artist, who sets the price.",
     "href": "/commission.html",
-    "image": "madhubani-kohbar-arti-kumari",
+    "image": "kohbar-wall",
     "action": "Start a commission",
     "form": {
       "choiceLabel": "What would you like made?",
@@ -108,7 +108,7 @@
     "title": "Small seasonal drops",
     "summary": "A few makers at a time, a limited number of pieces and the full story behind each one. Join the list to hear first.",
     "href": "/marketplace.html#drops",
-    "image": "pattachitra-painting",
+    "image": "pattachitra",
     "action": "Hear about the first drop",
     "form": {
       "choiceLabel": "What would you most like to see?",
@@ -128,7 +128,7 @@
     "title": "Culture sessions for teams",
     "summary": "Painting hours with named artists, regional food stories and short introductions to Indian thought, for offsites, festival weeks and onboarding.",
     "href": "/for-organisations.html",
-    "image": "madhubani-artist-dilli-haat",
+    "image": "mithila-painter",
     "action": "Plan a session",
     "form": {
       "organisation": true,

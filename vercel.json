@@ -2,22 +2,97 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "public",
+  "crons": [
+    {
+      "path": "/api/weekly-send",
+      "schedule": "30 4 * * *"
+    },
+    {
+      "path": "/api/notify",
+      "schedule": "30 12 * * *"
+    }
+  ],
+  "functions": {
+    "api/weekly-send.mjs": {
+      "includeFiles": "public/scripts/app-core.js"
+    },
+    "api/shared.mjs": {
+      "includeFiles": "{public/shared.html,public/places/places.json,content/site.json}"
+    }
+  },
   "redirects": [
-    { "source": "/bazaar.html", "destination": "/marketplace.html", "permanent": true },
-    { "source": "/journal/index.html", "destination": "/journal/", "permanent": true }
+    {
+      "source": "/bazaar.html",
+      "destination": "/marketplace.html",
+      "permanent": true
+    },
+    {
+      "source": "/journal/index.html",
+      "destination": "/journal/",
+      "permanent": true
+    }
   ],
   "headers": [
     {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
+    },
+    {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://biaogexcislxxzxiifib.supabase.co https://*.razorpay.com; media-src 'self' blob: https://biaogexcislxxzxiifib.supabase.co; connect-src 'self' https://biaogexcislxxzxiifib.supabase.co https://*.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(self), microphone=(self), geolocation=(), payment=(self \"https://api.razorpay.com\"), usb=(), serial=(), bluetooth=(), browsing-topics=()"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
+        }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/s/:id",
+      "destination": "/api/shared?id=:id"
     }
   ]
 }

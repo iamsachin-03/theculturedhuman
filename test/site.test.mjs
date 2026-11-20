@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { headBlock } from '../tools/lib/templates.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -37,15 +38,48 @@ test('the navigation is built around the platform and marks the current page', (
   const html = read('marketplace.html');
   const nav = html.match(/<nav class="primary-nav"[\s\S]*?<\/nav>/)[0];
   const labels = [...nav.matchAll(/<a [^>]*>([^<]+)<\/a>/g)].map((m) => m[1].replace('&amp;', '&'));
-  assert.deepEqual(labels, ['Trace Your Roots', 'Family Archive', 'Places', 'Stories', 'Keepsakes', 'Journeys', 'The Commons', 'Plans']);
-  assert.match(nav, /<a href="\/marketplace.html" aria-current="page">/);
+  assert.deepEqual(labels, ['What we offer', 'Places', 'Stories', 'The Commons', 'Plans']);
+  assert.match(nav, /<a href="\/offerings.html" aria-current="true">What we offer<\/a>/, 'a product page marks What we offer');
   assert.equal((nav.match(/aria-current/g) || []).length, 1);
-  assert.match(html, /<a class="account-link" href="\/app.html" data-account-link>Sign in<\/a>/);
+  assert.match(html, /<a class="account-link" href="\/app.html">My archive<\/a>/);
+  assert.doesNotMatch(html, /class="product-nav"/);
 });
 
-test('the homepage has four sections and leads to the archive', () => {
+test('tracing and the archive are one product, My Roots, with its own menu on each of its pages', () => {
+  for (const page of ['roots.html', 'trace.html', 'archive.html', 'family-stories.html', 'roots-kit.html']) {
+    const html = read(page);
+    const nav = html.match(/<nav class="primary-nav"[\s\S]*?<\/nav>/)[0];
+    assert.match(nav, /<a href="\/offerings.html" aria-current="true">What we offer<\/a>/, page);
+    const sub = html.match(/<nav class="product-nav"[\s\S]*?<\/nav>/);
+    assert.ok(sub, `${page}: has the My Roots menu`);
+    for (const href of ['/roots.html', '/trace.html', '/archive.html', '/app.html']) assert.ok(sub[0].includes(`href="${href}"`), `${page}: ${href}`);
+    assert.equal((sub[0].match(/aria-current="page"/g) || []).length, 1, `${page}: marks itself`);
+  }
+});
+
+test('The Commons asks a weekly question, shows live contributions and a word wall, and links answers to the app', () => {
+  const prompts = JSON.parse(read('community/prompts.json'));
+  assert.equal(new Date(prompts.start + 'T00:00:00Z').getUTCDay(), 1, 'the weekly cycle starts on a Monday');
+  assert.ok(prompts.prompts.length >= 12);
+  const kinds = readFileSync(join(PUBLIC, 'scripts/app-core.js'), 'utf8');
+  for (const p of prompts.prompts) assert.ok(kinds.includes(`'${p.kind}'`), `${p.text}: "${p.kind}" is a contribution kind`);
+  const html = read('manch.html');
+  assert.match(html, /id="this-week"[\s\S]*data-this-week-link[^>]*|href="\/app\.html#\/contribute\?week=0"/);
+  assert.match(html, /id="words"[\s\S]*data-community-feed[^>]*data-kind="A word or saying"/);
+  assert.match(html, /data-community-feed data-limit="6" data-url="https:\/\//);
+  assert.match(html, /\/scripts\/community-live\.js/);
+  for (const page of pages) {
+    const footer = read(page).match(/<footer[\s\S]*<\/footer>/)[0];
+    assert.ok(footer.includes('href="/manch.html#this-week"'), `${page}: footer links to this week's question`);
+  }
+});
+
+test('the homepage has six sections, opens with one question, and leads to the archive and The Commons', () => {
   const main = read('index.html').match(/<main id="main">([\s\S]*)<\/main>/)[1];
-  assert.equal((main.match(/<section\b/g) || []).length, 4);
+  assert.equal((main.match(/<section\b/g) || []).length, 6);
+  assert.match(main, /href="#first-story"[\s\S]*id="first-story"[\s\S]*data-first-story/);
+  assert.match(main, /data-this-week[\s\S]*data-community-feed data-limit="3"/);
+  assert.ok(main.includes('href="/manch.html"') && main.includes('href="/app.html?sample"') && main.includes('href="/offerings.html"'));
   assert.match(main, /href="\/app.html">Start your family archive/);
   for (const href of ['/trace.html', '/places/', '/journal/']) assert.ok(main.includes(`href="${href}"`), href);
 });
@@ -57,7 +91,7 @@ test('the app page carries its backend settings, loads its scripts in order and 
   assert.ok(meta, 'backend meta tag');
   assert.deepEqual(JSON.parse(meta[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&')), site.backend);
   const scripts = [...html.matchAll(/<script src="\/scripts\/([\w-]+)\.js" defer><\/script>/g)].map((m) => m[1]);
-  assert.deepEqual(scripts, ['site', 'app-core', 'app-store-local', 'app-store-supabase', 'app']);
+  assert.deepEqual(scripts, ['site', 'roots-art', 'app-core', 'app-store-local', 'app-store-supabase', 'app-store-sample', 'app']);
   assert.match(html, /<meta name="robots" content="noindex/);
   assert.ok(!read('sitemap.xml').includes('/app.html'));
   assert.ok(!read('index.html').includes('tch-backend'), 'only the app page carries the settings');
@@ -133,8 +167,140 @@ test('every place has a page, a point on the roots map and a contribution form t
 });
 
 test('directories with nobody listed invite the first people instead of showing an empty list', () => {
-  for (const [page, anchor] of [['marketplace.html', 'makers'], ['journeys.html', 'hosts'], ['family-stories.html', 'storytellers']]) {
-    assert.match(read(page), new RegExp(`<div class="empty-state">[^]*?href="/join.html#${anchor}"`), page);
+  for (const [page, role] of [['marketplace.html', 'maker'], ['journeys.html', 'host'], ['family-stories.html', 'storyteller']]) {
+    const html = read(page);
+    assert.match(html, new RegExp(`<div class="directory" data-listings data-role="${role}" data-url="https://[^"]+" data-key="[^"]+"><div class="empty-state">[^]*?href="/app\\.html#/offer\\?role=${role}"`), page);
+    assert.match(html, /\/scripts\/community-live\.js/, page);
   }
   assert.match(read('join.html'), /id="makers"[^]*id="hosts"[^]*id="storytellers"/);
+});
+
+test('visit counts are cookie-free, off until switched on, and never on private pages', () => {
+  const site = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8'));
+  const tag = '<script src="/_vercel/insights/script.js" defer></script>';
+  const on = { ...site, analytics: { vercel: true } };
+  assert.ok(headBlock({ site: on, page: { title: 'x', path: '/x.html' } }).includes(tag));
+  assert.ok(!headBlock({ site: on, page: { title: 'x', path: '/app.html', noindex: true } }).includes(tag));
+  assert.ok(!headBlock({ site: { ...site, analytics: { vercel: false } }, page: { title: 'x', path: '/x.html' } }).includes(tag));
+  const built = pages.filter((p) => read(p).includes('/_vercel/insights/'));
+  assert.deepEqual(built, site.analytics.vercel ? pages.filter((p) => !read(p).includes('noindex')) : []);
+});
+
+test('place pages send families to the app to write, keep the enquiry form, and read published contributions', () => {
+  const places = JSON.parse(read('places/places.json'));
+  const seed = readFileSync(join(ROOT, 'backend/places.sql'), 'utf8');
+  for (const p of places) {
+    const html = read(`places/${p.slug}.html`);
+    assert.match(html, new RegExp(`href="/app\\.html#/contribute\\?place=${p.slug}"`), p.slug);
+    assert.match(html, /<details class="contribute-other">[\s\S]*<form/, p.slug);
+    assert.match(html, new RegExp(`data-community-feed data-limit="100" data-place="${p.slug}" data-url="https://`), p.slug);
+    assert.match(html, /\/scripts\/community-live\.js/, p.slug);
+    assert.match(seed, new RegExp(`\\('${p.slug}', `), `backend/places.sql seeds ${p.slug}`);
+  }
+  assert.match(read('places/index.html'), /href="\/app\.html#\/contribute"/);
+  assert.doesNotMatch(read('sitemap.xml'), /places\.json|\.sql/);
+});
+
+test('the other sections lead into My Roots and The Commons', () => {
+  assert.match(read('places/index.html'), /data-community-feed data-limit="6"[\s\S]*\/scripts\/community-live\.js/);
+  assert.match(read('journal/index.html'), /href="\/manch\.html#this-week"[\s\S]*href="\/roots\.html"/);
+  assert.match(read('marketplace.html'), /href="\/trace\.html"[\s\S]*href="\/commission\.html"/);
+  assert.match(read('journeys.html'), /Trace your roots first[\s\S]*href="\/roots\.html#ask"/);
+});
+
+test('the platform fee shown on the site is the one the database charges', () => {
+  const site = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8'));
+  const schema = readFileSync(join(ROOT, 'backend/schema.sql'), 'utf8');
+  const rate = Number(schema.match(/create function platform_fee[\s\S]*?round\(price \* ([\d.]+)\)/)[1]);
+  assert.equal(Math.round(rate * 100), site.platformFeePercent);
+});
+
+test('makers, hosts and storytellers can list themselves from Join, and the fee shown everywhere is the real one', () => {
+  const site = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8'));
+  const joinPage = read('join.html');
+  for (const role of ['maker', 'host', 'storyteller']) assert.ok(joinPage.includes(`href="/app.html#/offer?role=${role}"`), role);
+  assert.match(joinPage, /id="makers"[^]*id="hosts"[^]*id="storytellers"/);
+  const fee = (6000 * site.platformFeePercent) / 100;
+  assert.ok(joinPage.includes(`<dt>The family pays</dt><dd>₹${(6000 + fee).toLocaleString('en-IN')}</dd>`), 'worked example uses the configured fee');
+  for (const page of ['join.html', 'plans.html', 'about.html']) assert.ok(read(page).includes(`${site.platformFeePercent}%`), page);
+  assert.doesNotMatch(joinPage + read('plans.html') + read('about.html'), /\{\{/);
+});
+
+test('the footer stays short, and every page it dropped is still reachable', () => {
+  const footer = read('index.html').match(/<footer[\s\S]*<\/footer>/)[0];
+  assert.ok((footer.match(/<li>/g) || []).length <= 14, 'at most 14 footer links');
+  const themes = read('journal/index.html').match(/<nav class="theme-links"[\s\S]*?<\/nav>/)[0];
+  for (const href of ['/culture.html', '/proverbs.html', '/experiences.html', '/conscious-living.html', '/fitness.html', '/music.html']) assert.ok(themes.includes(`href="${href}"`), href);
+  assert.match(read('index.html'), /href="\/credits\.html"/);
+});
+
+test('privacy, terms and community guidelines are on every page, and the contribute form points to them', () => {
+  for (const page of pages) {
+    const bottom = read(page).match(/<div class="container site-footer__bottom">[\s\S]*?<\/div>/)[0];
+    for (const href of ['/privacy.html', '/terms.html', '/community-guidelines.html', '/credits.html']) assert.ok(bottom.includes(`href="${href}"`), `${page}: ${href}`);
+  }
+  const app = readFileSync(join(PUBLIC, 'scripts/app.js'), 'utf8');
+  assert.ok(app.includes("'/community-guidelines.html'") && app.includes("'/privacy.html'"));
+  assert.ok(read('terms.html').includes(`${JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8')).platformFeePercent}%`), 'terms state the configured fee');
+});
+
+test('each contribution has its own page, kept out of search, and past questions have an archive', () => {
+  const shared = read('shared.html');
+  assert.match(shared, /<meta name="robots" content="noindex/);
+  assert.match(shared, /data-shared[^>]*data-url=/);
+  assert.doesNotMatch(read('sitemap.xml'), /shared\.html/);
+  assert.match(read('questions.html'), /data-question-archive[^>]*data-url=/);
+  assert.match(read('manch.html'), /href="\/questions\.html"/);
+  for (const page of ['shared.html', 'questions.html']) assert.match(read(page), /<script src="\/scripts\/community-live\.js" defer>/, page);
+});
+
+test('What we offer lists every offering, grouped by step, with the archive featured first', () => {
+  const { groups, products } = JSON.parse(readFileSync(join(ROOT, 'content/products.json'), 'utf8'));
+  const html = read('offerings.html');
+  for (const g of groups) assert.ok(html.includes(`id="${g.id}"`), `group ${g.id}`);
+  for (const p of products) assert.ok(html.includes(`href="${p.href}"`), `${p.id} links to ${p.href}`);
+  assert.equal(products.filter((p) => p.featured).length, 1, 'one featured product');
+  assert.match(html, /class="product-feature"[\s\S]*Family archive/, 'the archive is the featured offering');
+  assert.ok(!/\{\{/.test(html), 'no unexpanded placeholders');
+  assert.match(read('index.html'), /href="\/offerings\.html"/, 'the home page links to it');
+});
+
+test('every product page opens with the same facts: who it is for, price, promise, three steps and one action', () => {
+  const { products } = JSON.parse(readFileSync(join(ROOT, 'content/products.json'), 'utf8'));
+  for (const p of products.filter((x) => x.steps)) {
+    const html = read(p.href.slice(1));
+    const glance = html.match(/<section class="glance"[\s\S]*?<\/section>/);
+    assert.ok(glance, `${p.href} has an at-a-glance strip`);
+    for (const label of ['Who it is for', 'What it costs', 'Our promise', 'How it works']) assert.ok(glance[0].includes(label), `${p.href}: ${label}`);
+    assert.equal((glance[0].match(/<li>/g) || []).length, 3, `${p.href}: three steps`);
+    assert.ok(glance[0].includes(`href="${p.cta.href}"`), `${p.href}: its main action`);
+    assert.ok(html.indexOf('class="glance"') < html.indexOf('</section>', html.indexOf('class="glance"')) && html.indexOf('page-hero') < html.indexOf('class="glance"'), `${p.href}: right after the hero`);
+  }
+});
+
+test('every page is served with a content security policy the pages actually keep to', () => {
+  const vercel = JSON.parse(readFileSync(join(ROOT, 'vercel.json'), 'utf8'));
+  const all = Object.fromEntries(vercel.headers.find((h) => h.source === '/(.*)').headers.map((h) => [h.key, h.value]));
+  const csp = Object.fromEntries(all['Content-Security-Policy'].split(';').map((d) => d.trim().split(/\s+/)).map(([k, ...v]) => [k, v]));
+  const backend = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8')).backend.url;
+  for (const d of ['connect-src', 'img-src', 'media-src']) assert.ok(csp[d].includes(backend), `${d} allows the archive's backend`);
+  assert.deepEqual(csp['frame-ancestors'], ["'none'"]);
+  assert.deepEqual(csp['object-src'], ["'none'"]);
+  assert.ok(!csp['script-src'].some((s) => /unsafe|\*/.test(s)), 'no inline or wildcard scripts');
+  assert.equal(all['X-Frame-Options'], 'DENY');
+  assert.match(all['Strict-Transport-Security'], /max-age=\d{8}/);
+  assert.match(all['Permissions-Policy'], /microphone=\(self\)/);
+  for (const page of pages) {
+    const html = read(page);
+    for (const tag of html.match(/<script\b[^>]*>/g) || []) {
+      const src = tag.match(/src="([^"]+)"/);
+      if (!src) assert.match(tag, /type="application\/(ld\+)?json"/, `${page}: inline script ${tag}`);
+      else if (/^https?:/.test(src[1])) assert.ok(csp['script-src'].includes(new URL(src[1]).origin), `${page}: ${src[1]} is allowed`);
+    }
+    assert.ok(!/<[^>]+\son[a-z]+=/i.test(html), `${page}: no inline event handlers`);
+    for (const href of html.match(/<link[^>]+href="https:[^"]+"[^>]*>/g) || []) {
+      const origin = new URL(href.match(/href="([^"]+)"/)[1]).origin;
+      if (/stylesheet/.test(href)) assert.ok(csp['style-src'].includes(origin), `${page}: stylesheet from ${origin}`);
+    }
+  }
 });

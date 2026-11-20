@@ -24,3 +24,4 @@ grant select on auth.users to authenticated;
 SQL
 $PSQL -q -v ON_ERROR_STOP=1 -d "$DB" -f schema.sql >/dev/null
 $PSQL -q -v ON_ERROR_STOP=1 -d "$DB" -f test.sql 2>&1 | sed -n 's/^.*NOTICE:  //p; /ERROR/p; /All access rules hold/p'
+$PSQL -q -v ON_ERROR_STOP=1 -d "$DB" -f metrics.sql >/dev/null && echo "The metrics queries run."

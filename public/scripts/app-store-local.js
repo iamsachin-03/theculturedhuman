@@ -4,16 +4,17 @@
 (function (root) {
   var core = root.TCH.core;
   var SESSION = 'tch-local-session';
-  var STORES = ['users', 'people', 'entries', 'media', 'legacy', 'elders'];
+  var STORES = ['users', 'people', 'entries', 'media', 'legacy', 'elders', 'roots', 'contributions', 'listings'];
   var dbPromise = null;
 
   function db() {
     if (!dbPromise) {
       dbPromise = new Promise(function (resolve, reject) {
-        var req = indexedDB.open('tch-app', 1);
+        var req = indexedDB.open('tch-app', 4);
         req.onupgradeneeded = function () {
           STORES.forEach(function (name) {
-            req.result.createObjectStore(name, { keyPath: name === 'legacy' ? 'owner' : 'id' });
+            if (req.result.objectStoreNames.contains(name)) return;
+            req.result.createObjectStore(name, { keyPath: name === 'legacy' || name === 'roots' ? 'owner' : 'id' });
           });
         };
         req.onsuccess = function () { resolve(req.result); };
@@ -318,7 +319,7 @@
       var load = fields.id ? get('elders', fields.id) : Promise.resolve(null);
       return load.then(function (existing) {
         var e = existing && existing.owner === owner ? copy(existing) : { id: uid(), owner: owner, idx: 0, answered: 0, askedAt: null, createdAt: now().toISOString() };
-        ['name', 'relation', 'phone', 'day', 'idx', 'answered', 'askedAt', 'signAs'].forEach(function (k) { if (k in fields) e[k] = fields[k]; });
+        ['name', 'relation', 'phone', 'day', 'idx', 'answered', 'askedAt', 'signAs', 'autoSend', 'birthday'].forEach(function (k) { if (k in fields) e[k] = fields[k]; });
         e.day = Number(e.day) || 0;
         if (!String(e.name || '').trim()) throw new Error('Please add their name.');
         return put('elders', e);
@@ -330,14 +331,98 @@
       return get('elders', id).then(function (e) { if (e && e.owner === owner) return del('elders', id); });
     },
 
+    /** The roots portrait kept in this archive, in its saved form (TCHRootsArt.clean), or null. */
+    roots: function () {
+      var owner = need();
+      return get('roots', owner).then(function (r) { return r ? r.data : null; });
+    },
+
+    saveRoots: function (data) {
+      var owner = need();
+      return put('roots', { owner: owner, data: data, updatedAt: now().toISOString() }).then(function () { return data; });
+    },
+
+    /** Preview only: contributions stay on this device and nobody reviews them. */
+    contribute: function (fields) {
+      var owner = need();
+      var c = core.contribution(fields);
+      c.id = uid(); c.owner = owner; c.status = 'pending'; c.createdAt = now().toISOString();
+      return put('contributions', c);
+    },
+
+    myContributions: function () {
+      var owner = need();
+      return all('contributions').then(function (list) {
+        return list.filter(function (c) { return c.owner === owner; }).sort(function (a, b) { return a.createdAt < b.createdAt ? 1 : -1; });
+      });
+    },
+
+    contribution: function (id) {
+      var owner = need();
+      return get('contributions', id).then(function (c) { return c && c.owner === owner ? c : null; });
+    },
+
+    updateContribution: function (id, fields) {
+      var owner = need();
+      var c = core.contribution(fields);
+      return get('contributions', id).then(function (old) {
+        if (!old || old.owner !== owner) throw new Error('You can only change what you shared.');
+        c.id = id; c.owner = owner; c.status = 'pending'; c.createdAt = old.createdAt;
+        return put('contributions', c);
+      });
+    },
+
+    deleteContribution: function (id) {
+      var owner = need();
+      return get('contributions', id).then(function (old) {
+        if (!old || old.owner !== owner) throw new Error('You can only delete what you shared.');
+        return del('contributions', id);
+      });
+    },
+
+    report: function () { return Promise.reject(new Error('Reporting needs the real backend.')); },
+    pendingReports: function () { return Promise.resolve([]); },
+    suggestedPlaces: function () { return Promise.resolve([]); },
+    adoptSuggestion: function () { return Promise.reject(new Error('Needs the real backend.')); },
+    resolveReports: function () { return Promise.reject(new Error('Needs the real backend.')); },
+
+    isModerator: function () { return Promise.resolve(false); },
+    pendingContributions: function () { return Promise.resolve([]); },
+    reviewContribution: function () { return Promise.reject(new Error('Reviewing needs the real backend.')); },
+    recentlyPublished: function () { return Promise.resolve([]); },
+    featureContribution: function () { return Promise.reject(new Error('Featuring needs the real backend.')); },
+
+    myListings: function () {
+      var owner = need();
+      return all('listings').then(function (list) { return list.filter(function (l) { return l.userId === owner; }); });
+    },
+    saveListing: function (fields) {
+      var owner = need();
+      var l = core.listing(fields);
+      l.id = fields.id || uid(); l.userId = owner; l.owner = owner; l.status = 'pending'; l.createdAt = now().toISOString();
+      return put('listings', l);
+    },
+    deleteListing: function (id) { return del('listings', id); },
+    listing: function (id) { return get('listings', id).then(function (l) { return l || null; }); },
+    requestBooking: function () { return Promise.reject(new Error('Requests need the real backend. In preview mode nobody would receive them.')); },
+    myBookings: function () { return Promise.resolve([]); },
+    updateBooking: function () { return Promise.reject(new Error('Requests need the real backend.')); },
+    bookingContacts: function () { return Promise.resolve([]); },
+    pendingListings: function () { return Promise.resolve([]); },
+    reviewListing: function () { return Promise.reject(new Error('Reviewing needs the real backend.')); },
+    bookingsToSettle: function () { return Promise.resolve([]); },
+    myEchoes: function () { return Promise.resolve([]); },
+    echo: function () { return Promise.reject(new Error('Needs the real backend.')); },
+
     deleteAccount: function () {
       var owner = need();
-      return Promise.all(['entries', 'media', 'people', 'elders'].map(function (name) {
+      return Promise.all(['entries', 'media', 'people', 'elders', 'contributions', 'listings'].map(function (name) {
         return all(name).then(function (list) {
           return Promise.all(list.filter(function (x) { return x.owner === owner || (name === 'people' && x.userId === owner); })
             .map(function (x) { return del(name, x.id); }));
         });
       })).then(function () { return del('legacy', owner); })
+        .then(function () { return del('roots', owner); })
         .then(function () { return del('users', owner); })
         .then(function () { return store.signOut(); });
     },

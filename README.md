@@ -17,6 +17,8 @@ npm test         # unit, site and app tests (node --test)
 
 Node 18 or newer is all you need. There is nothing to `npm install`.
 
+The local server only answers this computer and sends the same security headers as the live site (from `vercel.json`). To try the site on a phone on your Wi-Fi, run `HOST=0.0.0.0 npm run serve`; anyone on that network can then open it. The security settings to check when you connect Supabase are in `backend/README.md`, under "Keeping it locked down".
+
 ## How the site is organised
 
 | Path | What it is |
@@ -38,7 +40,7 @@ Node 18 or newer is all you need. There is nothing to `npm install`.
 | `public/scripts/theme-init.js` | Applies the saved theme in `<head>`, before the page paints. |
 | `public/scripts/site.js` | Theme picker, mobile menu, quiz and enquiry forms. |
 | `public/brand/` | The logo badge at several sizes, the favicon and the phone home-screen icon. `public/site.webmanifest` points to them. |
-| `tools/build.mjs` | Builds every page, the journal index, image credits, `sitemap.xml` and `robots.txt`, and checks links and images. |
+| `tools/build.mjs` | Builds every page, the journal index, the illustrations page, `sitemap.xml` and `robots.txt`, and checks links and images. |
 | `public/scripts/roots.js` | The "Trace your roots" tool: draws a family's places as a downloadable portrait. Everything stays in the reader's browser. |
 | `tools/roots-example.mjs` | Regenerates `public/brand/roots-example.svg`, the sample portrait shown on the homepage. Run it after changing `roots.js`. |
 | `tools/add-commons-asset.mjs` | Downloads a Wikimedia Commons image at two sizes and records its licence in the register. |
@@ -56,12 +58,9 @@ Every HTML file in `public/` is generated. Edit the source in `src/pages/` or `c
 
 ### A new image
 
-```bash
-node tools/add-commons-asset.mjs "File:Example.jpg" --id example-id --dir craft/pottery \
-  --alt "What the image shows, for screen readers" --subject "Short title" --region "State"
-```
+Every picture on the site is an original illustration in the house style: warm gouache and coloured pencil on cream paper. Save it in `public/assets/illustrations/` as `<id>-1600.jpg` (full size) and `<id>-800.jpg` (800px on the long side), then add an entry to `public/assets/register.json` with `"kind": "illustration"`, `"source": "Original illustration"`, a subject and alt text. Draw people as they are traditionally pictured rather than as a likeness of a real, named person, and do not copy a particular artist's work. The build refuses any image that is not in the register.
 
-Only use images whose licence allows reuse, and keep their credit. The build refuses any image that is not in the register.
+`tools/add-commons-asset.mjs` can still record a freely licensed photograph with its credit, but the site currently uses none.
 
 ### Inside a page
 
@@ -93,7 +92,19 @@ Run `npm run build` after changing these settings.
 
 ## Accounts
 
-The header has a **Sign in** button that becomes **My archive** once someone is signed in on that device. Both lead to `/app.html`. To connect real accounts, create a Supabase project and fill in `backend` in `content/site.json`; [`backend/README.md`](backend/README.md) has the steps. Visitors who used the earlier on-device archive or weekly question are offered to bring them into their account the first time they sign in.
+The top menu is What we offer, Places, Stories, The Commons and Plans, with a **My archive** button that leads to `/app.html` (sign-in, if needed, happens there). Every offering is described once in `content/products.json`, which draws the What we offer page (`{{product-journey}}`). `/app.html?sample` opens a read-only sample archive (`public/scripts/app-store-sample.js`): an invented family with stories, photographs, a relative who adds and an elder, so visitors can look around before signing up. Pages that would add or change something invite them to start their own instead. Each product page puts `{{at-a-glance <id>}}` right after its hero: who it is for, what it costs, our promise, three steps and one main action, from the same file, so a price or promise is changed in one place. To connect real accounts, create a Supabase project and fill in `backend` in `content/site.json`; [`backend/README.md`](backend/README.md) has the steps. Visitors who used the earlier on-device archive or weekly question are offered to bring them into their account the first time they sign in.
+
+## A first story before signing up
+
+The home page opens with one question (`public/scripts/first-story.js`). Visitors can answer it in writing or with a voice note without an account; the answer is kept in their browser's IndexedDB (`tch-archive`) and turned into a keepsake card they can save or send. When they sign in, the archive offers to keep it. Entries already kept or declined are remembered by id in `localStorage` (`tch-imported-ids`), so later answers are still offered.
+
+## Sharing a voice note into the archive
+
+`public/site.webmanifest` declares a share target and `public/sw.js` receives it. On Android, once someone adds the site to their home screen, The Cultured Human appears in WhatsApp's share menu: a shared voice note, photograph or video is kept in IndexedDB (`tch-shared`) and the archive's editor opens with it attached (`#/entry/new?shared=N`). The service worker caches nothing, and `vercel.json` serves it with `no-cache`.
+
+## Birthdays, festivals and the family book
+
+The archive's home shows what is coming up within three weeks: the birthday of anyone you ask the weekly question (month and day only, `weekly_elders.birthday`), or a festival from `OCCASIONS` in `public/scripts/app-core.js`, each with a question to ask while the family is together. Fixed-day festivals repeat by themselves; festivals that follow the moon list their dates as published for India: Diwali and Gurpurab to 2035, Holi and Eid to 2031 (further ahead, published dates disagree). Eid's are tentative until the moon is sighted. `npm test` fails a year before any festival runs out of dates, as the reminder to add more. The archive card fills towards `BOOK_GOAL` (20 entries), the point at which the archive is long enough to print as a family book.
 
 ## Themes
 
@@ -104,6 +115,39 @@ Marigold (the default), Haldi, Indigo, Gulmohar and Evening. Haldi takes its tur
 `vercel.json` sets the build command (`npm run build`), the output directory (`public`), a permanent redirect from the retired `/bazaar.html` to `/marketplace.html`, long-lived caching for images and basic security headers.
 
 The `firebase.json`, `.firebaserc` and `firestore.*` files belong to the earlier Firebase project and are not used by the Vercel site.
+
+## Adding to a place
+
+Each place page sends families to `/app.html#/contribute?place=<slug>` to write a word, a dish, a festival, a song or a memory and choose their credit. It waits as `pending` until a moderator publishes it at `/app.html#/moderate`; `public/scripts/places-live.js` then shows it on the place page without a rebuild. The enquiry form stays on the page, folded away, for people who would rather not sign in. The database needs `backend/places.sql`, which the build writes from `content/places/*.json` ([steps](backend/README.md#connecting-a-supabase-project)).
+
+Moderators can also feature a published contribution from the moderate page ("Featured on The Commons"). Featured ones show first, with a Featured label, on The Commons, the home page and their place page. Only moderators can feature, and an author's edit sends it back for review unfeatured. Featuring one or two a week gives visitors a strong answer to read first.
+
+When families suggest a place that has no page yet, the moderate page groups the suggestions. `npm run new-place -- --list` shows them; `npm run new-place -- --name "Jorhat" --region "Assam" --lat 26.75 --lng 94.2` writes `content/places/jorhat.json` (marked as started by families, with no photograph yet). With `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` set it also adds the place to the database and moves the waiting suggestions onto it; otherwise build, re-run `backend/places.sql`, and move them from the moderate page. Suggestions that match an existing place can be moved from the moderate page.
+
+Shared contributions live at `/s/<id>`, served by `api/shared.mjs` so WhatsApp, LinkedIn and others show the contribution in their link preview. Empty Commons and home feeds show a few examples from `content/community-examples.json`, always labelled as written by us; keep them factual.
+
+## Weekly question sender
+
+`api/weekly-send.mjs` can send each person's weekly question on WhatsApp for their family member, once a day from a Vercel cron job. It is off until a WhatsApp Business number, an approved template and a few environment variables are in place; [`backend/weekly/README.md`](backend/weekly/README.md) has the steps.
+
+## Visit counts
+
+The site can count visits with [Vercel Web Analytics](https://vercel.com/docs/analytics), which uses no cookies and stores no personal data, so no consent banner is needed. It is off until both are done:
+
+1. In the Vercel dashboard, open the project, then **Analytics** → **Enable**.
+2. In `content/site.json`, set `"analytics": { "vercel": true }`, then build and push.
+
+Every public page then loads `/_vercel/insights/script.js`. Private pages (`noindex`, such as the archive app) never do, and the app's own addresses after `#` are never sent.
+
+## Measuring what matters
+
+Three numbers say whether families find the site and come back:
+
+1. **First-visit save rate**: home-page visitors who keep a first story. In Vercel Web Analytics, compare the `First story kept` event with visits to `/`. `First story started` shows how many begin, and `Keepsake card shared` shows how many send their card on (`how` is `share` or `download`). Custom events need a paid Vercel plan; on the free plan only visits are counted. Events never carry anything a visitor wrote.
+2. **Week-2 return**: archives where someone added something in the second week after the first entry.
+3. **Relatives per archive**: relatives added, relatives who have signed in, and relatives who have added something themselves.
+
+The second and third come from the database, not from tracking: run [`backend/metrics.sql`](backend/metrics.sql) in the Supabase SQL editor. It reads counts only. Week-2 return counts additions, not visits, which is the stronger signal and needs nothing extra in the archive app.
 
 ## Editorial rules
 

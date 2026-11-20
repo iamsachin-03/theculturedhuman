@@ -6,8 +6,8 @@ pillar: wisdom
 series: Wisdom of the Ages
 author: The Cultured Human editors
 date: 2026-11-15
-heroImage: rigveda-palm-leaf-sharada
-heroCaption: A fragment of a Rigveda manuscript in Sharada script, Bhandarkar Oriental Research Institute, Pune
+heroImage: sharada-manuscript
+heroCaption: A scholar reading a birch-bark manuscript in Kashmir, where Sharada script was long used to copy texts
 related: [madhubani-painting, regional-food-cultures]
 offers: [organisations, family-stories]
 ---
@@ -23,7 +23,7 @@ A common way of sorting the schools is by their attitude to the Vedas. Schools t
 
 Today it is usual to list six āstika schools in three pairs — Nyāya and Vaiśeṣika, Sāṃkhya and Yoga, Mīmāṃsā and Vedānta — and three nāstika traditions: the Jains, the Buddhists and the materialists, known as Lokāyata or Cārvāka.[^3] Even within the āstika group, the relationship to the Vedas varied. The foundational text of Sāṃkhya, the *Sāṅkhya Kārikā*, does not explicitly mention the Vedas at all.[^1]
 
-{{figure kalpasutra-mahavira-lustration "A folio from a Jain Kalpasutra manuscript showing the lustration of the infant Mahavira. Jain thinkers were among the most important voices in Indian philosophical debate."}}
+{{figure jain-manuscript "Reading the leaves of an illustrated manuscript. Jain thinkers, whose libraries preserved many such texts, were among the most important voices in Indian philosophical debate."}}
 
 ## How do you know?
 

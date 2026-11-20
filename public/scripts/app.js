@@ -1,10 +1,11 @@
 // The family archive app at /app.html: sign in, keep stories, voices, photographs, videos and
 // documents, share them with the people you choose, and decide what is passed on.
 // It talks to a Supabase project when one is configured (site.json "backend", or a developer
-// override in localStorage "tch-backend"); otherwise it runs in preview mode on this device.
+// override in localStorage "tch-backend", honoured on localhost only); otherwise it runs in preview mode on this device.
 (function () {
   var TCH = window.TCH;
   var core = TCH.core;
+  var Art = window.TCHRootsArt;
   var app = document.querySelector('[data-app]');
   if (!app) return;
 
@@ -13,18 +14,23 @@
     var cfg = {};
     if (/[?&]preview\b/.test(location.search)) return cfg;
     try { cfg = JSON.parse(document.querySelector('meta[name="tch-backend"]').content || '{}'); } catch (e) {}
+    // The override is for local development only: on the real site, nothing left in localStorage
+    // can send someone's sign-in and stories to another server.
+    var local = /^(localhost|127\.0\.0\.1)$/;
     try {
       var override = JSON.parse(localStorage.getItem('tch-backend') || 'null');
-      if (override && override.url && override.anonKey) cfg = override;
+      if (local.test(location.hostname) && override && override.anonKey && typeof override.url === 'string' && local.test(new URL(override.url).hostname)) cfg = override;
     } catch (e) {}
     return cfg;
   }
   var cfg = backendConfig();
-  var store = cfg.url && cfg.anonKey ? TCH.stores.supabase(cfg) : TCH.stores.local;
+  var sample = /[?&]sample\b/.test(location.search);
+  var store = sample ? TCH.stores.sample : cfg.url && cfg.anonKey ? TCH.stores.supabase(cfg) : TCH.stores.local;
   var returnTo = location.origin + location.pathname + (store.mode === 'local' && location.search ? location.search : '');
   var MAX_BYTES = store.mode === 'supabase' ? 50 * 1024 * 1024 : 500 * 1024 * 1024;
 
-  var state = { user: null, legacy: null, people: null };
+  var state = { user: null, legacy: null, people: null, market: false };
+  var FEE_PERCENT = Number(document.querySelector('meta[name="tch-fee"]').content);
 
   // ---------- tiny DOM helpers ----------
   function h(tag, attrs) {
@@ -76,6 +82,34 @@
     setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
   }
 
+  // Files shared from another app arrive through the service worker (public/sw.js).
+  function takeShared() {
+    return new Promise(function (resolve) {
+      var req = indexedDB.open('tch-shared', 1);
+      req.onupgradeneeded = function () { req.result.createObjectStore('files', { keyPath: 'id' }); };
+      req.onerror = function () { resolve({ files: [], text: '' }); };
+      req.onsuccess = function () {
+        var tx = req.result.transaction('files', 'readwrite');
+        var os = tx.objectStore('files');
+        var all = os.getAll();
+        all.onsuccess = function () {
+          var rows = all.result || [];
+          os.clear();
+          resolve({
+            files: rows.map(function (r) {
+              try { return new File([r.blob], r.name, { type: r.type }); } catch (err) { var b = r.blob; b.name = r.name; return b; }
+            }),
+            text: rows.map(function (r) { return r.text; }).filter(Boolean).join(' '),
+          });
+        };
+        all.onerror = function () { resolve({ files: [], text: '' }); };
+      };
+    });
+  }
+
+  var installPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (ev) { ev.preventDefault(); installPrompt = ev; });
+
   // ---------- frame ----------
   var nav = h('nav', { class: 'app-nav', 'aria-label': 'Your archive' });
   var notice = h('p', { class: 'app-notice', hidden: true });
@@ -94,7 +128,7 @@
 
   var TABS = [
     ['#/', 'Home'], ['#/archive', 'My archive'], ['#/weekly', 'Weekly question'],
-    ['#/people', 'My people'], ['#/shared', 'Shared with me'], ['#/settings', 'Settings'],
+    ['#/people', 'My people'], ['#/shared', 'Shared with me'], ['#/requests', 'Requests', 'market'], ['#/settings', 'Settings'],
   ];
   function drawNav(route) {
     nav.textContent = '';
@@ -102,6 +136,7 @@
     if (!state.user) return;
     var ul = h('ul');
     TABS.forEach(function (t) {
+      if (t[2] === 'market' && !state.market && route !== 'requests') return;
       var current = t[0] === '#/' ? route === '' : route.indexOf(t[0].slice(2)) === 0;
       ul.appendChild(h('li', null, h('a', { href: t[0], 'aria-current': current ? 'page' : null }, t[1])));
     });
@@ -109,7 +144,13 @@
   }
 
   function drawNotice() {
-    if (store.mode === 'local') {
+    if (sample) {
+      notice.hidden = false;
+      notice.textContent = '';
+      notice.className = 'app-notice app-notice--sample';
+      add(notice, [h('strong', null, 'A sample archive. '), 'The Mishra family is invented, so look around freely: nothing here can be changed. ',
+        link('/app.html', 'Start your own archive', 'btn btn--small'), ' ', link('/offerings.html', 'Back to what we offer', 'text-link')]);
+    } else if (store.mode === 'local') {
       notice.hidden = false;
       notice.textContent = '';
       add(notice, [h('strong', null, 'Preview mode. '), 'No account server is connected yet, so everything stays in this browser on this device, and the accounts here are pretend ones for trying out sharing. Keep a copy from Settings before clearing your browser.']);
@@ -134,9 +175,18 @@
 
   var routes = [
     [/^$/, home], [/^archive$/, archive], [/^entry\/new$/, editor], [/^entry\/([\w-]+)\/edit$/, editor],
-    [/^entry\/([\w-]+)$/, entryView], [/^weekly$/, weekly], [/^people$/, people], [/^shared$/, shared],
-    [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings],
+    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^people$/, people], [/^shared$/, shared],
+    [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings], [/^contribute$/, contribute], [/^moderate$/, moderate],
+    [/^offer$/, offer], [/^request$/, requestForm], [/^requests$/, requests], [/^echo$/, echo], [/^report$/, reportForm],
   ];
+
+  // In the sample archive, pages that only add or change things invite people to start their own instead.
+  var SAMPLE_STOPS = /^(entry\/new|entry\/[\w-]+\/edit|contribute|offer|request|echo|report|moderate)$/;
+  function sampleStop() {
+    var h1 = page('In your own archive, this is where you would add it', 'This sample belongs to an invented family, so nothing can be added or changed here. Your own archive is free to start, and private until you choose who sees each entry.');
+    add(view, h('div', { class: 'btn-row' }, link('/app.html', 'Start your own archive', 'btn'), link('#/archive', 'Keep looking around', 'btn btn--ghost')));
+    return h1;
+  }
 
   var rendering = 0;
   var flash = null;
@@ -150,6 +200,7 @@
       return signin();
     }
     drawNav(r.path);
+    if (sample && SAMPLE_STOPS.test(r.path)) return sampleStop();
     for (var i = 0; i < routes.length; i++) {
       var m = r.path.match(routes[i][0]);
       if (m) {
@@ -171,24 +222,58 @@
   }
 
   // ---------- sign in ----------
+  // Sign-in links come back to the app's front page, so the page someone was heading for is kept here.
+  var AFTER_SIGNIN = 'tch-after-signin';
+  function rememberWanted() {
+    try {
+      if (parse().path) localStorage.setItem(AFTER_SIGNIN, location.hash);
+      else localStorage.removeItem(AFTER_SIGNIN);
+    } catch (e) {}
+  }
+  function restoreWanted() {
+    var wanted = null;
+    try {
+      wanted = localStorage.getItem(AFTER_SIGNIN);
+      localStorage.removeItem(AFTER_SIGNIN);
+    } catch (e) {}
+    if (wanted && /^#\/[\w\/?=&%.-]+$/.test(wanted) && !parse().path) history.replaceState(null, '', location.pathname + location.search + wanted);
+  }
+
   function signin() {
-    var h1 = page('Your family archive', 'Keep the stories, voices, photographs and wisdom of your family in one private place, and choose who receives each one, now or later.');
+    var why = {
+      contribute: ['Add to a place', 'Sign in with your email to write it. It takes a minute, and you choose how you are credited.'],
+      offer: ['Offer your work', 'Sign in with your email to create your listing. Families find you through the places you work in.'],
+      request: ['Send a request', 'Sign in with your email so they can reply to you. Nothing is charged until you accept a quote.'],
+      requests: ['Your requests', 'Sign in with your email to see your requests and quotes.'],
+      echo: ['We have this too', 'Sign in with your email to say your family has this too.'],
+      report: ['Report this', 'Sign in with your email to report it. It stops one person sending many reports, and nobody else sees who reported.'],
+    }[parse().path];
+    var h1 = why
+      ? page(why[0], why[1])
+      : page('Your family archive', 'Keep the stories, voices, photographs and wisdom of your family in one private place, and choose who receives each one, now or later.');
+    if (!why) waitingOnDevice().then(function (w) {
+      if (!w.old.length || !h1.isConnected) return;
+      var lede = view.querySelector('.app-head .lede');
+      if (lede) lede.textContent = (w.old.length === 1 ? 'Your story is' : 'Your ' + w.old.length + ' stories are') + ' waiting in this browser. Sign in to keep ' + (w.old.length === 1 ? 'it' : 'them') + ' safe in your private archive, where you can open ' + (w.old.length === 1 ? 'it' : 'them') + ' on any device.';
+    });
     var form = h('form', { class: 'app-card app-signin' });
     var email = h('input', { type: 'email', name: 'email', autocomplete: 'email', required: true });
     var name = h('input', { type: 'text', name: 'name', autocomplete: 'name' });
     add(form, [
+      h('img', { class: 'app-signin__art', src: '/assets/illustrations/keepsake-box-800.jpg', width: 800, height: 534, alt: '' }),
       h('h2', null, store.mode === 'local' ? 'Try it on this device' : 'Sign in or create your archive'),
       field('Email', email, store.mode === 'local' ? 'Any address works in preview mode. Sign in as different addresses to see what each person would see.' : 'We will email you a link to sign in. No password to remember.'),
       field('Your name (optional)', name, 'Shown to the people you share with.'),
       h('div', { class: 'btn-row' }, button(store.mode === 'local' ? 'Open my archive' : 'Email me a sign-in link', null, 'btn', 'submit')),
     ]);
     if (store.google) {
-      add(form, h('p', { class: 'app-or' }, h('a', { class: 'btn btn--ghost', href: store.googleUrl(returnTo) }, 'Continue with Google')));
+      add(form, h('p', { class: 'app-or' }, h('a', { class: 'btn btn--ghost', href: store.googleUrl(returnTo), onclick: rememberWanted }, 'Continue with Google')));
     }
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var btn = form.querySelector('[type="submit"]');
       btn.disabled = true;
+      rememberWanted();
       store.signIn(email.value, name.value, returnTo).then(function (r) {
         if (r && r.sent) {
           form.textContent = '';
@@ -221,11 +306,15 @@
 
   // ---------- home ----------
   function home() {
-    var h1 = page('Welcome, ' + firstName(state.user.name) + '.');
-    return Promise.all([store.entries(), store.elders(), store.sharedWithMe()]).then(function (r) {
+    var h1 = sample
+      ? page('Asha\u2019s family archive', 'Asha keeps her grandmother\u2019s stories here, and her brother Ravi adds his own. This is what an archive looks like after a few weeks.')
+      : page('Welcome, ' + firstName(state.user.name) + '.');
+    return Promise.all([store.entries(), store.elders(), store.sharedWithMe(), store.roots()]).then(function (r) {
       var entries = r[0];
       var elders = r[1];
       var sharedList = r[2];
+      var keptRoots = hasRoots(r[3]) ? Art.clean(r[3]) : null;
+      var deviceHasRoots = hasRoots(deviceRoots());
       var mine = entries.filter(function (e) { return e.createdBy === state.user.id || e.owner === state.user.id; });
       var files = mine.reduce(function (n, e) { return n + e.media.length; }, 0);
       add(view, h('div', { class: 'app-quick' },
@@ -241,25 +330,61 @@
         h('p', null, elders[0] ? 'Send it, then keep their answer here.' : 'One question a week to someone you love. In a year, their life in their own words.'),
         link('#/weekly', elders[0] ? 'Open the weekly question' : 'Start with someone you love', 'text-link'),
       ));
-      grid.appendChild(h('section', { class: 'app-card' },
-        h('p', { class: 'eyebrow' }, 'Your archive'),
-        h('h2', null, mine.length ? plural(mine.length, 'entry', 'entries') + ', ' + plural(files, 'file') : 'Nothing kept yet'),
-        h('p', null, mine.length ? 'Stories, wisdom, things for hard days and letters to the future.' : 'Start with one question, one photograph or one saying.'),
-        link('#/archive', 'Open your archive', 'text-link'),
-      ));
+      grid.appendChild(bookCard(mine, files));
       grid.appendChild(h('section', { class: 'app-card' },
         h('p', { class: 'eyebrow' }, 'Shared with you'),
         h('h2', null, sharedList.length ? plural(sharedList.length, 'archive') : 'Nobody yet'),
         h('p', null, sharedList.length ? sharedList.map(function (s) { return s.ownerName; }).join(', ') : 'When someone adds you to their archive with this email address, it appears here.'),
         link('#/shared', 'See what is shared with you', 'text-link'),
       ));
+      grid.appendChild(h('section', { class: 'app-card' },
+        h('p', { class: 'eyebrow' }, 'Your roots'),
+        h('h2', null, keptRoots ? plural(Art.places(Art.fromSaved(keptRoots)).length, 'place') + ' kept' : deviceHasRoots ? 'Ready to keep' : 'Not traced yet'),
+        h('p', null, keptRoots ? 'The places your family has called home, drawn as a portrait.' : deviceHasRoots ? 'You made a roots portrait in this browser. Keep it in your archive.' : 'Draw the places your family has called home as roots, a tree, a river, rings or stars.'),
+        link(keptRoots || deviceHasRoots ? '#/roots' : '/trace.html', keptRoots ? 'See your roots' : deviceHasRoots ? 'Keep your roots portrait' : 'Trace your roots', 'text-link'),
+      ));
+      var soon = core.upcoming(new Date(), elders, 21)[0];
+      if (soon) add(view, occasionCard(soon));
       add(view, grid);
       if (entries.length) {
         add(view, h('h2', { class: 'app-sub' }, 'Recently kept'));
         add(view, h('div', { class: 'app-list' }, entries.slice(0, 4).map(entryCard)));
       }
-      return offerImport().then(function () { return h1; });
+      return (sample ? Promise.resolve() : offerImport()).then(function () { return h1; });
     });
+  }
+
+  function inDays(n) { return n === 0 ? 'today' : n === 1 ? 'tomorrow' : 'in ' + n + ' days'; }
+  function occasionCard(o) {
+    var teller = o.elder ? '&teller=' + encodeURIComponent(o.elder.name) : '';
+    return h('section', { class: 'app-card app-occasion' },
+      h('p', { class: 'eyebrow' }, 'Coming up'),
+      h('h2', null, o.name + ' is ' + inDays(o.days) + '.'),
+      h('p', null, o.kind === 'birthday'
+        ? 'Record a birthday message for ' + o.elder.name + ', or ask them a question only they can answer:'
+        : 'Festivals are when families sit together. Ask someone while everyone is home:'),
+      h('p', { class: 'app-occasion__q' }, o.question),
+      h('div', { class: 'btn-row' },
+        link('#/entry/new?kind=story&record=audio' + teller + '&prompt=' + encodeURIComponent(o.question), 'Record their answer', 'btn'),
+        o.kind === 'birthday' ? link('#/entry/new?kind=letter&forWhom=' + encodeURIComponent(o.elder.name), 'Write ' + o.elder.name + ' a birthday letter', 'btn btn--ghost') : null),
+    );
+  }
+  function bookCard(mine, files) {
+    var n = mine.length;
+    var goal = core.BOOK_GOAL;
+    var ready = n >= goal;
+    return h('section', { class: 'app-card app-book' },
+      h('p', { class: 'eyebrow' }, 'Your archive'),
+      h('h2', null, n ? plural(n, 'entry', 'entries') + ', ' + plural(files, 'file') : 'Nothing kept yet'),
+      h('div', { class: 'app-book__bar', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(goal), 'aria-valuenow': String(Math.min(n, goal)), 'aria-label': 'Entries towards a printed family book' },
+        h('span', { style: 'width:' + Math.min(100, Math.round((n / goal) * 100)) + '%' })),
+      h('p', null, ready
+        ? 'Long enough for a family book. Print it at home, or have it bound to give at the next family gathering.'
+        : n ? plural(goal - n, 'more entry', 'more entries') + ' and it is long enough to print as a family book.' : 'Every story, saying and photograph you keep becomes a page of your family book.'),
+      ready
+        ? h('div', { class: 'btn-row' }, link('#/archive', 'Open and print it', 'text-link'), link('/plans.html', 'Have it bound', 'text-link'))
+        : link('#/archive', 'Open your archive', 'text-link'),
+    );
   }
 
   // ---------- archive ----------
@@ -269,15 +394,56 @@
     e.media.forEach(function (m) { counts[m.kind] = (counts[m.kind] || 0) + 1; });
     var names = { audio: 'voice note', video: 'video', photo: 'photograph', document: 'document' };
     var media = Object.keys(counts).map(function (k) { return plural(counts[k], names[k]); }).join(', ');
-    return h('a', { class: 'app-entry', href: '#/entry/' + e.id },
-      h('span', { class: 'eyebrow' }, kind ? kind.heading : ''),
+    var photo = e.media.filter(function (m) { return m.kind === 'photo'; })[0];
+    var frame = null;
+    if (photo) {
+      frame = h('span', { class: 'app-entry__photo' });
+      store.mediaUrl(photo).then(function (url) { frame.appendChild(h('img', { src: url, alt: '', loading: 'lazy' })); }).catch(function () { frame.remove(); });
+    }
+    return h('a', { class: 'app-entry' + (photo ? ' app-entry--photo' : ''), href: '#/entry/' + e.id },
+      frame,
+      h('span', { class: 'eyebrow' }, kind ? kind.heading : '', counts.audio ? h('span', { class: 'app-entry__voice' }, 'Voice') : null),
       h('h3', null, e.title),
       e.body ? h('p', null, e.body.length > 160 ? e.body.slice(0, 157) + '…' : e.body) : null,
       h('span', { class: 'app-entry__meta' }, [e.teller ? 'Told by ' + e.teller : null, media || null, core.audienceLabel(e, state.people || []), core.formatDate(e.createdAt)].filter(Boolean).join(' · ')),
     );
   }
 
+  function sameName(a, b) { return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase(); }
+  // Memories of someone are asked for with this question, so they gather on that person's page
+  // even when somebody else told them.
+  function memoryPrompt(name) { return 'What do you remember about ' + name + '?'; }
+  function rememberedName(e) {
+    var m = /^What do you remember about (.+)\?$/.exec(e.prompt || '');
+    return m ? m[1] : '';
+  }
+  function aboutPerson(e, name) { return sameName(e.teller, name) || sameName(rememberedName(e), name); }
+  function tellers(entries) {
+    var list = [];
+    entries.forEach(function (e) {
+      var name = String(rememberedName(e) || e.teller || '').trim();
+      if (!name) return;
+      var t = list.filter(function (x) { return sameName(x.name, name); })[0];
+      if (t) {
+        t.count++;
+        if (!/^\p{Lu}/u.test(t.name) && /^\p{Lu}/u.test(name)) t.name = name;
+      } else list.push({ name: name, count: 1 });
+    });
+    return list.sort(function (a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
+  }
+  function keptBy(entries) {
+    var names = [];
+    entries.forEach(function (e) {
+      var p = state.people.filter(function (x) { return x.userId && x.userId === e.createdBy; })[0];
+      var name = e.createdBy === state.user.id ? 'you' : p ? p.name : null;
+      if (name && names.indexOf(name) === -1) names.push(name);
+    });
+    return names.sort(function (a, b) { return (b === 'you') - (a === 'you'); });
+  }
+
   function archive(_, query) {
+    var who = query.get('teller');
+    if (who) return personPage(who);
     var h1 = page('My archive', 'Everything you have kept, and what others in your family have added to it.');
     var kind = query.get('kind') || '';
     return Promise.all([store.entries(), loadPeople()]).then(function (r) {
@@ -289,14 +455,96 @@
       });
       add(view, h('div', { class: 'app-toolbar' }, link('#/entry/new' + (kind ? '?kind=' + kind : ''), 'Add to the archive', 'btn'), entries.length ? button('Print as a book', function () { window.print(); }, 'btn btn--ghost') : null));
       add(view, filters);
+      var people = tellers(entries.filter(function (e) { return e.owner === state.user.id; }));
+      if (people.length) {
+        add(view, h('nav', { class: 'app-tellers', 'aria-label': 'The people in these stories' },
+          h('span', { class: 'eyebrow' }, 'The people in these stories'),
+          h('ul', null, people.map(function (t) { return h('li', null, h('a', { href: '#/archive?teller=' + encodeURIComponent(t.name) }, t.name, h('small', null, String(t.count)))); })),
+        ));
+      }
       var shown = kind ? entries.filter(function (e) { return e.kind === kind; }) : entries;
-      if (!shown.length) {
-        add(view, h('p', { class: 'empty-state' }, entries.length ? 'Nothing of this kind yet.' : 'Nothing kept yet. Start with one question, one photograph or one saying.'));
+      if (!entries.length) {
+        add(view, emptyArchive());
+      } else if (!shown.length) {
+        add(view, h('p', { class: 'empty-state' }, 'Nothing of this kind yet.'));
       } else {
         add(view, h('div', { class: 'app-list' }, shown.map(entryCard)));
       }
       return h1;
     });
+  }
+
+  function emptyArchive() {
+    return h('section', { class: 'app-card app-welcome' },
+      h('img', { class: 'app-welcome__art', src: '/assets/illustrations/family-photo-album-800.jpg', alt: '', width: '800', height: '600', loading: 'lazy' }),
+      h('div', null,
+        h('h2', null, 'An album waiting for its first page'),
+        h('p', null, 'Most families begin with one small thing. Pick whichever is nearest to hand.'),
+        h('ul', { class: 'app-welcome__steps' },
+          h('li', null, link('#/entry/new?kind=story&record=audio', 'Record a grandparent telling one story', 'text-link'), h('small', null, 'Five minutes on the phone is enough.')),
+          h('li', null, link('#/entry/new?kind=memory', 'Keep an old photograph and who is in it', 'text-link'), h('small', null, 'A photo of a photo works.')),
+          h('li', null, link('#/entry/new?kind=wisdom', 'Write down a saying only your family uses', 'text-link'), h('small', null, 'The kind nobody outside would understand.'))),
+        h('p', { class: 'field__hint' }, 'Everything stays private to you until you choose who can see it.')));
+  }
+
+  // Everything told by or about one person, and a way to ask the rest of the family for theirs.
+  function personPage(who) {
+    return Promise.all([store.entries(), loadPeople()]).then(function (r) {
+      var mine = r[0].filter(function (e) { return e.owner === state.user.id && aboutPerson(e, who); });
+      var name = mine.length ? tellers(mine).filter(function (t) { return sameName(t.name, who); }).concat([{ name: who }])[0].name : who;
+      var by = keptBy(mine);
+      var h1 = page(name, mine.length
+        ? plural(mine.length, 'story', 'stories') + ' and memories' + (by.length ? ', kept by ' + listNames(by) : '') + '.'
+        : 'Nothing kept about ' + name + ' yet.');
+      view.querySelector('.app-head').insertBefore(h('p', { class: 'eyebrow' }, h('a', { class: 'eyebrow--plain', href: '#/archive' }, 'My archive'), ' · A person'), h1);
+      add(view, h('div', { class: 'app-toolbar' },
+        link('#/entry/new?prompt=' + encodeURIComponent(memoryPrompt(name)), 'Add your memory of ' + name, 'btn'),
+        link('#/entry/new?teller=' + encodeURIComponent(name) + '&record=audio', 'Keep a story ' + name + ' told', 'btn btn--ghost'),
+      ));
+      if (mine.length) add(view, h('div', { class: 'app-list' }, mine.map(entryCard)));
+      add(view, askFamily(name, true));
+      return h1;
+    });
+  }
+  function listNames(names) {
+    return names.length < 2 ? names.join('') : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+  }
+
+  function askText(person, about, url) {
+    return firstName(person.name) + ', I am keeping ' + about + '’s stories in our family archive on The Cultured Human. ' +
+      'What do you remember about ' + about + '? A story, a saying, the way they laughed. Add yours here, it only takes a few minutes: ' + url;
+  }
+  /** A panel for asking relatives, by name, to add their own memory of someone. */
+  function askFamily(about, open) {
+    var url = returnTo + '#/entry/new?owner=' + state.user.id + '&prompt=' + encodeURIComponent(memoryPrompt(about));
+    var canAdd = state.people.filter(function (p) { return p.role === 'family_edit'; });
+    var viewOnly = state.people.filter(function (p) { return p.role === 'family_view'; });
+    var panel = h('section', { class: 'app-card app-ask' },
+      h('p', { class: 'eyebrow' }, 'Ask the family'),
+      h('h2', null, 'Who else remembers ' + about + '?'),
+      h('p', null, 'Every person remembers someone differently. Ask them by name; what they add appears here, with ' + about + '’s other stories.'),
+    );
+    if (canAdd.length) {
+      add(panel, h('ul', { class: 'app-ask__list' }, canAdd.map(function (p) {
+        var text = askText(p, about, url);
+        return h('li', null, h('strong', null, p.name),
+          h('span', { class: 'btn-row' },
+            h('a', { class: 'btn btn--small', href: 'https://wa.me/?text=' + encodeURIComponent(text), target: '_blank', rel: 'noopener' }, 'Ask on WhatsApp'),
+            h('a', { class: 'btn btn--ghost btn--small', href: 'mailto:' + p.email + '?subject=' + encodeURIComponent('Your memory of ' + about) + '&body=' + encodeURIComponent(text) }, 'Ask by email')));
+      })));
+    }
+    if (viewOnly.length) {
+      add(panel, h('p', { class: 'field__hint' }, listNames(viewOnly.map(function (p) { return p.name; })) + (viewOnly.length === 1 ? ' can' : ' can') + ' see what you share but not add to it yet. ',
+        button(viewOnly.length === 1 ? 'Let them add too' : 'Let them all add too', function (ev) {
+          ev.target.disabled = true;
+          viewOnly.reduce(function (pr, p) { return pr.then(function () { return store.savePerson({ id: p.id, name: p.name, email: p.email, role: 'family_edit' }); }); }, Promise.resolve())
+            .then(function () { state.people = null; flash = 'They can now add their own memories.'; render(); }).catch(fail);
+        }, 'text-link')));
+    }
+    if (!canAdd.length && !viewOnly.length) {
+      add(panel, h('p', null, link('#/people', 'Add a relative who can add their memories', 'text-link')));
+    }
+    return open ? panel : h('details', { class: 'app-more' }, h('summary', null, 'Ask the family for their memory of ' + about), panel);
   }
 
   // ---------- one entry ----------
@@ -350,7 +598,10 @@
         ]);
       }
       add(actions, link(mineArchive ? '#/archive' : '#/shared/' + e.owner, 'Back', 'text-link'));
+      var about = String(rememberedName(e) || e.teller || '').trim();
+      if (mineArchive && about) add(actions, link('#/archive?teller=' + encodeURIComponent(about), 'Everything about ' + about, 'text-link'));
       add(view, actions);
+      if (mineArchive && about) add(view, askFamily(about, false));
       return h1;
     });
   }
@@ -370,7 +621,7 @@
       if (forOther && (!sharedRow || sharedRow.role !== 'family_edit')) {
         return page('Not available', 'You can only view this archive.');
       }
-      var e = existing || { kind: query.get('kind') || 'story', title: '', body: '', prompt: query.get('prompt') || '', teller: query.get('teller') || '', audience: forOther ? 'family' : 'private', audiencePeople: [], media: [] };
+      var e = existing || { kind: query.get('kind') || 'story', title: '', body: '', prompt: query.get('prompt') || '', teller: query.get('teller') || '', forWhom: query.get('forWhom') || '', audience: forOther ? 'family' : 'private', audiencePeople: [], media: [] };
       var h1 = page(existing ? 'Edit "' + e.title + '"' : forOther ? 'Add to ' + sharedRow.ownerName + '\'s archive' : 'Add to your archive');
       var form = h('form', { class: 'app-card app-editor' });
       var kind = options(h('select', { name: 'kind' }), core.KINDS, e.kind);
@@ -438,9 +689,17 @@
         });
         add(audience, [peopleBox, dateField]);
       }
+      var privacy = h('p', { class: 'app-privacy', 'aria-live': 'polite' });
       function sync() {
         peopleBox.hidden = ['people', 'date', 'passed'].indexOf(picked) === -1;
         dateField.hidden = picked !== 'date';
+        privacy.textContent = privacyLine();
+      }
+      function privacyLine() {
+        if (forOther) return picked === 'private' ? 'Only you and ' + sharedRow.ownerName + ' will be able to hear or see this.' : 'Only ' + sharedRow.ownerName + '\u2019s family will be able to hear or see this.';
+        if (picked === 'private') return 'Only you will be able to hear or see this. Nothing here is ever public.';
+        if (picked === 'family') return 'Only the family you have added will be able to hear or see this. Nothing here is ever public.';
+        return 'Only the people you choose under \u201cWho can see it\u201d will be able to hear or see this. Nothing here is ever public.';
       }
       sync();
       add(form, audience);
@@ -465,7 +724,7 @@
         });
         drawFiles();
       }
-      var picker = h('input', { type: 'file', multiple: true, accept: 'audio/*,video/*,image/*,application/pdf,.doc,.docx,.txt', onchange: function () { addFiles(picker.files); picker.value = ''; } });
+      var picker = h('input', { type: 'file', multiple: true, accept: 'audio/*,video/*,image/*,.opus,.ogg,.m4a,.amr,application/pdf,.doc,.docx,.txt', onchange: function () { addFiles(picker.files); picker.value = ''; } });
       var recordStatus = h('p', { class: 'field__hint', 'aria-live': 'polite' });
       var preview = h('div', { class: 'app-record__preview' });
       var recorder = null;
@@ -511,7 +770,7 @@
         h('legend', null, 'Voices, videos, photographs and documents'),
         h('p', { class: 'field__hint' }, 'Old certificates, letters, deeds and photographs of them count too. Up to ' + core.formatBytes(MAX_BYTES) + ' each.'),
         h('div', { class: 'btn-row' }, recordButton('audio'), recordButton('video'), h('label', { class: 'btn btn--ghost app-upload' }, 'Attach files', picker)),
-        recordStatus, preview, fileList,
+        privacy, recordStatus, preview, fileList,
       ));
       drawFiles();
 
@@ -540,6 +799,100 @@
       });
       add(view, form);
       if (query.get('record') === 'audio') setTimeout(function () { var b = form.querySelector('[data-record="audio"]'); if (b) b.focus(); }, 0);
+      if (query.get('shared') && !existing) {
+        takeShared().then(function (got) {
+          if (query.get('shared') === 'failed' || !got.files.length) { say('Nothing arrived from the other app. Save the file to your phone, then attach it here.', true); return; }
+          addFiles(got.files);
+          var voice = got.files.some(function (f) { return core.mediaKind(f.type, f.name) === 'audio'; });
+          if (!title.value) title.value = voice ? 'A voice note' + (e.teller ? ' from ' + e.teller : '') : 'Shared ' + core.formatDate(new Date().toISOString());
+          if (got.text && !body.value) body.value = got.text;
+          say(plural(got.files.length, 'file') + ' arrived. Add who told it and a title, then keep it.');
+          teller.focus();
+        });
+      }
+      return h1;
+    });
+  }
+
+  // ---------- roots portrait ----------
+  var ROOTS_DEVICE = 'tch-roots';
+  function deviceRoots() {
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(ROOTS_DEVICE) || 'null'); } catch (e) {}
+    return saved ? Art.clean(saved) : null;
+  }
+  function devicePhotos() {
+    try { return JSON.parse(localStorage.getItem('tch-roots-photos') || '{}') || {}; } catch (e) { return {}; }
+  }
+  function hasRoots(saved) { return !!saved && Art.places(Art.fromSaved(saved)).length > 0; }
+  function drawn(saved) {
+    var s = Art.clean(saved);
+    return JSON.stringify([s.name.trim(), s.mode, s.style, s.palette, s.format, Art.places(Art.fromSaved(s))]);
+  }
+  function sameRoots(a, b) { return drawn(a) === drawn(b); }
+
+  var portraits = 0;
+  function portrait(saved) {
+    var p = Art.paletteById(saved.palette);
+    var data = Art.fromSaved(saved);
+    var label = 'Roots portrait: ' + Art.places(data).map(function (g) { return g.label + ', ' + g.place; }).join('; ') + '.';
+    var box = h('div', { class: 'app-roots__art', role: 'img', 'aria-label': label, 'data-format': saved.format });
+    box.innerHTML = Art.render(data, p.c || Art.siteColours(), { style: saved.style, format: saved.format, lang: saved.lang, idPrefix: 'app-roots' + (++portraits), photos: devicePhotos() });
+    return box;
+  }
+
+  function openOnRootsPage(saved) {
+    try { localStorage.setItem(ROOTS_DEVICE, JSON.stringify(saved)); } catch (e) {}
+    location.href = '/trace.html';
+  }
+
+  function roots() {
+    var h1 = page('My roots', 'The places your family has called home, drawn as a portrait. It is kept in your archive, where only you can see it, so you can open it on any device.');
+    return store.roots().then(function (kept) {
+      kept = hasRoots(kept) ? Art.clean(kept) : null;
+      var device = deviceRoots();
+      device = hasRoots(device) ? device : null;
+      var differs = device && (!kept || !sameRoots(kept, device));
+
+      function keep() {
+        return store.saveRoots(device).then(function () { flash = 'Your roots portrait is kept in your archive.'; render(); }).catch(fail);
+      }
+
+      if (kept) {
+        var section = h('section', { class: 'app-roots' }, portrait(kept));
+        add(section, h('div', { class: 'app-roots__side' },
+          h('p', { class: 'eyebrow' }, 'Kept in your archive'),
+          h('h2', null, plural(Art.places(Art.fromSaved(kept)).length, 'place')),
+          h('p', null, 'Change the places, the style or the colours on the roots page, then come back here to keep the new version.'),
+          h('div', { class: 'btn-row' },
+            button('Change it on the roots page', function () {
+              if (differs && !window.confirm('This browser has a different portrait. Open the one from your archive instead?')) return;
+              openOnRootsPage(kept);
+            }),
+          ),
+        ));
+        add(view, section);
+      }
+      if (differs) {
+        var card = h('section', { class: 'app-card app-roots__device' },
+          h('p', { class: 'eyebrow' }, kept ? 'A newer portrait on this device' : 'On this device'),
+          h('h2', null, kept ? 'This browser has a different version' : 'Keep the portrait you made'),
+          h('p', null, kept ? 'Keep it to replace the one in your archive.' : 'You made this on the roots page in this browser. Keep it in your archive to open it anywhere.'),
+          portrait(device),
+          h('div', { class: 'btn-row' }, button(kept ? 'Replace with this version' : 'Keep in my archive', function () {
+            if (kept && !window.confirm('Replace the portrait in your archive with this one?')) return;
+            keep();
+          })),
+        );
+        add(view, card);
+      }
+      if (!kept && !device) {
+        add(view, h('section', { class: 'app-card' },
+          h('h2', null, 'You have not traced your roots yet'),
+          h('p', null, 'Add the places your family has called home, from you back to the oldest generation you know, and choose how to draw them: roots, a tree, a river, tree rings or a sky of stars.'),
+          link('/trace.html', 'Trace your roots', 'btn'),
+        ));
+      }
       return h1;
     });
   }
@@ -582,6 +935,16 @@
       h('pre', { class: 'app-message' }, text),
       elder.askedAt ? h('p', { class: 'field__hint' }, 'Asked on ' + core.formatDate(elder.askedAt) + '.') : null,
       actions,
+      autoSendToggle(elder),
+      h('details', { class: 'app-howto' },
+        h('summary', null, 'When ' + elder.name + ' replies with a voice note'),
+        h('p', null, 'On Android, add The Cultured Human to your home screen once. Then, in WhatsApp, press and hold their voice note, tap Share, and choose The Cultured Human: it opens here, ready to keep.'),
+        h('p', null, 'On an iPhone or a computer, save the voice note, then tap "Keep their answer" and attach it.'),
+        installPrompt ? h('div', { class: 'btn-row' }, button('Add to my home screen', function () {
+          installPrompt.prompt();
+          installPrompt.userChoice.then(function () { installPrompt = null; render(); });
+        }, 'btn btn--small')) : null,
+      ),
       h('div', { class: 'btn-row' },
         button('They answered, next question', function () { store.saveElder({ id: elder.id, idx: elder.idx + 1, answered: elder.answered + 1, askedAt: null }).then(function () { render(); }).catch(fail); }, 'btn btn--ghost btn--small'),
         button('Skip this one', function () { store.saveElder({ id: elder.id, idx: elder.idx + 1, askedAt: null }).then(function () { render(); }).catch(fail); }, 'btn btn--ghost btn--small'),
@@ -597,6 +960,23 @@
     return card;
   }
 
+  /** Only offered once the site's WhatsApp sender is set up (site.json backend.weeklyAuto). */
+  function autoSendToggle(elder) {
+    if (!cfg.weeklyAuto || store.mode !== 'supabase' || !elder.phone) return null;
+    var box = h('input', { type: 'checkbox', checked: !!elder.autoSend, onchange: function () {
+      store.saveElder({ id: elder.id, autoSend: box.checked }).then(function () {
+        flash = box.checked ? 'The question will be sent for you every ' + DAYS[elder.day] + ' morning.' : 'You will send the question yourself again.';
+        render();
+      }).catch(fail);
+    } });
+    return h('div', { class: 'app-auto' },
+      h('label', { class: 'app-check' }, box, ' Send it for me every ' + DAYS[elder.day] + ' morning. ' + elder.name + ' has agreed to get it from The Cultured Human\'s WhatsApp number.'),
+      h('p', { class: 'field__hint' }, elder.autoSend
+        ? 'Each new question goes out on its day, once you mark the last one answered or skipped. The message asks ' + elder.name + ' to send the answer to you, not to us.'
+        : 'Until then, send it yourself with the button above.'),
+    );
+  }
+
   function elderForm(open) {
     var form = h('form', { class: 'app-card' });
     var name = h('input', { name: 'name', required: true, maxlength: '40' });
@@ -604,18 +984,25 @@
     var phone = h('input', { name: 'phone', type: 'tel', autocomplete: 'off' });
     var day = options(h('select', { name: 'day' }), DAYS.map(function (d, i) { return { id: String(i), label: d }; }), String(new Date().getDay()));
     var signAs = h('input', { name: 'signAs', value: firstName(state.user.name) });
+    var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var bMonth = options(h('select', { name: 'birthMonth', 'aria-label': 'Month' }), [{ id: '', label: 'Month' }].concat(MONTHS.map(function (m, i) { return { id: ('0' + (i + 1)).slice(-2), label: m }; })), '');
+    var bDay = options(h('select', { name: 'birthDay', 'aria-label': 'Day' }), [{ id: '', label: 'Day' }].concat(Array.from({ length: 31 }, function (_, i) { var d = ('0' + (i + 1)).slice(-2); return { id: d, label: String(i + 1) }; })), '');
+    var birthday = h('span', { class: 'app-inline' }, bDay, bMonth);
     add(form, [
       h('h2', null, open ? 'Who would you like to ask?' : 'Ask someone else too'),
       h('div', { class: 'app-form-grid' },
         field('Their name', name), field('Who are they to you? (optional)', relation),
-        field('Their WhatsApp number (optional)', phone, 'With the country code. It stays in your archive and is only used to open WhatsApp on your phone.'),
+        field('Their WhatsApp number (optional)', phone, cfg.weeklyAuto && store.mode === 'supabase'
+          ? 'With the country code. It stays in your archive. It opens WhatsApp on your phone, or, if you switch on sending for you, the question is sent to it.'
+          : 'With the country code. It stays in your archive and is only used to open WhatsApp on your phone.'),
         field('Which day?', day), field('Sign the message as', signAs),
+        field('Their birthday (optional)', birthday, 'Just the day and month. We remind you a few days before.'),
       ),
       h('div', { class: 'btn-row' }, button('Start the weekly question', null, 'btn', 'submit')),
     ]);
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      store.saveElder({ name: name.value.trim(), relation: relation.value.trim(), phone: phone.value.trim(), day: Number(day.value), signAs: signAs.value.trim() })
+      store.saveElder({ name: name.value.trim(), relation: relation.value.trim(), phone: phone.value.trim(), day: Number(day.value), signAs: signAs.value.trim(), birthday: bMonth.value && bDay.value ? bMonth.value + '-' + bDay.value : '' })
         .then(function (e) { location.hash = '#/weekly?elder=' + e.id; }).catch(fail);
     });
     return open ? form : h('details', { class: 'app-more' }, h('summary', null, 'Ask someone else too'), form);
@@ -839,30 +1226,61 @@
     }).catch(function () { return []; });
   }
 
-  function offerImport() {
-    var done = false;
-    try { done = localStorage.getItem('tch-imported') === '1'; } catch (e) {}
-    if (done) return Promise.resolve();
+  // Entries already brought over (or declined) are remembered by id, so stories answered on the
+  // home page later are still offered. Before ids were kept, one flag covered everything.
+  function handledIds() {
+    try { return JSON.parse(localStorage.getItem('tch-imported-ids') || 'null'); } catch (e) { return null; }
+  }
+  function markHandled(ids) {
+    try {
+      localStorage.setItem('tch-imported-ids', JSON.stringify(ids));
+      localStorage.setItem('tch-imported', '1');
+    } catch (e) {}
+  }
+  function waitingOnDevice() {
+    var legacyDone = false;
+    try { legacyDone = localStorage.getItem('tch-imported') === '1'; } catch (e) {}
     var weeklyOld = null;
-    try { weeklyOld = JSON.parse(localStorage.getItem('tch-weekly') || 'null'); } catch (e) {}
-    var elders = weeklyOld && Array.isArray(weeklyOld.elders) ? weeklyOld.elders : [];
+    if (!legacyDone) try { weeklyOld = JSON.parse(localStorage.getItem('tch-weekly') || 'null'); } catch (e) {}
     return readOldArchive().then(function (old) {
+      var handled = handledIds();
+      if (!handled) {
+        handled = legacyDone ? old.map(function (o) { return o.id; }) : [];
+        if (legacyDone) markHandled(handled);
+      }
+      return {
+        handled: handled,
+        old: old.filter(function (o) { return handled.indexOf(o.id) === -1; }),
+        elders: weeklyOld && Array.isArray(weeklyOld.elders) ? weeklyOld.elders : [],
+        from: weeklyOld && weeklyOld.from,
+      };
+    });
+  }
+
+  function offerImport() {
+    return waitingOnDevice().then(function (w) {
+      var old = w.old;
+      var elders = w.elders;
       if (!old.length && !elders.length) return;
+      var fromHome = old.length && old.every(function (o) { return /^home-/.test(o.id); });
+      var done = function () { markHandled(w.handled.concat(old.map(function (o) { return o.id; }))); };
       var card = h('section', { class: 'app-card app-import' },
-        h('h2', null, 'Bring over what you kept on this device'),
-        h('p', null, 'Before accounts, this browser kept ' + [old.length ? plural(old.length, 'archive entry', 'archive entries') : null, elders.length ? plural(elders.length, 'person', 'people') + ' you ask the weekly question' : null].filter(Boolean).join(' and ') + '. Add them to your archive? They will be private until you share them.'),
+        h('h2', null, fromHome ? (old.length === 1 ? 'Keep the story you wrote' : 'Keep the stories you wrote') : 'Bring over what you kept on this device'),
+        h('p', null, fromHome
+          ? 'You answered ' + plural(old.length, 'question') + ' on the home page in this browser. Add ' + (old.length === 1 ? 'it' : 'them') + ' to your archive? ' + (old.length === 1 ? 'It stays' : 'They stay') + ' private until you share ' + (old.length === 1 ? 'it' : 'them') + '.'
+          : 'Before accounts, this browser kept ' + [old.length ? plural(old.length, 'archive entry', 'archive entries') : null, elders.length ? plural(elders.length, 'person', 'people') + ' you ask the weekly question' : null].filter(Boolean).join(' and ') + '. Add them to your archive? They will be private until you share them.'),
       );
       var row = h('div', { class: 'btn-row' });
       add(row, [
-        button('Bring them over', function () {
+        button(fromHome ? 'Keep ' + (old.length === 1 ? 'it' : 'them') : 'Bring them over', function () {
           row.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
-          importOld(old, elders, weeklyOld && weeklyOld.from).then(function () {
-            try { localStorage.setItem('tch-imported', '1'); } catch (e) {}
-            say('Brought over. Nothing was deleted from this device.');
-            card.remove();
+          importOld(old, elders, w.from).then(function () {
+            done();
+            flash = fromHome ? 'Kept in your archive. Nothing was deleted from this device.' : 'Brought over. Nothing was deleted from this device.';
+            render();
           }).catch(fail);
         }),
-        button('Not now', function () { try { localStorage.setItem('tch-imported', '1'); } catch (e) {} card.remove(); }, 'btn btn--ghost'),
+        button('Not now', function () { done(); card.remove(); }, 'btn btn--ghost'),
       ]);
       add(card, row);
       view.insertBefore(card, view.children[1] || null);
@@ -891,10 +1309,640 @@
     return steps.reduce(function (p, s) { return p.then(s); }, Promise.resolve());
   }
 
+  // ---------- adding to a place ----------
+  var placeList = null;
+  function loadPlaces() {
+    if (placeList) return Promise.resolve(placeList);
+    return fetch('/places/places.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
+      .then(function (list) { placeList = list; return list; });
+  }
+  // ?week=W answers the question of week W since content/prompts.json "start".
+  function loadWeek(w) {
+    if (w === null || !/^\d+$/.test(w)) return Promise.resolve(null);
+    return fetch('/community/prompts.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+      .then(function (data) {
+        if (!data || !data.prompts.length) return null;
+        return { week: Number(w), prompt: data.prompts[Number(w) % data.prompts.length] };
+      });
+  }
+  function placeName(list, c) {
+    var p = list.filter(function (x) { return x.slug === c.placeSlug; })[0];
+    return p ? p.name : c.suggestedPlace ? c.suggestedPlace + ' (a new place)' : c.placeSlug;
+  }
+  var REVIEW = { pending: 'Waiting to be read', published: 'Published', rejected: 'Not published' };
+  var WORD = core.CONTRIBUTION_KINDS[0];
+
+  function contribute(_, query) {
+    var editId = query.get('edit');
+    return Promise.all([loadPlaces(), store.myContributions(), store.isModerator(), editId ? store.contribution(editId) : null]).then(function (r) {
+      var list = r[0];
+      var sent = r[1];
+      var editing = r[3];
+      if (editId && !editing) throw new Error('That is not something you shared, or it has been deleted.');
+      return loadWeek(editing ? (editing.promptWeek === null ? null : String(editing.promptWeek)) : query.get('week')).then(function (week) {
+        var prompt = week && week.prompt;
+        var wantKind = editing ? editing.kind : prompt ? prompt.kind : query.get('kind');
+        if (core.CONTRIBUTION_KINDS.indexOf(wantKind) < 0) wantKind = core.CONTRIBUTION_KINDS[0];
+        var chosen = list.filter(function (p) { return p.slug === (editing ? editing.placeSlug : query.get('place')); })[0];
+        var h1 = editing
+          ? page('Change what you shared', 'Once you save it, it is read again before it appears.')
+          : page(chosen ? 'Add to ' + chosen.name : 'Add to a place', 'A word with no translation, a dish, a festival as your grandparents kept it, a song, a street that has changed. Everything is read before it appears, and credited the way you choose.');
+        if (prompt) {
+          add(view, h('div', { class: 'app-card app-prompt' },
+            h('p', { class: 'eyebrow' }, editing ? 'Your answer to the question' : 'Answering this week\'s question'),
+            h('p', { class: 'app-prompt__text' }, prompt.text),
+            prompt.hashtag && !editing ? h('p', { class: 'field__hint' }, 'Sharing it on Instagram too? Use #' + prompt.hashtag + ' and tag @theculturedhuman.') : null));
+        }
+        var form = h('form', { class: 'app-card app-form app-contribute' });
+        var place = options(h('select', { name: 'place' }),
+          [{ id: '?', label: 'Choose a place' }].concat(list.map(function (p) { return { id: p.slug, label: p.name }; }), [{ id: '', label: 'Somewhere else' }]),
+          chosen ? chosen.slug : editing ? '' : '?');
+        var other = h('input', { name: 'suggestedPlace', maxlength: 120, value: editing && editing.suggestedPlace || '' });
+        var otherField = field('Which place?', other, 'A town, village or region. When a place has a few contributions, it gets its own page.');
+        function showOther() { otherField.hidden = place.value !== ''; }
+        place.addEventListener('change', showOther);
+        showOther();
+        var kind = options(h('select', { name: 'kind' }), core.CONTRIBUTION_KINDS.map(function (k) { return { id: k, label: k }; }), wantKind);
+        var title = h('input', { name: 'title', required: true, maxlength: 120, value: editing ? editing.title : '' });
+        var script = h('input', { name: 'script', maxlength: 120, value: editing && editing.script || '' });
+        var pronunciation = h('input', { name: 'pronunciation', maxlength: 120, value: editing && editing.pronunciation || '' });
+        var scriptField = field('The word in its own script (optional)', script, 'For example ঠাকুমা, ಅಜ್ಜಿ or ਨਾਨੀ.');
+        var sayField = field('How it is said (optional)', pronunciation, 'Spell it the way it sounds, for example "THAA-koo-maa".');
+        var body = h('textarea', { name: 'body', rows: 8, required: true, maxlength: 5000 });
+        body.value = editing ? editing.body : '';
+        var credit = h('input', { name: 'credit', required: true, maxlength: 80, value: editing ? editing.credit : state.user.name || '' });
+        var consent = h('input', { type: 'checkbox', name: 'consent', required: true });
+        var bodyField = field('Tell us about it', body, 'What it means, how your family says it, makes it or keeps it, and where you heard it.', true);
+        function showWord() {
+          var word = kind.value === WORD;
+          scriptField.hidden = !word;
+          sayField.hidden = !word;
+          title.previousElementSibling.textContent = word ? 'For example the word itself, written in English letters.' : 'For example the name of the dish or the song.';
+          bodyField.querySelector('.field__hint').textContent = word
+            ? 'What it means, when your family says it, and where you heard it.'
+            : 'What it is, how your family makes it or keeps it, and where you learnt it.';
+        }
+        add(form, [
+          h('div', { class: 'app-form-grid' },
+            field('Place', place),
+            otherField,
+            field('What are you adding?', kind),
+            field('Title', title, ' '),
+            scriptField,
+            sayField,
+            bodyField,
+            field('How should we credit you?', credit, 'It appears with your words, for example "Anita, whose grandmother was from Jorhat".', true)),
+          h('label', { class: 'app-check app-consent' }, consent,
+            h('span', null, 'This is mine to share: my own words or my family\'s, with nothing private about someone who has not agreed. It follows the ',
+              h('a', { href: '/community-guidelines.html', target: '_blank', rel: 'noopener' }, 'community guidelines'), '.')),
+          store.mode === 'local' ? h('p', { class: 'field__hint' }, 'Preview mode: this stays in this browser and nobody reads it.') : null,
+          h('div', { class: 'btn-row' },
+            h('button', { type: 'submit', class: 'btn' }, editing ? 'Save and send to be read' : 'Send it to be read'),
+            editing ? link('#/contribute', 'Cancel', 'btn btn--ghost') : null),
+          h('p', { class: 'field__hint' }, 'You can change or delete it later. How we use what you share: ', link('/privacy.html', 'privacy'), '.'),
+        ]);
+        kind.addEventListener('change', showWord);
+        showWord();
+        form.addEventListener('submit', function (ev) {
+          ev.preventDefault();
+          var btn = form.querySelector('[type="submit"]');
+          btn.disabled = true;
+          Promise.resolve().then(function () {
+            if (place.value === '?') throw new Error('Please choose the place, or pick "Somewhere else" and name it.');
+            var fields = {
+              placeSlug: place.value, suggestedPlace: other.value, kind: kind.value, title: title.value, body: body.value, credit: credit.value,
+              script: script.value, pronunciation: pronunciation.value, promptWeek: editing ? editing.promptWeek : week ? week.week : null, consent: consent.checked,
+            };
+            return editing ? store.updateContribution(editing.id, fields) : store.contribute(fields);
+          }).then(function () {
+            flash = editing ? 'Saved. It will be read again before it appears.' : 'Thank you. It will appear once it has been read. We will email you when it does.';
+            if (editing) { location.hash = '#/contribute'; return null; }
+            return render();
+          }).catch(fail).then(function () { btn.disabled = false; });
+        });
+        add(view, form);
+        if (sent.length && !editing) {
+          add(view, h('h2', { class: 'app-sub' }, 'What you have shared'));
+          add(view, h('div', { class: 'app-list' }, sent.map(function (c) { return sentCard(c, list); })));
+        }
+        if (r[2]) add(view, h('p', null, link('#/moderate', 'Read contributions waiting to be published', 'text-link')));
+        return h1;
+      });
+    });
+  }
+
+  function sentCard(c, places) {
+    function remove() {
+      if (!confirm('Delete "' + c.title + '"? It will be removed from the site and cannot be brought back.')) return;
+      store.deleteContribution(c.id).then(function () {
+        flash = '"' + c.title + '" is deleted.';
+        return render();
+      }).catch(fail);
+    }
+    return h('article', { class: 'app-card app-sent' },
+      h('p', { class: 'eyebrow' }, c.kind + ' · ' + placeName(places, c)),
+      h('h3', null, c.status === 'published' && store.mode !== 'local' ? link('/s/' + c.id, c.title) : c.title),
+      h('p', { class: 'app-sent__status app-sent__status--' + c.status }, REVIEW[c.status] || c.status),
+      c.status === 'rejected' && c.reviewNote ? h('p', { class: 'app-sent__note' }, h('strong', null, 'Why: '), c.reviewNote) : null,
+      c.status === 'rejected' ? h('p', { class: 'field__hint' }, 'You can change it and send it again.') : null,
+      h('div', { class: 'btn-row' }, link('#/contribute?edit=' + c.id, 'Change', 'btn btn--ghost btn--small'), button('Delete', remove, 'btn btn--ghost btn--small')));
+  }
+
+  function safeBack(back, fallback) {
+    return back && /^\/(?!\/)[\w\/.#?=&-]*$/.test(back) ? back : fallback;
+  }
+
+  function reportForm(_, query) {
+    var id = query.get('c') || '';
+    var back = safeBack(query.get('back'), '/manch.html');
+    var h1 = page('Report this', 'Tell us what is wrong. A moderator reads every report, and the person who shared it is not told who reported it.');
+    var form = h('form', { class: 'app-card app-form' });
+    var list = h('fieldset', { class: 'app-reasons' }, h('legend', null, 'What is wrong?'));
+    core.REPORT_REASONS.forEach(function (r, i) {
+      add(list, h('label', { class: 'app-check' }, h('input', { type: 'radio', name: 'reason', value: r.id, required: i === 0 }), ' ' + r.label));
+    });
+    var note = h('textarea', { name: 'note', rows: 4, maxlength: 500 });
+    add(form, [
+      list,
+      field('Anything we should know (optional)', note, 'Needed for "It is wrong" and "Something else".', true),
+      h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, 'Send report'), h('a', { href: back, class: 'btn btn--ghost' }, 'Cancel')),
+    ]);
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var picked = form.querySelector('[name="reason"]:checked');
+      Promise.resolve().then(function () {
+        return store.report(id, { reason: picked ? picked.value : '', note: note.value });
+      }).then(function () {
+        view.textContent = '';
+        var done = page('Thank you', 'A moderator will read it. If it breaks the community guidelines, it will be taken down.');
+        add(view, h('p', null, h('a', { href: back, class: 'btn' }, 'Go back')));
+        done.focus();
+      }).catch(fail);
+    });
+    add(view, form);
+    return h1;
+  }
+
+  function contributionReview(c, places, extra) {
+    return h('article', { class: 'app-card app-review' },
+      h('p', { class: 'eyebrow' }, c.kind + ' · ' + placeName(places, c)),
+      h('h2', null, c.title),
+      c.script || c.pronunciation ? h('p', { class: 'app-review__word' }, [c.script, c.pronunciation ? '"' + c.pronunciation + '"' : null].filter(Boolean).join(' · ')) : null,
+      h('p', { class: 'app-review__body' }, c.body),
+      h('p', { class: 'carry-card__credit' }, 'Shared by ' + c.credit + (c.createdAt ? ', ' + core.formatDate(c.createdAt) : '')),
+      extra);
+  }
+
+  // Asks why before anything is left unpublished or taken down; the person who shared it sees the reason.
+  function askReason(onDone, label) {
+    var box = h('form', { class: 'app-reason' });
+    var note = h('textarea', { rows: 2, maxlength: 300, required: true });
+    add(box, [
+      field('Why? The person who shared it will see this.', note, 'For example "It names a neighbour who has not agreed" or "Please say where you heard it".', true),
+      h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, label)),
+    ]);
+    box.addEventListener('submit', function (ev) { ev.preventDefault(); onDone(note.value); });
+    return box;
+  }
+
+  // Contributions for places without a page. Ones that belong to an existing place move in one click;
+  // a new place needs its page built, with the command shown.
+  function moderateSuggestions(places, groups) {
+    if (!groups.length) return;
+    add(view, h('h2', { class: 'app-sub' }, 'Places families have suggested'));
+    add(view, h('p', { class: 'field__hint' }, 'Contributions for places that have no page yet. Publishing them shows them in The Commons; moving them puts them on a place page.'));
+    add(view, h('div', { class: 'app-list' }, groups.map(function (g) {
+      var match = places.filter(function (p) { return p.slug === g.match; })[0];
+      function move(slug, label) {
+        return function () {
+          store.adoptSuggestion(g.ids, slug).then(function (n) {
+            flash = plural(n, 'contribution') + ' moved to ' + label + '.';
+            return render();
+          }).catch(fail);
+        };
+      }
+      var command = 'npm run new-place -- --name "' + g.name.replace(/"/g, '') + '" --region "…" --lat … --lng …';
+      return h('article', { class: 'app-card app-suggestion' },
+        h('p', { class: 'eyebrow' }, plural(g.ids.length, 'contribution') + ' · ' + g.published + ' published'),
+        h('h3', null, g.name),
+        g.names.length > 1 ? h('p', { class: 'field__hint' }, 'Written as ' + g.names.join(', ')) : null,
+        match
+          ? [h('p', null, g.name + ' is part of ' + match.name + '.'), h('div', { class: 'btn-row' }, button('Move to ' + match.name, move(match.slug, match.name)))]
+          : [h('p', null, 'To give ' + g.name + ' its own page, run this in the project, then deploy:'), h('pre', { class: 'app-command' }, h('code', null, command)),
+            h('p', { class: 'field__hint' }, 'It writes content/places/' + g.slug + '.json and, with the service key set, moves these contributions to the new page.')]);
+    })));
+  }
+
+  function moderate() {
+    var h1 = page('To read', 'Publish what families and makers have sent so it appears on the site, or leave it unpublished with a reason. Check it is theirs to share and contains nothing private about someone else.');
+    return store.isModerator().then(function (yes) {
+      if (!yes) {
+        add(view, h('p', null, 'Only moderators can read contributions before they are published.'));
+        return h1;
+      }
+      return Promise.all([loadPlaces(), store.pendingContributions(), store.pendingListings(), store.bookingsToSettle(), store.pendingReports(), store.suggestedPlaces(), store.recentlyPublished()]).then(function (r) {
+        var places = r[0];
+        moderateFeatured(places, r[6]);
+        moderateSuggestions(places, core.groupSuggestions(r[5], places));
+        if (r[4].length) {
+          add(view, h('h2', { class: 'app-sub' }, 'Reported'));
+          add(view, h('div', { class: 'app-list' }, r[4].map(function (item) {
+            var c = item.contribution;
+            var holder = h('div');
+            function keep() {
+              store.resolveReports(c.id).then(function () { flash = '"' + c.title + '" stays up.'; return render(); }).catch(fail);
+            }
+            function takeDown() {
+              holder.textContent = '';
+              holder.appendChild(askReason(function (note) {
+                store.reviewContribution(c.id, 'rejected', note).then(function () { return store.resolveReports(c.id); }).then(function () {
+                  flash = '"' + c.title + '" is taken down.';
+                  return render();
+                }).catch(fail);
+              }, 'Take it down'));
+              holder.querySelector('textarea').focus();
+            }
+            add(holder, h('div', { class: 'btn-row' }, button('Take it down', takeDown), button('Keep it up', keep, 'btn btn--ghost')));
+            return contributionReview(c, places, [
+              h('ul', { class: 'app-reports' }, item.reports.map(function (rep) {
+                var reason = core.REPORT_REASONS.filter(function (x) { return x.id === rep.reason; })[0];
+                return h('li', null, h('strong', null, reason ? reason.label : rep.reason), rep.note ? ': ' + rep.note : '');
+              })),
+              holder,
+            ]);
+          })));
+        }
+        moderateMarket(places, r[2], r[3]);
+        if (!r[1].length) {
+          add(view, h('p', { class: 'app-empty' }, 'Nothing is waiting. Everything sent has been read.'));
+          return h1;
+        }
+        add(view, h('h2', { class: 'app-sub' }, 'Contributions'));
+        add(view, h('div', { class: 'app-list' }, r[1].map(function (c) {
+          var holder = h('div');
+          function publish() {
+            store.reviewContribution(c.id, 'published').then(function () { flash = '"' + c.title + '" is published.'; return render(); }).catch(fail);
+          }
+          function decline() {
+            holder.textContent = '';
+            holder.appendChild(askReason(function (note) {
+              store.reviewContribution(c.id, 'rejected', note).then(function () { flash = '"' + c.title + '" will not be published.'; return render(); }).catch(fail);
+            }, 'Do not publish'));
+            holder.querySelector('textarea').focus();
+          }
+          add(holder, h('div', { class: 'btn-row' }, button('Publish', publish), button('Do not publish', decline, 'btn btn--ghost')));
+          return contributionReview(c, places, holder);
+        })));
+        return h1;
+      });
+    });
+  }
+
+  // What is featured shows first on The Commons, the home page and its place page.
+  function moderateFeatured(places, list) {
+    if (!list.length) return;
+    var featured = list.filter(function (c) { return c.featuredAt; });
+    var box = h('details', { class: 'app-more app-featured' },
+      h('summary', null, 'Featured on The Commons (' + featured.length + ')'),
+      h('p', { class: 'field__hint' }, 'Featured contributions are shown first on The Commons, the home page and their place\u2019s page. Choose one or two a week that others will want to answer.'));
+    add(box, h('ul', { class: 'app-featured__list' }, list.map(function (c) {
+      return h('li', null,
+        h('span', null, h('strong', null, c.title), ' \u00b7 ' + placeName(places, c) + ' \u00b7 ' + c.credit),
+        button(c.featuredAt ? 'Stop featuring' : 'Feature', function () {
+          store.featureContribution(c.id, !c.featuredAt).then(function () {
+            flash = c.featuredAt ? '"' + c.title + '" is no longer featured.' : '"' + c.title + '" is featured.';
+            return render();
+          }).catch(fail);
+        }, c.featuredAt ? 'btn btn--small' : 'btn btn--ghost btn--small'));
+    })));
+    add(view, box);
+  }
+
+  // ---------- makers, hosts and storytellers ----------
+  var LISTING_STATUS = { pending: 'Being read: not public yet', published: 'Public', paused: 'Not public' };
+  function roleLabel(id) { var r = core.listingRole(id); return r ? r.label : id; }
+  function listingCard(l, places) {
+    var p = places.filter(function (x) { return x.slug === l.placeSlug; })[0];
+    return h('article', { class: 'app-card app-listing' },
+      h('p', { class: 'eyebrow' }, roleLabel(l.role) + ' · ' + (p ? p.name : l.placeSlug)),
+      h('h2', null, l.name),
+      h('p', null, l.summary),
+      l.languages.length ? h('p', { class: 'app-listing__meta' }, 'Speaks ' + l.languages.join(', ')) : null,
+      l.priceNote ? h('p', { class: 'app-listing__meta' }, l.priceNote) : null,
+      l.link ? h('p', { class: 'app-listing__meta' }, h('a', { href: l.link, rel: 'noopener nofollow' }, 'See their work')) : null);
+  }
+  function money(b, side) {
+    if (b.pricePaise == null) return null;
+    var fee = b.feePaise != null ? b.feePaise : core.platformFee(b.pricePaise, FEE_PERCENT);
+    return h('dl', { class: 'app-quote' },
+      h('div', null, h('dt', null, side === 'provider' ? 'Your price' : side === 'moderator' ? 'Their price (pay them this)' : 'Their price'), h('dd', null, core.formatRupees(b.pricePaise))),
+      h('div', null, h('dt', null, 'Platform fee (' + FEE_PERCENT + '%)'), h('dd', null, core.formatRupees(fee))),
+      h('div', { class: 'app-quote__total' }, h('dt', null, 'Total'), h('dd', null, core.formatRupees(b.pricePaise + fee))));
+  }
+
+  function offer(_, query) {
+    return Promise.all([loadPlaces(), store.myListings()]).then(function (r) {
+      var places = r[0];
+      var mine = r[1];
+      var editing = mine.filter(function (l) { return l.id === query.get('edit'); })[0] || null;
+      var h1 = page(editing ? 'Edit your listing' : 'Offer your work', 'Makers, hosts and storytellers list themselves here. Families find you on the page of the place you work in, and send you requests. You set your price; the ' + FEE_PERCENT + '% platform fee is added on top and shown separately.');
+      if (mine.length && !editing) {
+        add(view, h('h2', { class: 'app-sub' }, 'Your listings'));
+        add(view, h('div', { class: 'app-list' }, mine.map(function (l) {
+          var card = listingCard(l, places);
+          add(card, [
+            h('p', { class: 'app-sent__status app-sent__status--' + (l.status === 'published' ? 'published' : l.status === 'paused' ? 'rejected' : 'pending') }, LISTING_STATUS[l.status] || l.status),
+            h('div', { class: 'btn-row' }, link('#/offer?edit=' + l.id, 'Edit', 'btn btn--ghost'), link('#/requests', 'Requests to you', 'text-link')),
+          ]);
+          return card;
+        })));
+        add(view, h('h2', { class: 'app-sub' }, 'Add another listing'));
+      }
+      var start = editing || { role: core.listingRole(query.get('role')) ? query.get('role') : 'maker', placeSlug: '', name: state.user.name || '', summary: '', languages: [], link: '', priceNote: '' };
+      var form = h('form', { class: 'app-card app-form app-offer' });
+      var role = options(h('select', { name: 'role' }), core.LISTING_ROLES.map(function (x) { return { id: x.id, label: x.label + ': ' + x.what }; }), start.role);
+      var place = options(h('select', { name: 'place', required: true }), [{ id: '', label: 'Choose a place' }].concat(places.map(function (p) { return { id: p.slug, label: p.name }; })), start.placeSlug);
+      var name = h('input', { name: 'name', required: true, maxlength: 80, value: start.name });
+      var summary = h('textarea', { name: 'summary', rows: 6, required: true, maxlength: 600 });
+      summary.value = start.summary;
+      var languages = h('input', { name: 'languages', maxlength: 200, value: start.languages.join(', ') });
+      var priceNote = h('input', { name: 'priceNote', maxlength: 80, value: start.priceNote || '' });
+      var site = h('input', { name: 'link', type: 'url', maxlength: 300, value: start.link || '', placeholder: 'https://' });
+      add(form, [
+        h('div', { class: 'app-form-grid' },
+          field('What do you offer?', role),
+          field('Where do you work?', place, 'Your listing appears on this place\'s page. Not listed? Add your place first from Add to a place.'),
+          field('Name families will see', name, 'Your own name, or your studio\'s.'),
+          field('Languages you speak', languages, 'Separated by commas, for example Maithili, Hindi, English.'),
+          field('What you offer', summary, 'What you make or do, the tradition it comes from, how long it usually takes, and anything a family should know before asking.', true),
+          field('Price guide (optional)', priceNote, 'For example "From ₹2,500 a session" or "Paintings from ₹6,000". You quote the real price for each request.'),
+          field('Link to your work (optional)', site, 'Instagram, a website or a portfolio.')),
+        h('p', { class: 'field__hint' }, 'A person reads every listing, and every change, before it is public. ' + (store.mode === 'local' ? 'Preview mode: this stays in this browser and nobody reads it.' : '')),
+        h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, editing ? 'Save and send to be read' : 'Send my listing to be read'), editing ? link('#/offer', 'Cancel', 'btn btn--ghost') : null),
+      ]);
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var btn = form.querySelector('[type="submit"]');
+        btn.disabled = true;
+        Promise.resolve().then(function () {
+          return store.saveListing({ id: editing && editing.id, role: role.value, placeSlug: place.value, name: name.value, summary: summary.value, languages: languages.value, priceNote: priceNote.value, link: site.value });
+        }).then(function () {
+          state.market = true;
+          flash = 'Thank you. Your listing will be public once a person has read it. You can see its status here.';
+          if (editing) location.hash = '#/offer';
+          else return render();
+        }).catch(fail).then(function () { btn.disabled = false; });
+      });
+      add(view, form);
+      return h1;
+    });
+  }
+
+  var ASK_HINT = {
+    maker: 'What you would like made, for whom, any size or deadline, and what it should remember: a place, a family name, a story.',
+    host: 'Where your family comes from, what you already know (a village, a family name, an old photograph), when you might travel and who is coming.',
+    storyteller: 'Who you would like recorded, where they live, the language they are most at ease in, and what you hope to keep.',
+  };
+  function requestForm(_, query) {
+    return Promise.all([loadPlaces(), store.listing(query.get('listing') || '')]).then(function (r) {
+      var l = r[1];
+      if (!l || l.status !== 'published') {
+        var h0 = page('Send a request', null);
+        add(view, h('p', null, 'This listing is not available. ', link('/journeys.html', 'Find a host', 'text-link'), ' · ', link('/marketplace.html', 'Find a maker', 'text-link')));
+        return h0;
+      }
+      var h1 = page('Ask ' + l.name, 'Tell them what you would like. They reply with a price; the ' + FEE_PERCENT + '% platform fee is added on top and shown separately. Nothing is charged until you accept.');
+      add(view, listingCard(l, r[0]));
+      var form = h('form', { class: 'app-card app-form app-request' });
+      var message = h('textarea', { name: 'message', rows: 8, required: true, maxlength: 5000 });
+      add(form, [
+        field('Your request', message, ASK_HINT[l.role] || '', true),
+        h('p', { class: 'field__hint' }, 'Your email is shared with them only if you accept their quote.'),
+        h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, (core.listingRole(l.role) || {}).ask || 'Send request')),
+      ]);
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var btn = form.querySelector('[type="submit"]');
+        btn.disabled = true;
+        Promise.resolve().then(function () { return store.requestBooking(l.id, message.value); }).then(function () {
+          state.market = true;
+          flash = 'Sent. ' + l.name + ' will reply here with a price.';
+          location.hash = '#/requests';
+        }).catch(fail).then(function () { btn.disabled = false; });
+      });
+      add(view, form);
+      return h1;
+    });
+  }
+
+  function bookingCard(b, places, opts) {
+    var l = b.listing || { name: 'A listing', role: '', placeSlug: '' };
+    var p = places.filter(function (x) { return x.slug === l.placeSlug; })[0];
+    var side = opts.side || b.side;
+    var card = h('article', { class: 'app-card app-booking', 'data-booking': b.id },
+      h('p', { class: 'eyebrow' }, (side === 'provider' ? 'Request to ' : roleLabel(l.role) + ' · ') + l.name + (p ? ' · ' + p.name : '')),
+      h('p', { class: 'app-sent__status app-sent__status--' + (b.status === 'cancelled' ? 'rejected' : /paid|completed|accepted/.test(b.status) ? 'published' : 'pending') }, (core.BOOKING_STATUS[b.status] || {})[side === 'moderator' ? 'provider' : side] || b.status),
+      h('p', { class: 'app-booking__message' }, b.message),
+      money(b, side),
+      b.reply ? h('p', { class: 'app-booking__reply' }, h('strong', null, l.name + ': '), b.reply) : null,
+      h('p', { class: 'field__hint' }, 'Sent ' + core.formatDate(b.createdAt)));
+    function act(change, done) {
+      return function (ev) {
+        if (ev && ev.preventDefault) ev.preventDefault();
+        store.updateBooking(b.id, change).then(function () { flash = done; return render(); }).catch(fail);
+      };
+    }
+    if (side === 'provider' && (b.status === 'requested' || b.status === 'quoted')) {
+      var form = h('form', { class: 'app-form app-quote-form' });
+      var rupees = h('input', { name: 'rupees', inputmode: 'decimal', required: true, value: b.pricePaise != null ? String(b.pricePaise / 100) : '' });
+      var reply = h('textarea', { name: 'reply', rows: 3, maxlength: 2000 });
+      reply.value = b.reply || '';
+      var preview = h('p', { class: 'field__hint', 'aria-live': 'polite' });
+      function showFee() {
+        try {
+          var q = core.quote({ rupees: rupees.value });
+          var fee = core.platformFee(q.pricePaise, FEE_PERCENT);
+          preview.textContent = 'You receive ' + core.formatRupees(q.pricePaise) + '. The family pays ' + core.formatRupees(q.pricePaise + fee) + ', including the ' + FEE_PERCENT + '% platform fee.';
+        } catch (e) { preview.textContent = 'You receive your full price. The ' + FEE_PERCENT + '% platform fee is added on top for the family.'; }
+      }
+      rupees.addEventListener('input', showFee);
+      showFee();
+      add(form, [
+        h('div', { class: 'app-form-grid' },
+          field('Your price in rupees', rupees),
+          field('A note with your quote (optional)', reply, 'What is included, how long it takes, and any questions.', true)),
+        preview,
+        h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, b.status === 'quoted' ? 'Update quote' : 'Send quote'),
+          button('I can\'t take this on', function () { act({ status: 'cancelled', reply: reply.value.trim() || null }, 'Done. The family will see that you can\'t take this on.')(); }, 'btn btn--ghost')),
+      ]);
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var q;
+        try { q = core.quote({ rupees: rupees.value, reply: reply.value }); } catch (e) { return fail(e); }
+        act({ quote: q }, 'Quote sent. The family will see it here.')();
+      });
+      add(card, form);
+    }
+    if (side === 'family' && b.status === 'quoted') {
+      add(card, h('div', { class: 'btn-row' },
+        button('Accept ' + core.formatRupees(b.pricePaise + b.feePaise), act({ status: 'accepted' }, 'Accepted. You can pay below, and you can now reach ' + l.name + ' directly.')),
+        button('Decline', act({ status: 'cancelled' }, 'Declined.'), 'btn btn--ghost')));
+    }
+    if (side === 'family' && b.status === 'accepted') {
+      var payBtn = button('Pay ' + core.formatRupees(b.pricePaise + b.feePaise) + ' securely', function () { payOnline(b, l, payBtn); });
+      add(card, h('div', { class: 'app-pay' },
+        h('div', { class: 'btn-row' }, payBtn),
+        h('p', { class: 'field__hint' }, 'By UPI, card or net banking, through Razorpay. ' + l.name + ' receives ' + core.formatRupees(b.pricePaise) + '; the rest is our ' + FEE_PERCENT + '% fee.')));
+    }
+    if (side === 'family' && b.status === 'requested') {
+      add(card, h('div', { class: 'btn-row' }, button('Cancel request', act({ status: 'cancelled' }, 'Request cancelled.'), 'btn btn--ghost')));
+    }
+    if (/^(accepted|paid|completed)$/.test(b.status)) {
+      var box = h('div', { class: 'app-contacts' });
+      add(card, box);
+      store.bookingContacts(b.id).then(function (rows) {
+        add(box, rows.map(function (c) {
+          return h('p', null, (c.side === 'provider' ? 'Reach ' : 'The family: ') + c.name + ' at ', c.email ? h('a', { href: 'mailto:' + c.email }, c.email) : 'their email is not on file');
+        }));
+      }).catch(function () {});
+    }
+    if (opts.settle) add(card, opts.settle);
+    return card;
+  }
+
+  function postJson(url, body, token) {
+    return fetch(url, {
+      method: 'POST',
+      headers: Object.assign({ 'content-type': 'application/json' }, token ? { authorization: 'Bearer ' + token } : {}),
+      body: JSON.stringify(body),
+    }).then(function (res) {
+      var json = /json/.test(res.headers.get('content-type') || '') ? res.json() : Promise.resolve(null);
+      return json.then(function (data) {
+        if (!data) return { unavailable: true };
+        if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+        return data;
+      });
+    });
+  }
+  var checkoutReady = null;
+  function loadCheckout() {
+    if (!checkoutReady) {
+      checkoutReady = new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        s.onload = resolve;
+        s.onerror = function () { checkoutReady = null; reject(new Error('The payment window could not load. Check your connection and try again.')); };
+        document.head.appendChild(s);
+      });
+    }
+    return checkoutReady;
+  }
+  // Razorpay Checkout when the site's payment function has keys; otherwise the manual payment link.
+  function payOnline(b, l, btn) {
+    var token = store.accessToken ? store.accessToken() : null;
+    btn.disabled = true;
+    postJson('/api/razorpay-order', { bookingId: b.id }, token).then(function (order) {
+      if (order.unavailable || order.dryRun) {
+        flash = 'Online payment is not switched on yet. We will email you a secure payment link for ' + core.formatRupees(b.pricePaise + b.feePaise) + ' instead.';
+        return render();
+      }
+      return loadCheckout().then(function () {
+        return new Promise(function (resolve, reject) {
+          var rz = new window.Razorpay({
+            key: order.keyId, order_id: order.orderId, amount: order.amount, currency: order.currency,
+            name: 'The Cultured Human', description: order.name + (order.testMode ? ' (test payment)' : ''),
+            prefill: { email: order.email }, theme: { color: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#28594B' },
+            handler: function (resp) {
+              postJson('/api/razorpay-order', { bookingId: b.id, orderId: resp.razorpay_order_id, paymentId: resp.razorpay_payment_id, signature: resp.razorpay_signature }, token).then(resolve, reject);
+            },
+            modal: { ondismiss: function () { resolve(null); } },
+          });
+          rz.on('payment.failed', function (r) { reject(new Error((r.error && r.error.description) || 'The payment did not go through. Nothing was charged.')); });
+          rz.open();
+        });
+      }).then(function (done) {
+        if (!done) return null;
+        flash = 'Paid. Thank you! ' + l.name + ' has been told and can begin.';
+        return render();
+      });
+    }).catch(fail).then(function () { btn.disabled = false; });
+  }
+
+  function requests() {
+    var h1 = page('Requests', 'Requests you have sent to makers, hosts and storytellers, and requests families have sent you.');
+    return Promise.all([loadPlaces(), store.myBookings(), store.myListings()]).then(function (r) {
+      var places = r[0];
+      var sent = r[1].filter(function (b) { return b.side === 'family'; });
+      var received = r[1].filter(function (b) { return b.side === 'provider'; });
+      if (r[2].length) {
+        add(view, h('h2', { class: 'app-sub' }, 'Requests to you'));
+        add(view, received.length
+          ? h('div', { class: 'app-list' }, received.map(function (b) { return bookingCard(b, places, {}); }))
+          : h('p', { class: 'app-empty' }, r[2].some(function (l) { return l.status === 'published'; }) ? 'No requests yet. Share your place\'s page so families can find you.' : 'Requests will appear here once your listing is public.'));
+      }
+      add(view, h('h2', { class: 'app-sub' }, 'Requests you sent'));
+      add(view, sent.length
+        ? h('div', { class: 'app-list' }, sent.map(function (b) { return bookingCard(b, places, {}); }))
+        : h('p', { class: 'app-empty' }, 'None yet. Find a ', link('/marketplace.html', 'maker', 'text-link'), ', a ', link('/journeys.html', 'host', 'text-link'), ' or a ', link('/family-stories.html', 'storyteller', 'text-link'), ' on the page of your family\'s place.'));
+      add(view, h('p', null, link('#/offer', r[2].length ? 'Your listings' : 'Are you a maker, host or storyteller? Offer your work', 'text-link')));
+      return h1;
+    });
+  }
+
+  function echo(_, query) {
+    var id = query.get('c') || '';
+    var back = safeBack(query.get('back'), '/manch.html');
+    var h1 = page('We have this too', null);
+    return store.echo(id).then(function () {
+      location.replace(back);
+      return h1;
+    });
+  }
+
+  function moderateMarket(places, listings, bookings) {
+    if (listings.length) {
+      add(view, h('h2', { class: 'app-sub' }, 'Listings to read'));
+      add(view, h('div', { class: 'app-list' }, listings.map(function (l) {
+        var card = listingCard(l, places);
+        card.classList.add('app-review');
+        function review(status) {
+          return function () {
+            store.reviewListing(l.id, status).then(function () {
+              flash = status === 'published' ? l.name + ' is public.' : l.name + ' will stay private.';
+              return render();
+            }).catch(fail);
+          };
+        }
+        add(card, h('div', { class: 'btn-row' }, button('Publish listing', review('published')), button('Not now', review('paused'), 'btn btn--ghost')));
+        return card;
+      })));
+    }
+    if (bookings.length) {
+      add(view, h('h2', { class: 'app-sub' }, 'Bookings to settle'));
+      add(view, h('p', { class: 'field__hint' }, 'Families who pay online are marked paid automatically. Otherwise, send the family a payment link for the total, then record the payment reference here. When the work is done, mark it completed and pay the maker their price.'));
+      add(view, h('div', { class: 'app-list' }, bookings.map(function (b) {
+        var settle;
+        if (b.status === 'accepted') {
+          var ref = h('input', { name: 'paymentRef', maxlength: 120 });
+          settle = h('form', { class: 'app-form' }, field('Payment reference', ref, 'From the payment link, once the family has paid.'), h('div', { class: 'btn-row' }, h('button', { type: 'submit', class: 'btn' }, 'Mark as paid')));
+          settle.addEventListener('submit', function (ev) {
+            ev.preventDefault();
+            if (!ref.value.trim()) return fail(new Error('Please add the payment reference.'));
+            store.updateBooking(b.id, { status: 'paid', paymentRef: ref.value.trim() }).then(function () { flash = 'Recorded as paid.'; return render(); }).catch(fail);
+          });
+        } else {
+          settle = h('div', { class: 'btn-row' }, button('Mark as completed', function () {
+            store.updateBooking(b.id, { status: 'completed' }).then(function () { flash = 'Marked as completed.'; return render(); }).catch(fail);
+          }));
+        }
+        return bookingCard(b, places, { side: 'moderator', settle: settle });
+      })));
+    }
+  }
+
   function signedOut() {
     state.user = null;
     state.people = null;
-    try { localStorage.removeItem('tch-signed-in'); } catch (e) {}
     if (parse().path) {
       location.hash = '#/';
       return Promise.resolve();
@@ -908,14 +1956,12 @@
       state.user = s ? s.user : null;
       state.people = null;
       if (!state.user) return;
-      return store.touchSeen().then(function (l) { state.legacy = l; });
-    }).then(function () {
-      try {
-        if (state.user) localStorage.setItem('tch-signed-in', '1');
-        else localStorage.removeItem('tch-signed-in');
-      } catch (e) {}
-      return render();
-    });
+      restoreWanted();
+      return Promise.all([
+        store.touchSeen().then(function (l) { state.legacy = l; }),
+        Promise.all([store.myListings(), store.myBookings()]).then(function (r) { state.market = r[0].length + r[1].length > 0; }, function () {}),
+      ]);
+    }).then(render);
   }
 
   drawNotice();

@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
 
 const core = createRequire(import.meta.url)('../public/scripts/app-core.js');
 const { canSee, canAdd, canEdit, legacyNext, legacySeen, legacyReport, newLegacy, question, message, whatsappLink, reminder, mediaKind, audienceLabel, QUESTIONS, KINDS } = core;
@@ -93,4 +94,76 @@ test('audience labels name the people', () => {
   assert.equal(audienceLabel(entry('people', { audiencePeople: ['p-farah'] }), list), 'Shared with Farah');
   assert.equal(audienceLabel(entry('passed'), list), 'When passed on');
   assert.match(audienceLabel(entry('date', { audiencePeople: ['p-farah'], releaseAt: '2036-01-01' }), list), /^Farah, on 1 January 2036$/);
+});
+
+test('a contribution names a place, has a title, words, a credit and consent, within the database limits', () => {
+  const ok = { placeSlug: 'assam', title: 't', body: 'b', credit: 'c', consent: true };
+  const c = core.contribution({ placeSlug: 'assam', suggestedPlace: 'ignored', kind: 'A song', title: ' Bihu ', body: 'Sung in April.', credit: 'Anita', script: 'ignored', promptWeek: 3, consent: true });
+  assert.deepEqual(c, { placeSlug: 'assam', suggestedPlace: null, kind: 'A song', title: 'Bihu', body: 'Sung in April.', credit: 'Anita', script: null, pronunciation: null, promptWeek: 3, consent: true });
+  assert.equal(core.contribution({ suggestedPlace: 'Jorhat', kind: 'made up', title: 't', body: 'b', credit: 'c', consent: true }).kind, core.CONTRIBUTION_KINDS[0]);
+  const word = core.contribution({ ...ok, kind: 'A word or saying', script: ' ਨਾਨੀ ', pronunciation: 'NAA-nee', promptWeek: 'x' });
+  assert.deepEqual([word.script, word.pronunciation, word.promptWeek], ['ਨਾਨੀ', 'NAA-nee', null]);
+  assert.throws(() => core.contribution({ ...ok, consent: false }), /yours to share/);
+  assert.throws(() => core.contribution({ ...ok, consent: 'yes' }), /yours to share/);
+  assert.throws(() => core.contribution({ ...ok, kind: 'A word or saying', script: 'x'.repeat(121) }), /own script/);
+  assert.throws(() => core.contribution({ ...ok, placeSlug: '' }), /choose the place/);
+  assert.throws(() => core.contribution({ ...ok, title: '' }), /title/);
+  assert.throws(() => core.contribution({ ...ok, body: 'x'.repeat(5001) }), /5,000/);
+  assert.throws(() => core.contribution({ ...ok, credit: '' }), /credited/);
+});
+
+test('reports need a known reason, and a note when the reason needs explaining', () => {
+  assert.deepEqual(core.report({ reason: 'spam', note: ' ' }), { reason: 'spam', note: null });
+  assert.deepEqual(core.report({ reason: 'wrong', note: 'It means uncle' }), { reason: 'wrong', note: 'It means uncle' });
+  assert.throws(() => core.report({ reason: 'wrong' }), /a little more/);
+  assert.throws(() => core.report({ reason: 'because' }), /what is wrong/);
+  const schema = readFileSync(new URL('../backend/schema.sql', import.meta.url), 'utf8');
+  const inSchema = schema.match(/reason text not null check \(reason in \(([^)]*)\)\)/)[1].match(/'([^']+)'/g).map((x) => x.slice(1, -1));
+  assert.deepEqual(core.REPORT_REASONS.map((r) => r.id), inSchema, 'the same reasons as the database');
+  assert.equal(core.reviewNote('  '), null);
+  assert.throws(() => core.reviewNote('x'.repeat(301)), /300/);
+});
+
+test('listings need a role, a place, a name and a description, and links must be https', () => {
+  const ok = core.listing({ role: 'host', placeSlug: 'mithila', name: ' Ravi ', summary: 'Village walks', languages: 'Maithili, Hindi,, ', priceNote: 'From ₹2,500 a day' });
+  assert.deepEqual(ok, { role: 'host', placeSlug: 'mithila', name: 'Ravi', summary: 'Village walks', languages: ['Maithili', 'Hindi'], link: null, priceNote: 'From ₹2,500 a day' });
+  assert.throws(() => core.listing({ ...ok, role: 'seller' }), /what you offer/);
+  assert.throws(() => core.listing({ ...ok, placeSlug: '' }), /place/);
+  assert.throws(() => core.listing({ ...ok, link: 'http://example.com' }), /https/);
+  assert.throws(() => core.listing({ ...ok, summary: 'x'.repeat(601) }), /600/);
+});
+
+test('quotes are typed in rupees and kept in paise, with the fee added on top', () => {
+  assert.deepEqual(core.quote({ rupees: '₹8,000', reply: ' Two weeks ' }), { pricePaise: 800000, reply: 'Two weeks' });
+  assert.equal(core.quote({ rupees: '1250.5' }).pricePaise, 125050);
+  assert.throws(() => core.quote({ rupees: '0' }), /price/);
+  assert.throws(() => core.quote({ rupees: 'eight' }), /price/);
+  assert.equal(core.platformFee(800000, 10), 80000);
+  assert.equal(core.platformFee(125055, 10), 12506);
+  assert.equal(core.formatRupees(880000), '₹8,800');
+  assert.equal(core.formatRupees(12345678), '₹1,23,456.78');
+  assert.throws(() => core.bookingMessage('  '), /what you would like/);
+});
+
+test('upcoming birthdays and festivals come soonest first, and only within the window', () => {
+  const today = new Date(2026, 11, 20);
+  const list = core.upcoming(today, [{ name: 'Nani', birthday: '12-23' }, { name: 'Dada', birthday: '' }], 21);
+  assert.deepEqual(list.map((x) => [x.name, x.days]), [['Nani\u2019s birthday', 3], ['Christmas', 5]]);
+  const jan = core.upcoming(new Date(2027, 0, 1), [], 21);
+  assert.deepEqual(jan.map((x) => [x.name, x.days]), [['Makar Sankranti, Pongal and Magh Bihu', 13]]);
+  assert.equal(core.upcoming(new Date(2027, 2, 15), [], 10)[0].name, 'Holi', 'moon festivals use the next listed date');
+  assert.deepEqual(core.upcoming(new Date(2026, 11, 20), [{ name: 'Nani', birthday: '12-19' }], 21).filter((x) => x.kind === 'birthday'), [], 'a birthday just passed waits for next year');
+  for (const o of core.OCCASIONS) {
+    assert.ok(o.question.endsWith('?'), o.name);
+    if (o.dates) for (const d of o.dates) assert.match(d, /^\d{4}-\d{2}-\d{2}$/, o.name);
+    else assert.match(o.md, /^\d{2}-\d{2}$/, o.name);
+  }
+});
+
+test('every festival that follows the moon has dates listed at least a year ahead', () => {
+  const yearAhead = new Date(Date.now() + 365 * 86400000).toISOString().slice(0, 10);
+  for (const o of core.OCCASIONS.filter((x) => x.dates)) {
+    assert.ok(o.dates.every((d, i) => /^\d{4}-\d{2}-\d{2}$/.test(d) && (i === 0 || d > o.dates[i - 1])), `${o.name} dates are in order`);
+    assert.ok(o.dates.at(-1) >= yearAhead, `${o.name} needs dates beyond ${o.dates.at(-1)}: add the next years to OCCASIONS in app-core.js`);
+  }
 });

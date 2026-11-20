@@ -21,12 +21,18 @@
     if (e.key === STORAGE_KEY && e.newValue) applyTheme(e.newValue);
   });
 
-  var account = document.querySelector('[data-account-link]');
-  if (account) {
-    try {
-      if (localStorage.getItem('tch-signed-in') === '1') account.textContent = 'My archive';
-    } catch (e) {}
-  }
+  // Named moments counted by Vercel Web Analytics on public pages (custom events need a paid Vercel plan).
+  // Never pass anything a visitor wrote, or anything that could identify them.
+  var TCH = window.TCH = window.TCH || {};
+  TCH.track = function (name, data) {
+    if (!document.querySelector('script[src="/_vercel/insights/script.js"]')) return;
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    window.va('event', { name: name, data: data });
+  };
+
+  // Lets the site receive voice notes and photographs shared from other apps once it is on the home screen.
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('/sw.js').catch(function () {});
+
 
   var header = document.querySelector('.site-header');
   var toggle = document.querySelector('.menu-toggle');

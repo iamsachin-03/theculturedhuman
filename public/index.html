@@ -13,8 +13,8 @@
 <meta property="og:description" content="A private family archive for the stories, voices, photographs and wisdom your family carries, shared with the people you choose and passed on when you decide. Plus free tools to trace your roots.">
 <meta property="og:url" content="https://theculturedhuman.vercel.app/">
 <meta property="og:locale" content="en_IN">
-<meta property="og:image" content="https://theculturedhuman.vercel.app/assets/art/madhubani/madhubani-kohbar-arti-kumari-1600.jpg">
-<meta property="og:image:alt" content="Kohbar painting by Arti Kumari: a dense red and black composition built around a central lotus and Shri Yantra">
+<meta property="og:image" content="https://theculturedhuman.vercel.app/assets/illustrations/three-generations-story-1600.jpg">
+<meta property="og:image:alt" content="Illustration of a grandmother telling a story while her granddaughter records her voice on a phone, old family photographs on the table and a painted tree with spreading roots behind them">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/brand/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="icon" href="/brand/logo-192.png" type="image/png" sizes="192x192">
@@ -32,8 +32,8 @@
 <div class="site-header__inner">
 <a class="wordmark" href="/" aria-label="The Cultured Human — home"><img src="/brand/logo-96.png" width="44" height="44" alt="" decoding="async"><span>The Cultured Human</span></a>
 <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span class="menu-toggle__label">Menu</span></button>
-<nav class="primary-nav" id="primary-nav" aria-label="Main"><ul><li><a href="/trace.html">Trace Your Roots</a></li><li><a href="/archive.html">Family Archive</a></li><li><a href="/places/">Places</a></li><li><a href="/journal/">Stories</a></li><li><a href="/marketplace.html">Keepsakes</a></li><li><a href="/journeys.html">Journeys</a></li><li><a href="/manch.html">The Commons</a></li><li><a href="/plans.html">Plans</a></li></ul></nav>
-<a class="account-link" href="/app.html" data-account-link>Sign in</a>
+<nav class="primary-nav" id="primary-nav" aria-label="Main"><ul><li><a href="/offerings.html">What we offer</a></li><li><a href="/places/">Places</a></li><li><a href="/journal/">Stories</a></li><li><a href="/manch.html">The Commons</a></li><li><a href="/plans.html">Plans</a></li></ul></nav>
+<a class="account-link" href="/app.html">My archive</a>
 <label class="theme-picker"><span class="theme-swatch" aria-hidden="true"></span><span>Theme</span>
 <select data-theme-picker aria-label="Colour theme">
 <option value="marigold">Marigold</option>
@@ -52,16 +52,56 @@
       <h1>What your family knows, <em>kept for the ones who come next.</em></h1>
       <p class="lede">The photographs are backed up. The stories, the voices and the sayings usually aren't. Keep them in a private family archive, share them with the people you choose, and decide what is passed on.</p>
       <div class="btn-row">
-        <a class="btn" href="/app.html">Start your family archive</a>
-        <a class="btn btn--ghost" href="/trace.html">Explore your roots</a>
+        <a class="btn" href="#first-story">Answer one question</a>
+        <a class="btn btn--ghost" href="/app.html">Start your family archive</a>
       </div>
-      <p class="tagline-strip">Free to start. Private by default.</p>
+      <p class="tagline-strip">Free to start. Private by default. No sign-up to begin.</p>
+      <a class="hero-commons" href="/manch.html"><span class="hero-commons__tag">The Commons</span> One question a week about where your family comes from. Read the answers, or add yours.</a>
     </div>
     <div class="home-hero__art">
       <figure>
-        <img src="/assets/art/madhubani/madhubani-kohbar-arti-kumari-1600.jpg" srcset="/assets/art/madhubani/madhubani-kohbar-arti-kumari-800.jpg 800w, /assets/art/madhubani/madhubani-kohbar-arti-kumari-1600.jpg 1600w" sizes="(max-width: 860px) 420px, 560px" width="1600" height="1533" alt="Kohbar painting by Arti Kumari: a dense red and black composition built around a central lotus and Shri Yantra" fetchpriority="high">
-        <figcaption>A kohbar, painted in Mithila for a newly married couple's room. Kohbar painting by Arti Kumari. <span class="credit">Photo: <a href="https://commons.wikimedia.org/wiki/File%3AKOHBAR_BY_ARTI_KUMARI.jpg" rel="noopener">Apurv1015</a>, CC BY-SA 4.0 (<a href="https://creativecommons.org/licenses/by-sa/4.0" rel="noopener">licence</a>)</span></figcaption>
+        <img src="/assets/illustrations/three-generations-story-1600.jpg" srcset="/assets/illustrations/three-generations-story-800.jpg 800w, /assets/illustrations/three-generations-story-1600.jpg 1600w" sizes="(max-width: 860px) 420px, 560px" width="1024" height="1536" alt="Illustration of a grandmother telling a story while her granddaughter records her voice on a phone, old family photographs on the table and a painted tree with spreading roots behind them" fetchpriority="high">
+        <figcaption>One story, told once, kept for everyone who comes after. <span class="credit">Illustration: <a href="/credits.html">The Cultured Human</a></span></figcaption>
       </figure>
+    </div>
+  </div>
+</section>
+
+<section class="first-story" id="first-story" aria-labelledby="first-story-title" data-first-story>
+  <div class="container first-story__grid">
+    <div class="first-story__intro">
+      <p class="eyebrow">Start here, no account needed</p>
+      <h2 id="first-story-title">One question. One story.</h2>
+      <p>Answer it for someone you love: your Nani, your father, the aunt who remembers everything. Write it as they told it, or record it in your own voice.</p>
+      <p class="first-story__promise">It stays in this browser, seen by nobody else, until you choose to keep it in your private archive.</p>
+      <p class="first-story__waiting" data-waiting hidden>You have <span data-count></span> waiting on this device. <a href="/app.html" data-keep-link>Keep it in your archive</a>.</p>
+    </div>
+    <div class="first-story__card">
+      <form novalidate>
+        <p class="eyebrow">Today's question</p>
+        <p class="first-story__question" data-question aria-live="polite">Which story did you love to hear as a child, and who told it?</p>
+        <button type="button" class="text-link first-story__another" data-another>Ask me another</button>
+        <p class="field"><label for="fs-teller">Who is it about? (optional)</label><input id="fs-teller" name="teller" type="text" maxlength="40" placeholder="Nani, Dadaji, my mother…" autocomplete="off"></p>
+        <p class="field"><label for="fs-text">In their words</label><textarea id="fs-text" name="text" rows="5" maxlength="5000" placeholder="She always began, “In the year of the big flood…”"></textarea></p>
+        <div class="btn-row">
+          <button type="button" class="btn btn--ghost" data-record>Record it instead</button>
+          <button type="submit" class="btn">Keep it</button>
+        </div>
+        <p class="field__hint" data-record-note aria-live="polite"></p>
+        <div class="first-story__preview" data-record-preview></div>
+      </form>
+      <div class="first-story__done" data-done hidden>
+        <h3 tabindex="-1"><span data-who>Your story is</span> kept on this device.</h3>
+        <p>Keep it safe in your private archive, where you can add photographs, ask the next question, and choose who in the family sees it. Here is a card of it to keep, or to send to whoever told it.</p>
+        <div data-card-slot></div>
+        <div class="btn-row">
+          <a class="btn" href="/app.html">Keep it in my archive</a>
+          <button type="button" class="btn btn--ghost" data-share>Save or send the card</button>
+          <button type="button" class="text-link" data-again>Answer another</button>
+        </div>
+      </div>
+      <p class="field__hint first-story__status" data-status role="status" aria-live="polite"></p>
+      <noscript><p class="field__hint">Answering here needs JavaScript. You can still <a href="/app.html">start your family archive</a>.</p></noscript>
     </div>
   </div>
 </section>
@@ -74,19 +114,22 @@
     </div>
     <ol class="how-steps">
       <li>
+        <img src="/assets/illustrations/ask-a-question-1600.jpg" srcset="/assets/illustrations/ask-a-question-800.jpg 800w, /assets/illustrations/ask-a-question-1600.jpg 1600w" sizes="(max-width: 860px) 100vw, 360px" width="1536" height="1024" alt="Illustration of a grandfather on a sunlit veranda smiling as he reads a question on his phone, a cup of tea beside him" loading="lazy" decoding="async">
         <h3>Ask</h3>
         <p>One question a week to a parent or grandparent, sent on WhatsApp. They reply with a voice note whenever they like. In a year, their life in their own words.</p>
       </li>
       <li>
+        <img src="/assets/illustrations/keepsake-box-1600.jpg" srcset="/assets/illustrations/keepsake-box-800.jpg 800w, /assets/illustrations/keepsake-box-1600.jpg 1600w" sizes="(max-width: 860px) 100vw, 360px" width="1536" height="1024" alt="Illustration of an open wooden keepsake box holding old family photographs, a letter, a cassette tape, a key and a marigold, with ribbons of sound rising from it" loading="lazy" decoding="async">
         <h3>Keep</h3>
         <p>Stories and tales, voice notes and videos, photographs and what happened outside the frame, sayings, things for hard days, and old documents. All in one private place.</p>
       </li>
       <li>
+        <img src="/assets/illustrations/passing-it-on-1600.jpg" srcset="/assets/illustrations/passing-it-on-800.jpg 800w, /assets/illustrations/passing-it-on-1600.jpg 1600w" sizes="(max-width: 860px) 100vw, 360px" width="1536" height="1024" alt="Illustration of an elder&#39;s hands passing a ribbon-tied family book to a child&#39;s reaching hands, old photographs and marigold petals around them" loading="lazy" decoding="async">
         <h3>Pass it on</h3>
         <p>Share with family now. Leave letters for a grandchild's eighteenth birthday. Choose what your beloved ones receive when you are gone, and who confirms when it is time.</p>
       </li>
     </ol>
-    <div class="btn-row"><a class="btn" href="/app.html">Start your family archive</a><a class="btn btn--ghost" href="/archive.html">How the archive works</a></div>
+    <div class="btn-row"><a class="btn" href="/app.html">Start your family archive</a><a class="btn btn--ghost" href="/app.html?sample">Look inside a sample archive</a></div>
   </div>
 </section>
 
@@ -105,18 +148,41 @@
         <p>Add the places your family has lived, generation by generation, and download the portrait.</p>
       </a>
       <a class="explore-card" href="/places/">
-        <img src="/assets/art/warli/warli-house-wall-1600.jpg" srcset="/assets/art/warli/warli-house-wall-800.jpg 800w, /assets/art/warli/warli-house-wall-1600.jpg 1600w" sizes="(max-width: 860px) 100vw, 400px" width="1600" height="965" alt="White Warli painting on the mud wall of a Warli house, with a central square chauk surrounded by stick figures" loading="lazy" decoding="async">
+        <img src="/assets/illustrations/places-journey-map-1600.jpg" srcset="/assets/illustrations/places-journey-map-800.jpg 800w, /assets/illustrations/places-journey-map-1600.jpg 1600w" sizes="(max-width: 860px) 100vw, 400px" width="1536" height="1024" alt="Illustrated map of a family&#39;s journey along a dotted path from a riverside temple town and a paddy-field village to a desert town, a palm-fringed coast and a modern city" loading="lazy" decoding="async">
         <span class="eyebrow">Places</span>
         <h3>What families from each place carry</h3>
         <p>Words, dishes, rituals and memories, written by the families who come from there.</p>
       </a>
       <a class="explore-card" href="/journal/">
-        <img src="/assets/art/madhubani/madhubani-artist-dilli-haat-1600.jpg" srcset="/assets/art/madhubani/madhubani-artist-dilli-haat-800.jpg 800w, /assets/art/madhubani/madhubani-artist-dilli-haat-1600.jpg 1600w" sizes="(max-width: 860px) 100vw, 400px" width="1600" height="1067" alt="A Mithila painter at work on a painting at his stall, with finished paintings displayed behind him" loading="lazy" decoding="async">
+        <img src="/assets/illustrations/book-of-stories-1600.jpg" srcset="/assets/illustrations/book-of-stories-800.jpg 800w, /assets/illustrations/book-of-stories-1600.jpg 1600w" sizes="(max-width: 860px) 100vw, 400px" width="1536" height="1024" alt="Illustration of an open book with small scenes rising from its pages: a weaver at a loom, a family cooking together, musicians, a painter decorating a wall and a boat on a river" loading="lazy" decoding="async">
         <span class="eyebrow">Stories</span>
         <h3>Stories of where we come from</h3>
         <p>Researched and sourced essays on the crafts, kitchens, ideas and places families carry.</p>
       </a>
     </div>
+    <p class="explore-more">Storytellers, keepsakes, journeys and more: <a class="text-link" href="/offerings.html">See everything we offer</a></p>
+  </div>
+</section>
+
+<section class="section section--surface" aria-labelledby="commons-title">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">The Commons</p>
+      <h2 id="commons-title">One question a week, answered by families.</h2>
+      <p>Answers are read before they appear, then added to the page of the place they come from.</p>
+    </div>
+<div class="this-week" data-this-week>
+<p class="eyebrow">This week's question</p>
+<p class="this-week__question" data-this-week-text>Which word from your family has no translation?</p>
+<p class="this-week__tag" data-this-week-tag>#OneWordFromHome</p>
+<div class="btn-row"><a class="btn btn--light" href="/app.html#/contribute?week=0" data-this-week-link>Answer it</a><a class="btn btn--light btn--outline" href="/questions.html">Read the answers</a></div>
+<p class="this-week__note">A new question every Monday. Answers are read before they appear, then added to the page of the place they come from, credited the way you choose. <a href="/questions.html">Past questions</a>.</p>
+</div>
+    <div class="section-gap section-gap--sm"></div>
+<div class="community-feed community-feed--cards" data-community-feed data-limit="3" data-url="https://biaogexcislxxzxiifib.supabase.co" data-key="sb_publishable_LOnHHRxeeeUMbVcWWhvPtw_X-0gGSnT">
+<div class="empty-state"><p><strong>Nothing shared yet.</strong> Be the first: answer this week's question, or add something to your place.</p><a class="text-link" href="/app.html#/contribute">Add to a place</a></div>
+<div class="community-examples"><p class="community-examples__note">Examples of what belongs here, written by The Cultured Human, not shared by families. They make way for real contributions as they're published.</p><div class="carry-grid"><article class="carry-card carry-card--example"><p class="example-tag">Example</p><p class="eyebrow">A dish or recipe</p><h3>Pitha for Bihu</h3><p>Rice cakes made at home in Assam for Bihu, above all for Magh Bihu in January. A family&#39;s version might be about who made them, which kind, and how.</p><p class="carry-card__credit"><a class="community-place" href="/places/assam.html">Assam</a></p></article><article class="carry-card carry-card--example"><p class="example-tag">Example</p><p class="eyebrow">A festival or ritual</p><h3>The Onam pookalam</h3><p>A carpet of flowers laid at the front of the house during Onam in Kerala. A family might share the pattern they repeat each year, or who started it.</p><p class="carry-card__credit"><a class="community-place" href="/places/kerala.html">Kerala</a></p></article><article class="carry-card carry-card--example"><p class="example-tag">Example</p><p class="eyebrow">A memory of the place</p><h3>The painted kohbar</h3><p>In Mithila, the walls of the kohbar, the room prepared for a wedding couple, were traditionally painted by the women of the family. A family might share whose hands painted theirs.</p><p class="carry-card__credit"><a class="community-place" href="/places/mithila.html">Mithila</a></p></article></div></div></div>
+    <div class="btn-row"><a class="btn" href="/manch.html">Visit The Commons</a><a class="btn btn--ghost" href="/manch.html#words">One word from home</a></div>
   </div>
 </section>
 
@@ -140,13 +206,15 @@
 <div class="border-weave" aria-hidden="true"></div>
 <div class="container site-footer__grid">
 <div class="site-footer__brand"><a class="wordmark wordmark--footer" href="/"><img src="/brand/logo-192.png" width="96" height="96" alt="" decoding="async"><span>The Cultured Human</span></a><p>Everyone comes from somewhere. Trace where your family comes from, keep what they know, and pass it on.</p></div>
-<div><h2>Your roots</h2><ul><li><a href="/app.html">My archive</a></li><li><a href="/roots.html">Begin here</a></li><li><a href="/trace.html">Trace your roots</a></li><li><a href="/archive.html">Family archive</a></li><li><a href="/places/">Places</a></li><li><a href="/family-stories.html">Storytellers</a></li><li><a href="/roots-kit.html">The Roots Kit</a></li></ul></div>
-<div><h2>Stories</h2><ul><li><a href="/journal/">All stories</a></li><li><a href="/culture.html">Many cultures</a></li><li><a href="/proverbs.html">Wisdom of the ages</a></li><li><a href="/experiences.html">Food &amp; places</a></li><li><a href="/music.html">Music &amp; curious minds</a></li><li><a href="/conscious-living.html">Conscious living</a></li><li><a href="/fitness.html">The better self</a></li></ul></div>
-<div><h2>On the platform</h2><ul><li><a href="/marketplace.html">Keepsakes</a></li><li><a href="/journeys.html">Journeys</a></li><li><a href="/commission.html">Commission a piece</a></li><li><a href="/gifting.html">Gifting</a></li><li><a href="/join.html">Join as a maker, host or storyteller</a></li><li><a href="/for-organisations.html">For organisations</a></li></ul></div>
-<div><h2>About</h2><ul><li><a href="/about.html">Our story</a></li><li><a href="/plans.html">Plans</a></li><li><a href="/manch.html">The Commons</a></li><li><a href="/credits.html">Image credits</a></li><li><a href="https://www.instagram.com/theculturedhuman/" rel="noopener">Instagram</a></li></ul></div>
+<div><h2>Explore</h2><ul><li><a href="/offerings.html">What we offer</a></li><li><a href="/roots.html">My Roots</a></li><li><a href="/places/">Places</a></li><li><a href="/journal/">Stories</a></li><li><a href="/marketplace.html">Keepsakes</a></li><li><a href="/journeys.html">Journeys</a></li><li><a href="/manch.html">The Commons</a></li></ul></div>
+<div><h2>Take part</h2><ul><li><a href="/manch.html#this-week">This week&#39;s question</a></li><li><a href="/app.html#/contribute">Add to a place</a></li><li><a href="/join.html">Join the platform</a></li><li><a href="/for-organisations.html">For organisations</a></li></ul></div>
+<div><h2>About</h2><ul><li><a href="/about.html">Our story</a></li><li><a href="/plans.html">Plans</a></li><li><a href="https://www.instagram.com/theculturedhuman/" rel="noopener">Instagram</a></li></ul></div>
 </div>
-<div class="container site-footer__bottom"><span>© 2026 The Cultured Human. Rooted in India, curious about everywhere.</span><span>Images are credited on our <a href="/credits.html">image credits</a> page.</span></div>
+<div class="container site-footer__bottom"><span>© 2026 The Cultured Human. Rooted in India, curious about everywhere.</span><span class="site-footer__legal"><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/community-guidelines.html">Community guidelines</a><a href="/credits.html">Illustrations</a></span></div>
 </footer>
 <script src="/scripts/site.js" defer></script>
+<script src="/scripts/app-core.js" defer></script>
+<script src="/scripts/first-story.js" defer></script>
+<script src="/scripts/community-live.js" defer></script>
 </body>
 </html>

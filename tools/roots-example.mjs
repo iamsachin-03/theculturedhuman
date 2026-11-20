@@ -7,12 +7,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const { renderRoots } = createRequire(import.meta.url)(join(ROOT, 'public/scripts/roots.js'));
-
-const haldi = {
-  page: '#FFF5D9', surface: '#FFFBEC', primary: '#1E4A27', accent: '#DC4F0E', accentInk: '#A83A07',
-  gold: '#F5B323', ink: '#1C2B1C', muted: '#5A5536', line: '#EDD596',
-};
+const Art = createRequire(import.meta.url)(join(ROOT, 'public/scripts/roots-art.js'));
+const haldi = Art.paletteById('haldi').c;
 
 const example = {
   name: '',
@@ -24,5 +20,5 @@ const example = {
   ],
 };
 
-writeFileSync(join(ROOT, 'public/brand/roots-example.svg'), renderRoots(example, haldi) + '\n');
+writeFileSync(join(ROOT, 'public/brand/roots-example.svg'), Art.render(example, haldi, { style: 'roots', idPrefix: 'ex' }) + '\n');
 console.log('Wrote public/brand/roots-example.svg');

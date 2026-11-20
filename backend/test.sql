@@ -144,8 +144,13 @@ set role authenticated;
 
 -- Place contributions are moderated.
 select as_user('00000000-0000-0000-0000-00000000000c');
-insert into place_contributions (place_slug, kind, title, body, credit, status) values ('mithila', 'Word', 'Sasur', 'x', 'C.', 'published');
-select check_that((select status from place_contributions) = 'pending', 'contributions start as pending, whatever the browser sends');
+select check_that(fails($$insert into place_contributions (place_slug, kind, title, body, credit) values ('mithila', 'Word', 'No consent', 'x', 'C.')$$), 'nothing is shared without saying it is yours to share');
+insert into place_contributions (place_slug, kind, title, body, credit, status, consent, review_note, notified_status) values ('mithila', 'Word', 'Sasur', 'x', 'C.', 'published', true, 'fake', 'published');
+select check_that((select status = 'pending' and review_note is null and notified_status is null from place_contributions), 'contributions start as pending, whatever the browser sends');
+insert into place_contributions (place_slug, kind, title, body, credit, consent) select 'mithila', 'Word', 'Extra ' || n, 'x', 'C.', true from generate_series(1, 9) n;
+select check_that(fails($$insert into place_contributions (place_slug, kind, title, body, credit, consent) values ('mithila', 'Word', 'Eleventh', 'x', 'C.', true)$$), 'ten contributions a day is the limit');
+delete from place_contributions where title like 'Extra %';
+select check_that((select count(*) from place_contributions) = 1, 'people can delete what they shared');
 select as_user('00000000-0000-0000-0000-00000000000e');
 update place_contributions set status = 'published';
 reset role;
@@ -155,8 +160,51 @@ select check_that((select count(*) from place_contributions) = 1, 'published con
 select check_that(fails($$select * from entries$$), 'anonymous visitors cannot read archives at all');
 set role authenticated;
 
+-- Editing sends it back to be read; moderators give reasons; reports reach moderators only.
+select as_user('00000000-0000-0000-0000-00000000000c');
+select check_that(fails($$update place_contributions set submitted_by = '00000000-0000-0000-0000-00000000000b'$$), 'nobody can hand their contribution to someone else');
+update place_contributions set status = 'published', notified_status = null where title = 'Sasur';
+select check_that((select status = 'published' and notified_status is null from place_contributions where title = 'Sasur'), 'touching nothing that matters keeps it published, and the browser cannot fake notifications');
+update place_contributions set body = 'Father-in-law, in Maithili' where title = 'Sasur';
+select check_that((select status from place_contributions where title = 'Sasur') = 'pending', 'an edit goes back to be read');
+select as_user('00000000-0000-0000-0000-00000000000e');
+update place_contributions set status = 'rejected', review_note = 'Please say where you heard it.';
+select as_user('00000000-0000-0000-0000-00000000000c');
+select check_that((select review_note from place_contributions) = 'Please say where you heard it.', 'the person who shared it sees why it was not published');
+update place_contributions set review_note = null, status = 'published' where title = 'Sasur';
+select check_that((select status = 'rejected' and review_note is not null from place_contributions), 'and cannot clear the reason or publish it themselves');
+select as_user('00000000-0000-0000-0000-00000000000e');
+update place_contributions set status = 'published', review_note = null;
+insert into place_contributions (place_slug, kind, title, body, credit, consent, status) values ('mithila', 'Word', 'Moderator word', 'x', 'M.', true, 'published');
+update place_contributions set body = 'changed' where title = 'Moderator word';
+select check_that((select status from place_contributions where title = 'Moderator word') = 'pending', 'a moderator''s own edits are read again too');
+delete from place_contributions where title = 'Moderator word';
+update place_contributions set featured_at = now() where title = 'Sasur';
+select as_user('00000000-0000-0000-0000-00000000000c');
+update place_contributions set featured_at = null where title = 'Sasur';
+select check_that((select featured_at is not null from place_contributions where title = 'Sasur'), 'only moderators choose what is featured');
+insert into place_contributions (place_slug, kind, title, body, credit, consent, featured_at) values ('mithila', 'Word', 'Self-featured', 'x', 'C.', true, now());
+select check_that((select featured_at is null from place_contributions where title = 'Self-featured'), 'nobody features their own contribution');
+delete from place_contributions where title = 'Self-featured';
+select as_user('00000000-0000-0000-0000-00000000000b');
+insert into contribution_reports (contribution_id, reason, note) select id, 'wrong', 'Sasur means father-in-law' from place_contributions;
+select check_that(fails($$insert into contribution_reports (contribution_id, reason) select id, 'spam' from place_contributions$$), 'one report per person per contribution');
+select check_that(fails($$insert into contribution_reports (contribution_id, reason) select id, 'because' from place_contributions$$), 'reports need a known reason');
+select as_user('00000000-0000-0000-0000-00000000000c');
+select check_that((select count(*) from contribution_reports) = 0, 'the person reported cannot see who reported them');
+select as_user('00000000-0000-0000-0000-00000000000e');
+select check_that((select count(*) from contribution_reports) = 1, 'moderators see reports');
+update contribution_reports set resolved = true;
+select as_user('00000000-0000-0000-0000-00000000000b');
+select check_that(fails($$update contribution_reports set resolved = false$$) or (select resolved from contribution_reports), 'only moderators resolve reports');
+reset role;
+set role anon;
+select as_user('', '');
+select check_that(fails($$insert into contribution_reports (contribution_id, reason) select id, 'spam' from place_contributions$$), 'visitors must sign in to report');
+set role authenticated;
+
 -- A maker lists herself; she is not public until reviewed, and families can then book.
-select as_user('00000000-0000-0000-0000-00000000000d');
+select as_user('00000000-0000-0000-0000-00000000000d', 'devi@example.com');
 insert into listings (id, role, place_slug, name, summary, status) values ('33333333-3333-3333-3333-333333333333', 'maker', 'mithila', 'Devi', 'Kohbar paintings', 'published');
 select check_that((select status from listings) = 'pending', 'new listings wait for review');
 select as_user('00000000-0000-0000-0000-00000000000c');
@@ -164,17 +212,70 @@ select check_that((select count(*) from listings) = 0, 'unreviewed listings are 
 select check_that(fails($$insert into bookings (listing_id, message) values ('33333333-3333-3333-3333-333333333333', 'hello')$$), 'unreviewed listings cannot be booked');
 select as_user('00000000-0000-0000-0000-00000000000e');
 update listings set status = 'published';
-select as_user('00000000-0000-0000-0000-00000000000c');
-insert into bookings (listing_id, message) values ('33333333-3333-3333-3333-333333333333', 'A painting of our village, please');
+select as_user('00000000-0000-0000-0000-00000000000d', 'devi@example.com');
+select check_that(fails($$insert into bookings (listing_id, message) values ('33333333-3333-3333-3333-333333333333', 'me')$$), 'makers cannot book themselves');
+select as_user('00000000-0000-0000-0000-00000000000c', 'chetan@example.com');
+insert into bookings (listing_id, message, status, price_paise) values ('33333333-3333-3333-3333-333333333333', 'A painting of our village, please', 'accepted', 1);
+select check_that((select status = 'requested' and price_paise is null from bookings), 'a new request starts as a request, whatever the browser sends');
 select check_that(fails($$update bookings set price_paise = 1$$), 'families cannot set the price');
+select check_that(fails($$update bookings set status = 'accepted'$$), 'families cannot accept before there is a quote');
 select check_that(fails($$update bookings set status = 'paid'$$), 'nobody can mark a booking paid from a browser');
-select as_user('00000000-0000-0000-0000-00000000000d');
-update bookings set price_paise = 800000, platform_fee_paise = 120000, status = 'quoted';
-select as_user('00000000-0000-0000-0000-00000000000c');
+select check_that((select count(*) from booking_contacts((select id from bookings))) = 0, 'no contact details before a quote is accepted');
+select as_user('00000000-0000-0000-0000-00000000000d', 'devi@example.com');
+select check_that(fails($$update bookings set status = 'quoted'$$), 'a quote needs a price');
+select check_that(fails($$update bookings set message = 'changed'$$), 'makers cannot rewrite the family''s message');
+update bookings set price_paise = 800000, platform_fee_paise = 1, reply = 'Two weeks, on handmade paper', status = 'quoted';
+select check_that((select platform_fee_paise from bookings) = 80000, 'the platform fee is worked out by the database, not the browser');
+select check_that(fails($$update bookings set status = 'accepted'$$), 'makers cannot accept their own quote');
+select as_user('00000000-0000-0000-0000-00000000000c', 'chetan@example.com');
 update bookings set status = 'accepted';
 select check_that((select status from bookings) = 'accepted', 'the maker quotes and the family accepts');
+select check_that((select email from booking_contacts((select id from bookings))) = 'devi@example.com'
+  and (select count(*) from booking_contacts((select id from bookings))) = 1, 'once accepted, the family sees only the maker''s email');
+select as_user('00000000-0000-0000-0000-00000000000d', 'devi@example.com');
+select check_that((select email from booking_contacts((select id from bookings))) = 'chetan@example.com', 'and the maker sees only the family''s');
+select check_that(fails($$update bookings set price_paise = 1$$), 'the price cannot change once accepted');
+select check_that((select count(*) from contacts) = 1, 'people can read only their own contact row');
+select as_user('00000000-0000-0000-0000-00000000000c', 'chetan@example.com');
+select check_that(fails($$update bookings set payment_order_id = 'order_fake'$$), 'families cannot attach a payment order');
+reset role;
+select as_user('', '');
+update bookings set payment_order_id = 'order_test';
+select check_that((select payment_order_id from bookings) = 'order_test', 'the payment function (service key) attaches the order');
+set role authenticated;
 select as_user('00000000-0000-0000-0000-00000000000b');
 select check_that((select count(*) from bookings) = 0, 'other people cannot see a booking');
+select check_that((select count(*) from booking_contacts((select id from bookings limit 1))) = 0, 'or anyone''s contact details');
+select as_user('00000000-0000-0000-0000-00000000000e');
+update bookings set status = 'paid', payment_ref = 'link-123';
+select check_that((select status from bookings) = 'paid' and (select count(*) from booking_contacts((select id from bookings))) = 2, 'a moderator records a payment and can reach both sides');
+select as_user('00000000-0000-0000-0000-00000000000c', 'chetan@example.com');
+select check_that(fails($$update bookings set status = 'cancelled'$$), 'a paid booking cannot be cancelled from the browser');
+
+-- Families recognise what others shared; visitors see counts but never who.
+select as_user('00000000-0000-0000-0000-00000000000b');
+insert into contribution_echoes (contribution_id) select id from place_contributions where status = 'published';
+select check_that(fails($$insert into contribution_echoes (contribution_id) select id from place_contributions where status = 'published'$$), 'one echo per person');
+select check_that(fails($$insert into contribution_echoes (contribution_id, user_id) select id, '00000000-0000-0000-0000-00000000000c' from place_contributions where status = 'published'$$), 'nobody can echo for someone else');
+reset role;
+set role anon;
+select as_user('', '');
+select check_that((select sum(echoes) from contribution_echo_counts) = 1, 'visitors see how many families recognise it');
+select check_that(fails($$select * from contribution_echoes$$), 'but not who');
+set role authenticated;
+
+-- A roots portrait is the owner's alone.
+select as_user('00000000-0000-0000-0000-00000000000a', 'asha@example.com');
+insert into roots (data) values ('{"mode": "line", "generations": [{"place": "Pune"}]}');
+insert into roots (data) values ('{"mode": "sides"}') on conflict (owner_id) do update set data = excluded.data;
+select check_that((select data->>'mode' from roots) = 'sides', 'an owner keeps and replaces their roots portrait');
+select as_user('00000000-0000-0000-0000-00000000000b');
+select check_that((select count(*) from roots) = 0, 'nobody else can see a roots portrait');
+update roots set data = '{}' where owner_id = '00000000-0000-0000-0000-00000000000a';
+select check_that(fails($$insert into roots (owner_id, data) values ('00000000-0000-0000-0000-00000000000a', '{}')$$), 'nobody can write into someone else''s roots');
+reset role;
+select check_that((select data->>'mode' from roots where owner_id = '00000000-0000-0000-0000-00000000000a') = 'sides', 'and nobody else can change it');
+set role authenticated;
 
 -- Leaving takes the whole archive with it.
 select as_user('00000000-0000-0000-0000-000000000012', 'quiet@example.com');
