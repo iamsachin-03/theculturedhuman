@@ -45,7 +45,6 @@ The local server only answers this computer and sends the same security headers 
 | `public/scripts/roots.js` | The "Trace your roots" tool: draws a family's places as a downloadable portrait. Everything stays in the reader's browser. |
 | `tools/roots-example.mjs` | Regenerates `public/brand/roots-example.svg`, the sample portrait shown on the homepage. Run it after changing `roots.js`. |
 | `tools/add-commons-asset.mjs` | Downloads a Wikimedia Commons image at two sizes and records its licence in the register. |
-| `legacy/bihar-angan/` | Unused code from an earlier project, kept for reference. Not deployed. |
 
 Every HTML file in `public/` is generated. Edit the source in `src/pages/` or `content/`, then run `npm run build` and commit both.
 
@@ -113,9 +112,7 @@ Marigold (the default), Haldi, Indigo, Gulmohar and Evening. Haldi takes its tur
 
 ## Deployment
 
-`vercel.json` sets the build command (`npm run build`), the output directory (`public`), a permanent redirect from the retired `/bazaar.html` to `/marketplace.html`, long-lived caching for images and basic security headers.
-
-The `firebase.json`, `.firebaserc` and `firestore.*` files belong to the earlier Firebase project and are not used by the Vercel site.
+`vercel.json` sets the build command (`npm run build`), the output directory (`public`), a permanent redirect from the retired `/bazaar.html` to `/marketplace.html`, long-lived caching for images, and the security headers (a strict content security policy among them) that `npm run serve` also sends.
 
 ## Adding to a place
 
