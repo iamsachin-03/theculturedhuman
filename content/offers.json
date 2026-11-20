@@ -101,26 +101,6 @@
     }
   },
   {
-    "id": "drops",
-    "label": "Coming drops",
-    "title": "Small seasonal drops",
-    "summary": "A few makers at a time, a limited number of pieces and the full story behind each one. Join the list to hear first.",
-    "href": "/marketplace.html#drops",
-    "image": "pattachitra",
-    "action": "Hear about the first drop",
-    "form": {
-      "choiceLabel": "What would you most like to see?",
-      "choices": [
-        "Art and craft",
-        "Home and living",
-        "Books and ideas"
-      ],
-      "messageLabel": "Anything you would love us to find?",
-      "messageHint": "A craft, a region or a maker you admire.",
-      "messageOptional": true
-    }
-  },
-  {
     "id": "organisations",
     "label": "For organisations",
     "title": "Roots programmes for groups",

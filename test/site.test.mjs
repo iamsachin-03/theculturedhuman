@@ -243,7 +243,7 @@ test('the retired lifestyle pages and the quiz are gone, and their old addresses
     assert.ok(!existsSync(join(PUBLIC, `${page}.html`)), `${page}.html is gone`);
     assert.ok(redirects[`/${page}.html`], `/${page}.html redirects`);
   }
-  for (const page of pages) assert.doesNotMatch(read(page), /data-quiz|Curious Minds|The Better Self/, page);
+  for (const page of pages) assert.doesNotMatch(read(page), /data-quiz|Curious Minds|The Better Self|Coming drops|id="drops"/, page);
 });
 
 test('privacy, terms and community guidelines are on every page, and the contribute form points to them', () => {
