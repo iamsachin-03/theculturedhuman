@@ -323,6 +323,7 @@
         link('#/entry/new?kind=story', 'Write a story', 'btn'),
         link('#/entry/new?kind=story&record=audio', 'Record a voice note', 'btn btn--ghost'),
         link('#/entry/new?kind=memory', 'Add photographs or video', 'btn btn--ghost'),
+        link('#/entry/new?kind=memory&narrate=1', 'Narrate an old photo', 'btn btn--ghost'),
       ));
       var grid = h('div', { class: 'app-grid' });
       var q = elders[0] ? core.question(elders[0].idx) : core.question(0);
@@ -636,7 +637,7 @@
         list.forEach(function (t) { var o = h('option', { value: t }, t); if (t === e.prompt) o.selected = true; prompt.appendChild(o); });
       }
       fillPrompts();
-      var title = h('input', { name: 'title', type: 'text', required: true, maxlength: '120', value: e.title });
+      var title = h('input', { name: 'title', type: 'text', required: true, maxlength: '120', value: e.title, placeholder: query.get('narrate') ? 'Papa\u2019s wedding, 1974' : null });
       var body = h('textarea', { name: 'body', rows: '10', maxlength: '50000' });
       body.value = e.body || '';
       var teller = h('input', { name: 'teller', type: 'text', value: e.teller || '' });
@@ -726,6 +727,7 @@
         });
         drawFiles();
       }
+      var camera = h('input', { type: 'file', accept: 'image/*', capture: 'environment', onchange: function () { addFiles(camera.files); camera.value = ''; } });
       var picker = h('input', { type: 'file', multiple: true, accept: 'audio/*,video/*,image/*,.opus,.ogg,.m4a,.amr,application/pdf,.doc,.docx,.txt', onchange: function () { addFiles(picker.files); picker.value = ''; } });
       var recordStatus = h('p', { class: 'field__hint', 'aria-live': 'polite' });
       var preview = h('div', { class: 'app-record__preview' });
@@ -768,10 +770,16 @@
         b.setAttribute('data-record', what);
         return b;
       }
+      var narrate = query.get('narrate') && !existing;
       add(form, h('fieldset', { class: 'app-attach' },
-        h('legend', null, 'Voices, videos, photographs and documents'),
-        h('p', { class: 'field__hint' }, 'Old certificates, letters, deeds and photographs of them count too. Up to ' + core.formatBytes(MAX_BYTES) + ' each.'),
-        h('div', { class: 'btn-row' }, recordButton('audio'), recordButton('video'), h('label', { class: 'btn btn--ghost app-upload' }, 'Attach files', picker)),
+        h('legend', null, narrate ? 'The photograph, and their voice' : 'Voices, videos, photographs and documents'),
+        narrate
+          ? h('ol', { class: 'app-narrate' },
+            h('li', null, 'Photograph the print with ', h('strong', null, 'Take a photo of a print'), ', flat and in daylight, or attach a scan.'),
+            h('li', null, 'Sit with the person who remembers it, press ', h('strong', null, 'Record a voice note'), ' and ask: Who is in it? Where was it taken? What happened that day? Who took it?'),
+            h('li', null, 'Let them wander. The stories around the photograph are often better than the photograph.'))
+          : h('p', { class: 'field__hint' }, 'Old certificates, letters, deeds and photographs of them count too. Up to ' + core.formatBytes(MAX_BYTES) + ' each.'),
+        h('div', { class: 'btn-row' }, narrate ? h('label', { class: 'btn app-upload' }, 'Take a photo of a print', camera) : null, recordButton('audio'), recordButton('video'), h('label', { class: 'btn btn--ghost app-upload' }, narrate ? 'Attach a scan' : 'Attach files', picker)),
         privacy, recordStatus, preview, fileList,
       ));
       drawFiles();
