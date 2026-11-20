@@ -5,6 +5,8 @@
 (function () {
   var TCH = window.TCH;
   var core = TCH.core;
+  var exporter = TCH.archiveExport;
+  var exporting = false;
   var Art = window.TCHRootsArt;
   var app = document.querySelector('[data-app]');
   if (!app) return;
@@ -1159,8 +1161,8 @@
       });
 
       var data = h('section', { class: 'app-card' }, h('h2', null, 'Your data'),
-        h('p', null, 'Download a copy of everything in your archive, including files, as one file you can keep anywhere.'),
-        h('div', { class: 'btn-row' }, button('Download a copy', exportAll, 'btn btn--ghost')),
+        h('p', null, 'One zip file with every story, photograph, recording and document, and a page that opens in any browser without the internet. Keep it anywhere.'),
+        h('div', { class: 'btn-row' }, button('Download everything', exportAll, 'btn'), link('/if-we-close.html', 'Our promise if we ever close', 'text-link')),
         h('h3', null, 'Delete your account'),
         h('p', null, 'This deletes your archive, every file in it, and what you added to other people\'s archives. It cannot be undone.'),
         h('div', { class: 'btn-row' }, button('Delete my account', function () {
@@ -1174,36 +1176,35 @@
     });
   }
 
-  function toDataUrl(url) {
-    return fetch(url).then(function (r) { return r.blob(); }).then(function (blob) {
-      return new Promise(function (resolve) {
-        var reader = new FileReader();
-        reader.onload = function () { resolve(reader.result); };
-        reader.onerror = function () { resolve(null); };
-        reader.readAsDataURL(blob);
-      });
-    });
-  }
-
   function exportAll() {
-    say('Preparing your copy…');
+    if (exporting) return;
+    exporting = true;
+    say('Preparing your copy\u2026');
     Promise.all([store.entries(), loadPeople(true), store.elders(), store.legacy()]).then(function (r) {
-      var entries = r[0].filter(function (e) { return e.owner === state.user.id; });
-      var media = [];
-      entries.forEach(function (e) { e.media.forEach(function (m) { media.push(m); }); });
-      return media.reduce(function (p, m, i) {
+      var archive = {
+        owner: { name: state.user.name, email: state.user.email }, legacy: r[3], people: r[1], weekly: r[2],
+        entries: r[0].filter(function (e) { return e.owner === state.user.id; }), exportedAt: new Date().toISOString(),
+      };
+      var files = exporter.layout(archive.entries);
+      var fetched = {};
+      return files.reduce(function (p, f, i) {
         return p.then(function () {
-          say('Adding file ' + (i + 1) + ' of ' + media.length + '…');
-          return store.mediaUrl(m).then(toDataUrl).then(function (d) { m.data = d; }, function () { m.data = null; });
+          say('Copying file ' + (i + 1) + ' of ' + files.length + '\u2026');
+          return store.mediaUrl(f.media)
+            .then(function (url) { return fetch(url); })
+            .then(function (res) { if (!res.ok) throw new Error(res.status); return res.arrayBuffer(); })
+            .then(function (buf) { fetched[f.path] = new Uint8Array(buf); }, function () {});
         });
       }, Promise.resolve()).then(function () {
-        download('family-archive-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({
-          format: 'the-cultured-human-family-archive', version: 2, exportedAt: new Date().toISOString(),
-          owner: { name: state.user.name, email: state.user.email }, legacy: r[3], people: r[1], weekly: r[2], entries: entries,
-        }, null, 1), 'application/json');
-        say('Your copy has been downloaded.');
+        var parts = exporter.build(archive, files, fetched);
+        var a = h('a', { href: URL.createObjectURL(new Blob(parts, { type: 'application/zip' })), download: 'family-archive-' + archive.exportedAt.slice(0, 10) + '.zip' });
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 60000);
+        var missing = files.length - Object.keys(fetched).length;
+        say(missing ? 'Your copy has been downloaded, but ' + plural(missing, 'file') + ' could not be copied. Try again later, or open them from the archive.' : 'Your copy has been downloaded: open \u201cStart here\u201d inside it.', !!missing);
       });
-    }).catch(fail);
+    }).catch(fail).then(function () { exporting = false; });
   }
 
   // ---------- bring over the archive kept on this device before accounts ----------

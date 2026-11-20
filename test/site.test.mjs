@@ -91,7 +91,7 @@ test('the app page carries its backend settings, loads its scripts in order and 
   assert.ok(meta, 'backend meta tag');
   assert.deepEqual(JSON.parse(meta[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&')), site.backend);
   const scripts = [...html.matchAll(/<script src="\/scripts\/([\w-]+)\.js" defer><\/script>/g)].map((m) => m[1]);
-  assert.deepEqual(scripts, ['site', 'roots-art', 'app-core', 'app-store-local', 'app-store-supabase', 'app-store-sample', 'app']);
+  assert.deepEqual(scripts, ['site', 'roots-art', 'app-core', 'app-export', 'app-store-local', 'app-store-supabase', 'app-store-sample', 'app']);
   assert.match(html, /<meta name="robots" content="noindex/);
   assert.ok(!read('sitemap.xml').includes('/app.html'));
   assert.ok(!read('index.html').includes('tch-backend'), 'only the app page carries the settings');
@@ -232,6 +232,13 @@ test('the footer stays short', () => {
   assert.match(read('index.html'), /href="\/credits\.html"/);
 });
 
+test('the closing promise is published and linked from the plans and the archive settings', () => {
+  const promise = read('if-we-close.html');
+  for (const words of [/90 days/, /never sell your archive/, /Download everything/, /delete every archive/]) assert.match(promise, words);
+  assert.match(read('plans.html'), /href="\/if-we-close\.html"/);
+  assert.match(readFileSync(join(PUBLIC, 'scripts/app.js'), 'utf8'), /'\/if-we-close\.html'/);
+});
+
 test('nothing is offered to companies: no corporate gifting, team sessions or offsites', () => {
   for (const page of pages) assert.doesNotMatch(read(page), /corporate|company gift|offsite|workplace|your team\b/i, page);
 });
@@ -249,7 +256,7 @@ test('the retired lifestyle pages and the quiz are gone, and their old addresses
 test('privacy, terms and community guidelines are on every page, and the contribute form points to them', () => {
   for (const page of pages) {
     const bottom = read(page).match(/<div class="container site-footer__bottom">[\s\S]*?<\/div>/)[0];
-    for (const href of ['/privacy.html', '/terms.html', '/community-guidelines.html', '/credits.html']) assert.ok(bottom.includes(`href="${href}"`), `${page}: ${href}`);
+    for (const href of ['/privacy.html', '/terms.html', '/community-guidelines.html', '/if-we-close.html', '/credits.html']) assert.ok(bottom.includes(`href="${href}"`), `${page}: ${href}`);
   }
   const app = readFileSync(join(PUBLIC, 'scripts/app.js'), 'utf8');
   assert.ok(app.includes("'/community-guidelines.html'") && app.includes("'/privacy.html'"));
