@@ -45,7 +45,7 @@ Until the steps below are done, the function refuses to run (no `CRON_SECRET`) o
 
    जब मन करे, अपना जवाब {{2}} को वॉइस नोट में भेजिए, जिस भी भाषा में आप सहज हों। यह नंबर सिर्फ़ सवाल भेजता है।
    ```
-4. **Replies.** Some people will reply to the business number anyway. In WhatsApp Manager, set an away message such as "Thank you! Please send your answer to the person who asked you."
+4. **Replies.** Until answers are kept (the next section), some people will reply to the business number anyway. In WhatsApp Manager, set an away message such as "Thank you! Please send your answer to the person who asked you."
 5. **Vercel environment variables** (Project → Settings → Environment Variables, Production):
 
    | Name | Value |
@@ -65,3 +65,46 @@ Until the steps below are done, the function refuses to run (no `CRON_SECRET`) o
 7. **Offer it in the app.** In `content/site.json`, set `"weeklyAuto": true` inside `backend`, then build and push. The **Send it for me** choice then appears on the weekly question for people with a WhatsApp number.
 
 Vercel's logs for the function show each day's result: the day, how many were sent and any failures (for example a number without its country code).
+
+## Keeping the answers people send back
+
+Once this is set up, the person can reply to the question with a voice note (or a photo, video or message) and it goes straight into the family member's archive. `api/whatsapp-webhook.py` and `backend/whatsapp/replies.py` do it:
+
+- Only messages from the number of someone with **Send it for me** switched on are kept; anything else is ignored. If two people share a number, the one asked most recently is taken to be answering.
+- The first message after a question becomes an entry under that question, told by that person and kept as **Only me**. Anything else they send within twelve hours joins the same entry: more voice notes, a photo, a few words.
+- The question then counts as answered, so the next one goes out on their next day.
+- They get a short thank-you in their language, and the family member gets an email with a link (when `RESEND_API_KEY` and `EMAIL_FROM` are set, as for the notifier).
+- Each message is kept once, even when Meta sends it twice. Files over 50 MB are not downloaded; the entry says one arrived.
+
+1. **Database.** Run the current `backend/schema.sql`, which has the `whatsapp_messages` table.
+2. **The webhook.** In the Meta app, open WhatsApp → Configuration → Webhook. Set the callback URL to `https://<your-site>/api/whatsapp-webhook` and the verify token to a long random string, then subscribe to the **messages** field. Note the app secret (App settings → Basic).
+3. **Vercel environment variables**, as well as the ones above:
+
+   | Name | Value |
+   | --- | --- |
+   | `WHATSAPP_VERIFY_TOKEN` | The verify token from step 2 |
+   | `WHATSAPP_APP_SECRET` | The app secret. Every message is checked against it; without it the webhook refuses everything. |
+
+4. **A template that asks for the reply here.** Create a template named `weekly_question_reply` (English, and Hindi for people asked in Hindi) and set `WHATSAPP_TEMPLATE=weekly_question_reply`:
+
+   ```
+   {{1}}, this week's question from {{2}}:
+
+   {{3}}
+
+   Reply here with a voice note whenever you like, in whichever language feels right. It goes straight to {{2}}'s family archive, seen only by the family.
+   ```
+
+   ```
+   {{1}}, {{2}} की ओर से इस हफ़्ते का सवाल:
+
+   {{3}}
+
+   जब मन करे, यहीं वॉइस नोट में जवाब दीजिए, जिस भी भाषा में आप सहज हों। यह सीधे {{2}} के पारिवारिक संग्रह में जाता है, जिसे सिर्फ़ परिवार देखता है।
+   ```
+
+   Remove the away message from step 4 above.
+5. **Tell the app.** In `content/site.json`, set `"whatsappReplies": true` inside `backend`, then build and push. The weekly question then tells the family member that answers arrive by themselves.
+
+The thank-you is a reply inside a conversation the person started, which Meta's current pricing does not charge for; check its pricing page.
+

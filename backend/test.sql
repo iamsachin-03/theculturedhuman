@@ -282,6 +282,16 @@ reset role;
 select check_that((select data->>'mode' from roots where owner_id = '00000000-0000-0000-0000-00000000000a') = 'sides', 'and nobody else can change it');
 set role authenticated;
 
+-- Kept WhatsApp messages are for the webhook alone.
+reset role;
+insert into weekly_elders (owner_id, name, day, auto_send, phone) values ('00000000-0000-0000-0000-00000000000a', 'Nani', 0, true, '98765 43210');
+insert into whatsapp_messages (id, elder_id, entry_id)
+  select 'wamid.1', (select id from weekly_elders where name = 'Nani'), (select id from entries where owner_id = '00000000-0000-0000-0000-00000000000a' limit 1);
+set role authenticated;
+select as_user('00000000-0000-0000-0000-00000000000a', 'asha@example.com');
+select check_that(fails($$select * from whatsapp_messages$$), 'nobody signed in can read which WhatsApp messages were kept');
+select check_that(fails($$insert into whatsapp_messages (id, elder_id, entry_id) values ('x', gen_random_uuid(), gen_random_uuid())$$), 'or add to them');
+
 -- Leaving takes the whole archive with it.
 select as_user('00000000-0000-0000-0000-000000000012', 'quiet@example.com');
 insert into entries (kind, title, audience) values ('story', 'A quiet story', 'private');

@@ -1161,7 +1161,9 @@
     return h('div', { class: 'app-auto' },
       h('label', { class: 'app-check' }, box, ' Send it for me every ' + DAYS[elder.day] + ' morning. ' + elder.name + ' has agreed to get it from The Cultured Human\'s WhatsApp number.'),
       h('p', { class: 'field__hint' }, elder.autoSend
-        ? 'Each new question goes out on its day, once you mark the last one answered or skipped. The message asks ' + elder.name + ' to send the answer to you, not to us.'
+        ? 'Each new question goes out on its day, once the last one is answered or skipped. ' + (cfg.whatsappReplies
+          ? elder.name + ' can simply reply with a voice note: it lands in your archive, kept as Only me, and the next question waits for next week.'
+          : 'The message asks ' + elder.name + ' to send the answer to you, not to us.')
         : 'Until then, send it yourself with the button above.'),
     );
   }

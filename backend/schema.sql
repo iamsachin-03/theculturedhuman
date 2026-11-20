@@ -115,6 +115,16 @@ create table weekly_elders (
   created_at timestamptz not null default now()
 );
 
+-- WhatsApp messages kept from the people asked the weekly question (api/whatsapp-webhook.py, using the
+-- service key): each message once, and later messages join the entry its first one made.
+create table whatsapp_messages (
+  id text primary key,
+  elder_id uuid not null references weekly_elders (id) on delete cascade,
+  entry_id uuid not null references entries (id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+create index whatsapp_messages_recent on whatsapp_messages (elder_id, created_at desc);
+
 create table roots (
   owner_id uuid primary key default auth.uid() references auth.users (id) on delete cascade,
   data jsonb not null default '{}'
@@ -587,6 +597,7 @@ alter table legacy enable row level security;
 alter table entries enable row level security;
 alter table media enable row level security;
 alter table weekly_elders enable row level security;
+alter table whatsapp_messages enable row level security;
 alter table roots enable row level security;
 alter table places enable row level security;
 alter table place_contributions enable row level security;
@@ -672,6 +683,7 @@ grant usage on schema public to anon, authenticated;
 grant select on places, place_contributions, listings, contribution_echo_counts to anon;
 grant select, insert, update, delete on all tables in schema public to authenticated;
 revoke insert, update, delete on contacts, contribution_echo_counts from authenticated;
+revoke all on whatsapp_messages from authenticated;
 revoke update on legacy, people, media from authenticated;
 grant update (transcript, translation, transcript_by) on media to authenticated;
 grant update (quiet_months, wait_days) on legacy to authenticated;

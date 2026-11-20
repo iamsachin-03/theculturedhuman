@@ -134,6 +134,7 @@
     "anonKey": "sb_publishable_LOnHHRxeeeUMbVcWWhvPtw_X-0gGSnT",
     "google": false,
     "weeklyAuto": false,
-    "transcribe": false
+    "transcribe": false,
+    "whatsappReplies": false
   }
 }
