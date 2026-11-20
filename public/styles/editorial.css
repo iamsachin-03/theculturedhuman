@@ -945,6 +945,12 @@ button.text-link { background: none; border: 0; padding: 0; cursor: pointer; fon
 .app-transcript h4 { margin: .5rem 0 0; font: 600 .8rem/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .app-transcript__text { margin: 0; white-space: pre-wrap; }
 .app-transcript__form { display: grid; gap: .75rem; }
+.app-visit__questions summary { cursor: pointer; }
+.app-visit__group { border: 0; margin: 1rem 0 0; padding: 0; display: grid; gap: .45rem; }
+.app-visit__group legend { font-weight: 600; margin-bottom: .4rem; }
+.app-visit__group .app-check { align-items: flex-start; line-height: 1.4; }
+.app-visit__group input { margin-top: .2rem; flex: none; }
+.app-visit__count { color: var(--muted); font-size: .9rem; }
 .app-gift-options { display: grid; gap: .8rem; margin-bottom: var(--space-3); }
 .app-gift-options h2 { margin: .5rem 0 0; font-size: var(--step-1); }
 .app-giftcard { max-width: 34rem; margin: 0 auto var(--space-3); padding: clamp(2rem, 6vw, 3.5rem) clamp(1.5rem, 5vw, 3rem); text-align: center; background: var(--surface); border: 1px solid var(--line); outline: 1px solid var(--accent-2); outline-offset: -12px; font-family: var(--serif); }

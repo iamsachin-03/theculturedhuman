@@ -177,7 +177,7 @@
 
   var routes = [
     [/^$/, home], [/^archive$/, archive], [/^entry\/new$/, editor], [/^entry\/([\w-]+)\/edit$/, editor],
-    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^interview$/, interview], [/^book$/, book], [/^gift$/, gift], [/^people$/, people], [/^shared$/, shared],
+    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^interview$/, interview], [/^book$/, book], [/^gift$/, gift], [/^visit$/, visit], [/^people$/, people], [/^shared$/, shared],
     [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings], [/^contribute$/, contribute], [/^moderate$/, moderate],
     [/^offer$/, offer], [/^request$/, requestForm], [/^requests$/, requests], [/^echo$/, echo], [/^report$/, reportForm],
   ];
@@ -1207,21 +1207,119 @@
   // ---------- a sit-down interview ----------
   // For when you are with them: one question at a time on screen, a recorder, follow-ups to keep
   // them talking, and each answer kept as its own entry, private until you choose otherwise.
+  // With owner=, a relative or a visiting storyteller who can add to that archive records into it;
+  // with set=, only those questions (numbers from 0), as chosen for a recording visit.
   function interview(_, query) {
-    var h1 = page('An interview', 'Sit together somewhere quiet, put the phone between you, and let the questions do the work. Each answer is kept as its own entry, visible only to you until you share it.');
-    return store.elders().then(function (elders) {
+    var owner = query.get('owner') || state.user.id;
+    var forOther = owner !== state.user.id;
+    var set = (query.get('set') || '').split(',').filter(function (n) { return /^\d+$/.test(n) && Number(n) < core.QUESTIONS.length; }).map(Number);
+    return Promise.all([forOther ? Promise.resolve([]) : store.elders(), forOther ? store.sharedWithMe() : Promise.resolve([])]).then(function (r) {
+      var elders = r[0];
+      var sharedRow = r[1].filter(function (x) { return x.owner === owner; })[0];
+      if (forOther && (!sharedRow || sharedRow.role !== 'family_edit')) {
+        return page('Not available', 'You can only record into an archive whose owner added you as Family, can add. Ask them to add ' + state.user.email + '.');
+      }
+      var h1 = page(forOther ? 'An interview for ' + firstName(sharedRow.ownerName) + '\u2019s archive' : 'An interview', forOther
+        ? 'Each answer is kept in ' + sharedRow.ownerName + '\u2019s archive as its own entry, visible only to them and you until they share it.'
+        : 'Sit together somewhere quiet, put the phone between you, and let the questions do the work. Each answer is kept as its own entry, visible only to you until you share it.');
       var elder = elders.filter(function (e) { return e.id === query.get('elder'); })[0] || null;
       var who = elder ? elder.name : query.get('teller') || '';
-      if (!who) return interviewSetup(elders, h1);
+      if (!who) return interviewSetup(elders, h1, forOther ? owner : null);
       var lang = query.get('lang') || (elder && elder.lang) || 'en';
       var at = Number(query.get('q'));
-      if (!(at >= 0)) at = elder ? elder.idx : 0;
-      add(view, interviewCard(who, lang, at, elder));
+      if (!(at >= 0)) at = elder && !set.length ? elder.idx : 0;
+      add(view, interviewCard(who, lang, at, elder, { owner: owner, ownerName: forOther ? sharedRow.ownerName : null, set: set }));
       return h1;
     });
   }
 
-  function interviewSetup(elders, h1) {
+  // ---------- a recording visit ----------
+  // For when someone else does the recording: a storyteller booked on the platform, or a cousin who
+  // lives nearby. The family chooses the questions; the brief carries a link that records straight
+  // into this archive once the visitor is added as Family, can add.
+  function visit(_, query) {
+    var h1 = page('Prepare a recording visit', 'For when a storyteller, or a relative who lives nearby, sits with someone you love and records them for you. Choose the questions, send the brief, and every answer lands in your archive.');
+    return Promise.all([store.elders(), loadPeople(true)]).then(function (r) {
+      var elders = r[0];
+      var who = h('input', { name: 'teller', required: true, maxlength: '80', placeholder: 'Nani, Dad, my aunt\u2026', value: query.get('teller') || (elders[0] ? elders[0].name : '') });
+      var lang = options(h('select', { name: 'lang' }), core.LANGUAGES, elders[0] ? elders[0].lang : 'en');
+      var visitor = h('input', { name: 'visitor', maxlength: '80', placeholder: 'Their name' });
+      var email = h('input', { name: 'visitorEmail', type: 'email', placeholder: 'The email they will sign in with' });
+      var notes = h('textarea', { name: 'notes', rows: '4', maxlength: '2000', placeholder: 'Names to ask about, a story you have heard half of, anything to avoid\u2026' });
+      var boxes = core.QUESTIONS.map(function (q, i) { return h('input', { type: 'checkbox', value: String(i), checked: i < 8, onchange: draw }); });
+      var brief = h('pre', { class: 'app-message' });
+      var actions = h('div', { class: 'btn-row' });
+      var addedNote = h('p', { class: 'field__hint', 'aria-live': 'polite' });
+      [who, visitor, email, notes].forEach(function (el) { el.addEventListener('input', draw); });
+      lang.addEventListener('change', draw);
+      var text = '';
+
+      add(view, h('section', { class: 'app-card' },
+        h('h2', null, 'Who will be recorded?'),
+        elders.length > 1 ? h('div', { class: 'app-filters', role: 'group', 'aria-label': 'People you ask every week' }, elders.map(function (e) {
+          return h('a', { href: '#/visit?teller=' + encodeURIComponent(e.name), onclick: function (ev) { ev.preventDefault(); who.value = e.name; lang.value = e.lang; draw(); } }, e.name);
+        })) : null,
+        h('div', { class: 'app-form-grid' }, field('Their name', who), field('Ask in', lang, 'They can answer in any language.')),
+        h('h2', null, 'Who is visiting?'),
+        h('div', { class: 'app-form-grid' }, field('Name (optional)', visitor), field('Email (optional)', email, 'Needed to record straight into your archive.')),
+        field('Notes for the visitor (optional)', notes, null, true),
+      ));
+      var groups = core.KINDS.map(function (k) {
+        var items = core.QUESTIONS.map(function (_, i) { return { q: core.question(i), i: i }; }).filter(function (x) { return x.q.kind === k.id; });
+        return items.length ? h('fieldset', { class: 'app-visit__group' }, h('legend', null, k.heading),
+          items.map(function (x) { return h('label', { class: 'app-check' }, boxes[x.i], ' ' + x.q.text); })) : null;
+      });
+      add(view, h('details', { class: 'app-card app-visit__questions', open: true },
+        h('summary', null, h('strong', null, 'The questions'), ' ', h('span', { class: 'app-visit__count' })),
+        h('p', { class: 'field__hint' }, 'Eight to twelve fill a relaxed afternoon. They are asked in this order.'),
+        groups));
+      add(view, h('section', { class: 'app-card app-card--accent' },
+        h('h2', null, 'The brief'),
+        brief, actions, addedNote,
+        h('p', { class: 'field__hint' }, 'While the visitor is on your list as Family, can add, they also see what you share with My family. Remove them in My people after the visit; what they recorded stays yours.'),
+      ));
+
+      function chosen() { return boxes.filter(function (b) { return b.checked; }).map(function (b) { return Number(b.value); }); }
+      function draw() {
+        var set = chosen();
+        view.querySelector('.app-visit__count').textContent = '(' + set.length + ' chosen)';
+        var name = who.value.trim() || 'them';
+        var lng = lang.value;
+        var url = returnTo + '#/interview?owner=' + state.user.id + '&teller=' + encodeURIComponent(name) + '&lang=' + lng + '&set=' + set.join(',');
+        text = (visitor.value.trim() ? visitor.value.trim() + ', thank you for recording ' : 'Thank you for recording ') + name + ' for our family.\n\n' +
+          'Please ask in ' + core.find(core.LANGUAGES, lng).label.replace(/ \(.*\)$/, '') + ' (they can answer in any language), and ask ' + name + '\u2019s permission before you start.\n\n' +
+          (notes.value.trim() ? 'A few notes:\n' + notes.value.trim() + '\n\n' : '') +
+          'The questions:\n' + set.map(function (i, n) { return (n + 1) + '. ' + core.question(i, lng).text; }).join('\n') + '\n\n' +
+          'To record each answer straight into my family archive, sign in at ' + returnTo + (email.value.trim() ? ' with ' + email.value.trim() : '') + ', then open:\n' + url + '\n\n' +
+          'Each answer is kept as its own entry, seen only by me and you until I share it.\n\n' + firstName(state.user.name);
+        brief.textContent = text;
+        actions.textContent = '';
+        add(actions, [
+          button('Copy the brief', function () {
+            (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { say('Copied. Paste it into any message.'); }, function () { say('Select the brief above and copy it.'); });
+          }),
+          h('a', { class: 'btn btn--ghost', href: 'https://wa.me/?text=' + encodeURIComponent(text), target: '_blank', rel: 'noopener' }, 'Send on WhatsApp'),
+          email.value.trim() ? h('a', { class: 'btn btn--ghost', href: 'mailto:' + email.value.trim() + '?subject=' + encodeURIComponent('Recording ' + name + ' for our family') + '&body=' + encodeURIComponent(text) }, 'Send by email') : null,
+        ]);
+        var mail = email.value.trim().toLowerCase();
+        var listed = (state.people || []).filter(function (p) { return p.email === mail; })[0];
+        addedNote.textContent = '';
+        if (!mail) return;
+        if (listed && listed.role === 'family_edit') add(addedNote, (listed.name || mail) + ' can record into your archive.');
+        else add(addedNote, button(listed ? 'Let ' + listed.name + ' record into your archive' : 'Add ' + (visitor.value.trim() || mail) + ' so they can record into your archive', function (ev) {
+          ev.target.disabled = true;
+          store.savePerson({ id: listed && listed.id, name: visitor.value.trim() || (listed && listed.name) || mail.split('@')[0], email: mail, role: 'family_edit' })
+            .then(function () { return loadPeople(true); })
+            .then(function () { say('Added. They can record once they sign in with ' + mail + '.'); draw(); })
+            .catch(function (err) { ev.target.disabled = false; fail(err); });
+        }, 'btn btn--small'));
+      }
+      draw();
+      return h1;
+    });
+  }
+
+  function interviewSetup(elders, h1, owner) {
     var form = h('form', { class: 'app-card' });
     var name = h('input', { name: 'teller', required: true, maxlength: '80', placeholder: 'Nani, Dad, my aunt\u2026' });
     var lang = options(h('select', { name: 'lang' }), core.LANGUAGES, 'en');
@@ -1231,7 +1329,7 @@
         return h('a', { href: '#/interview?elder=' + e.id }, e.name);
       })) : null,
       h('div', { class: 'app-form-grid' }, field('Their name', name), field('Ask in', lang, 'They can answer in any language.')),
-      h('div', { class: 'btn-row' }, button('Begin', null, 'btn', 'submit')),
+      h('div', { class: 'btn-row' }, button('Begin', null, 'btn', 'submit'), owner ? null : link('#/visit', 'Someone else will record them?', 'text-link')),
       h('details', { class: 'app-howto' }, h('summary', null, 'Before you begin'),
         h('ul', null,
           h('li', null, 'Ask if they are happy to be recorded, and tell them who will hear it.'),
@@ -1241,15 +1339,26 @@
     ]);
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      location.hash = '#/interview?teller=' + encodeURIComponent(name.value.trim()) + '&lang=' + lang.value;
+      location.hash = '#/interview?' + (owner ? 'owner=' + owner + '&' : '') + 'teller=' + encodeURIComponent(name.value.trim()) + '&lang=' + lang.value;
     });
     add(view, form);
     return h1;
   }
 
-  function interviewCard(who, lang, at, elder) {
-    var q = core.question(at, lang);
-    var base = '#/interview?' + (elder ? 'elder=' + elder.id : 'teller=' + encodeURIComponent(who)) + '&lang=' + lang + '&q=';
+  function interviewCard(who, lang, at, elder, opts) {
+    var set = opts.set;
+    var total = set.length || core.QUESTIONS.length;
+    var forOther = opts.owner !== state.user.id;
+    var base = '#/interview?' + (forOther ? 'owner=' + opts.owner + '&' : '') + (elder ? 'elder=' + elder.id : 'teller=' + encodeURIComponent(who)) + '&lang=' + lang + (set.length ? '&set=' + set.join(',') : '') + '&q=';
+    var seeKept = link(forOther ? '#/shared/' + opts.owner : '#/archive?teller=' + encodeURIComponent(who), forOther ? 'See ' + firstName(opts.ownerName) + '\u2019s archive' : 'See what you kept from ' + who, 'text-link');
+    if (set.length && at >= set.length) {
+      return h('section', { class: 'app-card app-card--accent app-interview' },
+        h('p', { class: 'eyebrow' }, 'With ' + who),
+        h('h2', null, 'That was the last question for this visit.'),
+        h('p', null, 'Thank ' + who + '. Everything you kept is waiting' + (forOther ? ' in ' + opts.ownerName + '\u2019s archive' : ' in your archive') + ', private until ' + (forOther ? firstName(opts.ownerName) : 'you') + ' choose' + (forOther ? 's' : '') + ' who sees it.'),
+        h('div', { class: 'btn-row' }, link(base + '0', 'Start again from the first', 'btn btn--ghost'), seeKept));
+    }
+    var q = core.question(set.length ? set[at] : at, lang);
     var card = h('section', { class: 'app-card app-card--accent app-interview' });
     var status = h('p', { class: 'field__hint', 'aria-live': 'polite' });
     var preview = h('div', { class: 'app-record__preview' });
@@ -1292,20 +1401,20 @@
     }
     function keep() {
       keepBtn.disabled = true;
-      store.saveEntry({ owner: state.user.id, kind: q.kind, title: q.text.length > 120 ? q.text.slice(0, 117) + '\u2026' : q.text, prompt: q.text, teller: who, body: '', audience: 'private', audiencePeople: [] })
+      store.saveEntry({ owner: opts.owner, kind: q.kind, title: q.text.length > 120 ? q.text.slice(0, 117) + '\u2026' : q.text, prompt: q.text, teller: who, body: '', audience: 'private', audiencePeople: [] })
         .then(function (saved) {
           say('Saving the recording\u2026');
           return store.addMedia(saved, take, take.name).then(function () { return saved; });
         })
         .then(function () {
-          return elder ? store.saveElder({ id: elder.id, idx: at + 1, answered: elder.answered + 1, askedAt: null }) : null;
+          return elder && !set.length ? store.saveElder({ id: elder.id, idx: at + 1, answered: elder.answered + 1, askedAt: null }) : null;
         })
-        .then(function () { flash = 'Kept, visible only to you. Here is the next one.'; location.hash = base + (at + 1); })
+        .then(function () { flash = (forOther ? 'Kept, visible only to ' + firstName(opts.ownerName) + ' and you.' : 'Kept, visible only to you.') + (set.length && at + 1 >= set.length ? '' : ' Here is the next one.'); location.hash = base + (at + 1); })
         .catch(fail).then(function () { keepBtn.disabled = false; });
     }
 
     add(card, [
-      h('p', { class: 'eyebrow' }, 'With ' + who + ' \u00b7 question ' + q.week + ' of ' + core.QUESTIONS.length),
+      h('p', { class: 'eyebrow' }, 'With ' + who + ' \u00b7 question ' + (set.length ? at + 1 : q.week) + ' of ' + total),
       h('h2', { class: 'app-interview__q', lang: q.lang }, q.text),
       q.lang !== 'en' ? h('p', { class: 'field__hint' }, q.en) : null,
       h('div', { class: 'btn-row' }, recordBtn, keepBtn, againBtn),
@@ -1314,7 +1423,7 @@
         h('ul', { lang: q.lang }, core.FOLLOW_UPS[q.lang].map(function (f) { return h('li', null, f); }))),
       h('div', { class: 'btn-row' },
         link(base + (at + 1), 'Skip to the next question', 'btn btn--ghost btn--small'),
-        link('#/archive?teller=' + encodeURIComponent(who), 'See what you kept from ' + who, 'text-link')),
+        seeKept),
     ]);
     return card;
   }
@@ -1481,7 +1590,7 @@
       if (!s) return page('Not shared with you', 'This archive has not been shared with ' + state.user.email + '.');
       var h1 = page(s.ownerName + '\'s archive', ROLE_SENTENCE[s.role]);
       if (s.role === 'legacy') add(view, legacyPanel(s));
-      if (s.role === 'family_edit') add(view, h('div', { class: 'app-toolbar' }, link('#/entry/new?owner=' + owner, 'Add to ' + firstName(s.ownerName) + '\'s archive', 'btn')));
+      if (s.role === 'family_edit') add(view, h('div', { class: 'app-toolbar' }, link('#/entry/new?owner=' + owner, 'Add to ' + firstName(s.ownerName) + '\'s archive', 'btn'), link('#/interview?owner=' + owner, 'Record an interview', 'btn btn--ghost')));
       return store.entries(owner).then(function (entries) {
         if (!entries.length) add(view, h('p', { class: 'empty-state' }, s.role === 'beloved' || s.role === 'legacy' ? 'Nothing has been left for you to see yet. What ' + firstName(s.ownerName) + ' leaves for you appears here on the day they chose, or when their archive is passed on.' : 'Nothing has been shared with you yet.'));
         else add(view, h('div', { class: 'app-list' }, entries.map(entryCard)));
