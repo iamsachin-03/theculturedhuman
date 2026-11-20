@@ -17,13 +17,15 @@
 // into responsive images and credit lines drawn from the register.
 // {{offer-cards id id …}} lists offers as cards and {{enquiry id}} renders an offer's enquiry form.
 // {{directory maker|host|storyteller}} lists people from content/people.json, {{place-cards}} and
-// {{roots-map}} show the places.
+// {{roots-map}} show the places. {{sample-voice}} carries the sample archive's real voice note,
+// when content/sample-voice-note.json gives one (see tools/lib/sample-voice.mjs).
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, statSync, rmSync } from 'node:fs';
 import { join, relative, dirname, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { parseFrontMatter, renderMarkdown, wordCount, inline, escapeHtml } from './lib/markdown.mjs';
 import * as t from './lib/templates.mjs';
+import { readSampleVoice, sampleVoiceScript } from './lib/sample-voice.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC = join(ROOT, 'public');
@@ -32,6 +34,7 @@ const CHECK = process.argv.includes('--check');
 const site = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8'));
 const register = JSON.parse(readFileSync(join(PUBLIC, 'assets/register.json'), 'utf8'));
 const assets = new Map(register.map((a) => [a.id, a]));
+const sampleVoice = readSampleVoice(ROOT);
 
 const offers = new Map();
 for (const [i, o] of JSON.parse(readFileSync(join(ROOT, 'content/offers.json'), 'utf8')).entries()) {
@@ -331,6 +334,7 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
     .replace(/\{\{directory\s+(maker|host|storyteller)\}\}/g, (_, role) => directory(role))
     .replace(/\{\{place-cards\}\}/g, placeCards)
     .replace(/\{\{roots-map\}\}/g, rootsMap)
+    .replace(/\{\{sample-voice\}\}/g, () => sampleVoiceScript(sampleVoice))
     .replace(/\{\{product-journey\}\}/g, () => productJourney(where))
     .replace(/\{\{at-a-glance\s+([\w-]+)\}\}/g, (_, id) => { const p = product(id, where); return t.atAGlance(p, productGroups.get(p.group)); })
     .replace(/\{\{fee-percent\}\}/g, String(site.platformFeePercent))

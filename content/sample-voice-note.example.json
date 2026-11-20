@@ -1,0 +1,14 @@
+{
+  "file": "nani-sings.m4a",
+  "title": "Nani sings the fish song",
+  "speaker": "Full name of the person speaking",
+  "teller": "Nani",
+  "place": "Darbhanga",
+  "recordedOn": "2026-11-21",
+  "transcript": "Every word that is said, in the language it is said in, with an English line under each verse.",
+  "consent": {
+    "given": true,
+    "how": "agreed in writing to it playing on the public sample archive, and can ask for it to be taken down at any time",
+    "date": "2026-11-21"
+  }
+}

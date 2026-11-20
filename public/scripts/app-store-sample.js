@@ -1,6 +1,7 @@
 // A sample family archive, opened with /app.html?sample, so visitors can look around a lived-in
 // archive before they start their own. The family is invented. Everything is read-only and kept
-// in memory; nothing is saved and nothing leaves the browser.
+// in memory; nothing is saved and nothing leaves the browser. The one real thing is an optional voice
+// note, recorded with its speaker's consent (content/sample-voice-note.json, tools/lib/sample-voice.mjs).
 (function (root) {
   var core = root.TCH.core;
   var NO = 'This is a sample archive, so nothing here can be changed. Start your own archive to keep your family\u2019s stories.';
@@ -21,6 +22,10 @@
     { id: 'el-nani', owner: ASHA, name: 'Nani', relation: 'Grandmother', phone: '', day: 0, idx: 6, answered: 5, askedAt: ago(3), birthday: '03-12', createdAt: ago(45) },
   ];
   var memory = function (name) { return 'What do you remember about ' + name + '?'; };
+  var voice = (function () {
+    var el = root.document && root.document.getElementById('tch-sample-voice');
+    try { return el ? JSON.parse(el.textContent) : null; } catch (e) { return null; }
+  })();
   var entries = [
     {
       id: 'kosi-flood', kind: 'story', title: 'How Nani crossed the Kosi in the flood year', teller: 'Nani', place: 'Darbhanga',
@@ -64,7 +69,12 @@
       id: 'guests', kind: 'wisdom', title: 'Nani\u2019s rule for guests', teller: 'Nani', audience: 'family', createdBy: ASHA, createdAt: ago(2),
       body: 'Water first, before they ask. Then ask about their mother. Only then ask why they have come.',
     },
-  ].map(function (e) {
+  ].concat(voice ? [{
+    id: 'voice-note', kind: 'story', title: voice.title, teller: voice.teller, place: voice.place, audience: 'family', createdBy: ASHA, createdAt: ago(1),
+    body: voice.transcript + '\n\nThis voice is real. ' + voice.speaker + ' recorded it on ' + core.formatDate(voice.recordedOn) +
+      ' and agreed to it playing in this sample (' + voice.consent + '). Everything else in this archive is invented.',
+    media: [{ id: 'm-voice', name: voice.title + '.' + voice.url.split('.').pop(), kind: 'audio', type: voice.type, size: voice.size, url: voice.url }],
+  }] : []).map(function (e) {
     var out = { owner: ASHA, prompt: '', teller: '', place: '', forWhom: '', openWhen: '', audiencePeople: [], releaseAt: null, media: [] };
     Object.keys(e).forEach(function (k) { out[k] = e[k]; });
     out.updatedAt = out.createdAt;

@@ -31,6 +31,7 @@ test('the sample archive is lived in: entries, photographs, a relative who adds,
   assert.equal(elders.length, 1);
   assert.ok(roots.generations.length >= 3);
   assert.equal((await sample.entry(entries[0].id)).title, entries[0].title);
+  assert.ok(!entries.some((e) => e.id === 'voice-note'), 'no voice note without a recording and consent');
 });
 
 test('the sample archive refuses every change with an invitation to start your own', async () => {
