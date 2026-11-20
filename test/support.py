@@ -5,7 +5,7 @@ import io
 import json
 import os
 import sys
-from contextlib import contextmanager
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -69,3 +69,10 @@ def env(**values):
     finally:
         os.environ.clear()
         os.environ.update(saved)
+
+
+@contextmanager
+def quiet():
+    """Swallows what a function logs (tracebacks on purpose-made failures, run summaries)."""
+    with redirect_stderr(io.StringIO()), redirect_stdout(io.StringIO()):
+        yield

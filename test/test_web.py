@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timezone
 
-from support import call_wsgi
+from support import call_wsgi, quiet
 from backend.web import Response, cron_allowed, iso_utc, wsgi
 
 
@@ -20,7 +20,8 @@ class Web(unittest.TestCase):
         def boom(req):
             raise RuntimeError('secret detail')
         app = wsgi({'GET': boom, 'POST': lambda req: Response.json({'got': req.json()}, 201)})
-        status, _, body = call_wsgi(app, 'GET')
+        with quiet():
+            status, _, body = call_wsgi(app, 'GET')
         self.assertEqual(status, 500)
         self.assertNotIn('secret detail', body)
         self.assertEqual(call_wsgi(app, 'DELETE')[0], 405)

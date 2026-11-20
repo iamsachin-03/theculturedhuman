@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timezone
 
-from support import FakeHttp, env, load_api
+from support import FakeHttp, env, load_api, quiet
 from backend.notify.notifier import booking_email, config, contribution_email, run
 from backend.web import Request
 
@@ -88,9 +88,9 @@ class Notifier(unittest.TestCase):
 
     def test_the_cron_endpoint_needs_its_secret(self):
         notify = load_api('notify')
-        with env(CRON_SECRET=None):
+        with quiet(), env(CRON_SECRET=None):
             self.assertEqual(notify.get(Request(), http=fake()).status, 503)
-        with env(CRON_SECRET='shh'):
+        with quiet(), env(CRON_SECRET='shh'):
             self.assertEqual(notify.get(Request(headers={'Authorization': 'Bearer nope'}), http=fake()).status, 401)
             with env(SUPABASE_URL=None):
                 res = notify.get(Request(headers={'Authorization': 'Bearer shh'}), http=fake())

@@ -3,7 +3,7 @@ import subprocess
 import unittest
 from datetime import datetime, timezone
 
-from support import ROOT, FakeHttp, env, load_api
+from support import ROOT, FakeHttp, env, load_api, quiet
 from backend.weekly.sender import config, due_today, phone_digits, question, run, template_params, weekday_in
 from backend.web import Request
 
@@ -98,7 +98,7 @@ class WeeklySender(unittest.TestCase):
         weekly = load_api('weekly-send')
         with env(CRON_SECRET=None):
             self.assertEqual(weekly.get(Request(), http=fake()).status, 503)
-        with env(CRON_SECRET='cron'):
+        with quiet(), env(CRON_SECRET='cron'):
             self.assertEqual(weekly.get(Request(headers={'Authorization': 'Bearer wrong'}), http=fake()).status, 401)
             with env(SUPABASE_URL=None):
                 res = weekly.get(Request(headers={'Authorization': 'Bearer cron'}), http=fake())

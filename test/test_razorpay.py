@@ -3,7 +3,7 @@ import json
 import subprocess
 import unittest
 
-from support import FakeHttp, call_wsgi, env, load_api
+from support import FakeHttp, call_wsgi, env, load_api, quiet
 from backend.payments.razorpay import PaymentError, config, create_order, handle_webhook, hmac, respond, verify_payment
 
 BOOKING = '11111111-2222-3333-4444-555555555555'
@@ -112,7 +112,8 @@ class Razorpay(unittest.TestCase):
 
         def boom():
             raise RuntimeError('boom')
-        res = respond(boom)
+        with quiet():
+            res = respond(boom)
         self.assertEqual(res.status, 500)
         self.assertNotIn('boom', res.body.decode())
 
