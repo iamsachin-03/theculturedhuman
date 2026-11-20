@@ -640,26 +640,6 @@ button.text-link { background: none; border: 0; padding: 0; cursor: pointer; fon
 .ask-list li::marker { color: var(--accent-ink); font-family: var(--sans); font-size: .85em; }
 .feature .callout { margin-top: 1.5rem; }
 
-/* ── 8. Curious Minds quiz ───────────────────────────────────────────────── */
-
-.quiz { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.5rem, 4vw, 2.75rem); box-shadow: var(--shadow); }
-.quiz__progress { font-size: .8rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
-.quiz__question { font: 500 var(--step-2)/1.15 var(--serif); color: var(--primary); margin: .5rem 0 1.25rem; }
-.quiz__options { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; list-style: none; margin: 0; padding: 0; }
-.quiz__option {
-  width: 100%; min-height: 52px; padding: .8rem 1rem; text-align: left; cursor: pointer;
-  border-radius: var(--radius-sm); border: 1.5px solid var(--line); background: var(--page); color: var(--ink); font-size: 1rem;
-  transition: border-color .2s, background-color .2s;
-}
-.quiz__option:hover:not([disabled]) { border-color: var(--accent-2); }
-.quiz__option[data-state="correct"] { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 12%, var(--page)); }
-.quiz__option[data-state="wrong"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--page)); }
-.quiz__option[disabled] { cursor: default; }
-.quiz__feedback { min-height: 3.2em; margin: 1rem 0 0; color: var(--muted); font-size: .95rem; }
-.quiz__feedback strong { color: var(--ink); }
-.quiz__actions { display: flex; gap: .75rem; align-items: center; margin-top: .5rem; }
-@media (max-width: 600px) { .quiz__options { grid-template-columns: 1fr; } }
-
 /* ── 9. Community & newsletter ───────────────────────────────────────────── */
 
 .invite { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(1.25rem, 3vw, 2.5rem); }
@@ -1160,9 +1140,6 @@ button.text-link { background: none; border: 0; padding: 0; cursor: pointer; fon
 .earn-card p { color: var(--muted); font-size: .95rem; }
 .earn-card .text-link { margin-top: auto; }
 
-.theme-links ul { list-style: none; margin: var(--space-3) 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
-.theme-links a { display: inline-block; padding: .4rem .9rem; border: 1px solid var(--line); border-radius: 999px; font-size: .9rem; color: var(--primary); text-decoration: none; }
-.theme-links a:hover { border-color: var(--accent-2); }
 
 /* Archive home: coming up, and the family book */
 .app-occasion { border-left: 4px solid var(--accent-2); }

@@ -121,30 +121,9 @@
     }
   ],
   "pillars": {
-    "culture": {
-      "label": "India, Many Cultures",
-      "href": "/culture.html"
-    },
-    "wisdom": {
-      "label": "Wisdom of the Ages",
-      "href": "/proverbs.html"
-    },
-    "food-travel": {
-      "label": "Food, Places & Journeys",
-      "href": "/experiences.html"
-    },
-    "conscious-living": {
-      "label": "Conscious Living",
-      "href": "/conscious-living.html"
-    },
-    "better-self": {
-      "label": "The Better Self",
-      "href": "/fitness.html"
-    },
-    "curious-minds": {
-      "label": "Music, Arts & Curious Minds",
-      "href": "/music.html"
-    }
+    "culture": { "label": "India, Many Cultures" },
+    "wisdom": { "label": "Wisdom of the Ages" },
+    "food-travel": { "label": "Food, Places & Journeys" }
   },
   "analytics": {
     "vercel": false

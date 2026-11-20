@@ -125,18 +125,6 @@ export function storyCard(article, asset, pillarLabel) {
   return `<a class="story-card" href="${article.path}"><div class="story-card__media">${picture(asset, { sizes: '(max-width: 700px) 100vw, 400px' })}</div><span class="eyebrow">${e(pillarLabel)}</span><h3>${e(article.title)}</h3><p>${e(article.description)}</p></a>`;
 }
 
-export function quiz(questions) {
-  return `<div class="quiz" data-quiz>
-<script type="application/json">${JSON.stringify(questions).replace(/</g, '\\u003c')}</script>
-<p class="quiz__progress" aria-live="polite"></p>
-<h3 class="quiz__question">Six questions on India's arts, food and ideas</h3>
-<ul class="quiz__options"></ul>
-<p class="quiz__feedback" aria-live="polite"></p>
-<div class="quiz__actions"><button class="btn quiz__next" type="button" hidden>Next question</button></div>
-<noscript><p>This quiz needs JavaScript. You can still explore every story in <a href="/journal/">the journal</a>.</p></noscript>
-</div>`;
-}
-
 export function offerCard(offer, asset) {
   return `<a class="offer-card" href="${offer.href}"><div class="offer-card__media">${picture(asset, { sizes: '(max-width: 700px) 100vw, 360px', alt: '' })}</div><div class="offer-card__body"><span class="eyebrow">${e(offer.label)}</span><h3>${e(offer.title)}</h3><p>${e(offer.summary)}</p><span class="offer-card__action">${e(offer.action)}</span></div></a>`;
 }
@@ -260,7 +248,7 @@ export function articleMain({ site, article, hero, bodyHtml, sourcesHtml, relate
   const pillar = site.pillars[article.pillar];
   const main = `<article>
 <header class="article-header container">
-<a class="eyebrow eyebrow--plain" href="${pillar.href}">${e(article.series ? `${article.series} · ${pillar.label}` : pillar.label)}</a>
+<p class="eyebrow">${e(article.series ? `${article.series} · ${pillar.label}` : pillar.label)}</p>
 <h1>${e(article.title)}</h1>
 <p class="dek">${e(article.dek)}</p>
 <p class="article-meta"><span>${e(article.author)}</span><span><time datetime="${article.date}">${formatDate(article.date)}</time></span><span>${article.readingMinutes} min read</span></p>
@@ -277,13 +265,12 @@ ${related.length ? `<section class="related container" aria-labelledby="related-
   return main;
 }
 
-export function journalMain({ cards, themes }) {
+export function journalMain({ cards }) {
   return `<section class="page-hero">
 <div class="container">
 <p class="eyebrow">Stories</p>
 <h1>Stories of <em>where we come from.</em></h1>
 <p class="lede">Researched, sourced and written with care: the crafts, kitchens, ideas and places that families carry with them.</p>
-<nav class="theme-links" aria-label="Story themes"><ul>${themes.map((p) => `<li><a href="${p.href}">${e(p.label)}</a></li>`).join('')}</ul></nav>
 </div>
 </section>
 <section class="section">

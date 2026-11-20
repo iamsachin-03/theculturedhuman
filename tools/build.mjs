@@ -32,12 +32,6 @@ const CHECK = process.argv.includes('--check');
 const site = JSON.parse(readFileSync(join(ROOT, 'content/site.json'), 'utf8'));
 const register = JSON.parse(readFileSync(join(PUBLIC, 'assets/register.json'), 'utf8'));
 const assets = new Map(register.map((a) => [a.id, a]));
-const quiz = JSON.parse(readFileSync(join(ROOT, 'content/quiz.json'), 'utf8'));
-quiz.forEach((q, i) => {
-  if (!q.q || !Array.isArray(q.options) || !(q.answer in q.options) || !q.explain) {
-    throw new Error(`content/quiz.json: question ${i + 1} needs q, options, a valid answer index and explain`);
-  }
-});
 
 const offers = new Map();
 for (const [i, o] of JSON.parse(readFileSync(join(ROOT, 'content/offers.json'), 'utf8')).entries()) {
@@ -227,9 +221,9 @@ emit(
   {
     path: '/journal/',
     title: `Stories — ${site.name}`,
-    description: 'Researched essays and explainers on Indian art, philosophy, food, craft and conscious living from The Cultured Human.',
+    description: 'Researched stories of the crafts, kitchens, ideas and places that families carry with them, from The Cultured Human.',
   },
-  t.journalMain({ cards: articles.map(card), themes: Object.values(site.pillars) }),
+  t.journalMain({ cards: articles.map(card) }),
   articles[0]?.heroImage,
 );
 emit(
@@ -332,7 +326,6 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith('.html'))) {
       return t.picture(a, { sizes: opt.sizes, className: opt.class, eager: Boolean(opt.eager), alt: opt.alt });
     })
     .replace(/\{\{latest-articles(?:\s+(\d+))?\}\}/g, (_, n) => articles.slice(0, Number(n) || 3).map(card).join('\n'))
-    .replace(/\{\{quiz\}\}/g, () => t.quiz(quiz))
     .replace(/\{\{offer-cards\s+([\w\s-]+)\}\}/g, (_, ids) => `<div class="offer-grid">${offerCards(ids.trim().split(/\s+/), where).join('')}</div>`)
     .replace(/\{\{enquiry\s+([\w-]+)\}\}/g, (_, id) => t.enquiryForm(site, offer(id, where)))
     .replace(/\{\{directory\s+(maker|host|storyteller)\}\}/g, (_, role) => directory(role))

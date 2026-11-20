@@ -33,7 +33,7 @@ const TYPES = {
   '.xml': 'application/xml; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
 };
-const REDIRECTS = { '/bazaar.html': '/marketplace.html', '/journal/index.html': '/journal/' };
+
 
 /** vercel.json's headers for every path, adjusted for plain http on this computer. */
 function securityHeaders() {
@@ -47,6 +47,7 @@ function securityHeaders() {
   return out;
 }
 const SECURITY = securityHeaders();
+const REDIRECTS = Object.fromEntries(JSON.parse(readFileSync(join(ROOT, 'vercel.json'), 'utf8')).redirects.map((r) => [r.source, r.destination]));
 
 /** The file under public/ for a URL path, or null. Never anything outside public/, and no dotfiles. */
 async function resolve(urlPath) {

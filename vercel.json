@@ -30,6 +30,36 @@
       "source": "/journal/index.html",
       "destination": "/journal/",
       "permanent": true
+    },
+    {
+      "source": "/culture.html",
+      "destination": "/places/",
+      "permanent": true
+    },
+    {
+      "source": "/experiences.html",
+      "destination": "/places/",
+      "permanent": true
+    },
+    {
+      "source": "/proverbs.html",
+      "destination": "/manch.html",
+      "permanent": true
+    },
+    {
+      "source": "/music.html",
+      "destination": "/journal/",
+      "permanent": true
+    },
+    {
+      "source": "/conscious-living.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/fitness.html",
+      "destination": "/",
+      "permanent": true
     }
   ],
   "headers": [

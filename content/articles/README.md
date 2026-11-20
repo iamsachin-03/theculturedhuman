@@ -9,7 +9,7 @@ Each `.md` file in this folder becomes a page at `/journal/<file-name>.html`. Ru
 title: From wedding walls to the world: the story of Madhubani painting
 description: One or two sentences for search engines and link previews (about 150 characters).
 dek: The italic standfirst under the headline.
-pillar: culture            # culture, wisdom, food-travel, conscious-living, better-self or curious-minds
+pillar: culture            # culture, wisdom or food-travel (content/site.json → pillars)
 series: Living Heritage    # optional
 author: The Cultured Human editors
 date: 2026-11-16           # YYYY-MM-DD

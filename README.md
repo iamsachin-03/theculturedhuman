@@ -28,9 +28,8 @@ The local server only answers this computer and sends the same security headers 
 | --- | --- |
 | `src/pages/*.html` | Hand-written pages: a short front-matter block, then the page's main content. |
 | `content/articles/*.md` | Journal articles in Markdown, with citations. See [`content/articles/README.md`](content/articles/README.md). |
-| `content/site.json` | Navigation, footer links, the six editorial pillars, the site URL and where enquiries are sent. |
+| `content/site.json` | Navigation, footer links, the three story themes (`pillars`), the site URL and where enquiries are sent. |
 | `content/offers.json` | What readers can commission, book or join: each offer's card text, page and enquiry form questions. |
-| `content/quiz.json` | Questions for the Curious Minds quiz. |
 | `content/places/*.json` | One file per place. The build turns each into `/places/<name>.html`, adds it to the roots map and to `/places/places.json`, which the Trace tool uses to link typed places to their pages. `carries` must come from sourced stories; `contributions` are what families sent in, added after review with the credit they chose. |
 | `content/people.json` | Makers, hosts and storytellers listed on the platform (`id`, `name`, `role`, `place`, `summary`, optional `languages` and `link`). Empty until the first people are reviewed; pages show an invitation to join instead. |
 | `src/pages/app.html`, `public/scripts/app.js` | The signed-in family archive app at `/app.html`: sign in and out, the archive with voice, video, photo and document uploads, the weekly question, the people you share with, archives shared with you, passing your archive on, export and account deletion. Screens are hash routes (`#/archive`, `#/weekly`, `#/people`, …). |
@@ -41,7 +40,7 @@ The local server only answers this computer and sends the same security headers 
 | `public/assets/register.json` | Every image, with its creator, source, licence and alt text. |
 | `public/styles/editorial.css` | The design system: five themes, type scale, spacing and components. |
 | `public/scripts/theme-init.js` | Applies the saved theme in `<head>`, before the page paints. |
-| `public/scripts/site.js` | Theme picker, mobile menu, quiz and enquiry forms. |
+| `public/scripts/site.js` | Theme picker, mobile menu and enquiry forms. |
 | `public/brand/` | The logo badge at several sizes, the favicon and the phone home-screen icon. `public/site.webmanifest` points to them. |
 | `tools/build.mjs` | Builds every page, the journal index, the illustrations page, `sitemap.xml` and `robots.txt`, and checks links and images. |
 | `public/scripts/roots.js` | The "Trace your roots" tool: draws a family's places as a downloadable portrait. Everything stays in the reader's browser. |
@@ -69,7 +68,6 @@ Every picture on the site is an original illustration in the house style: warm g
 - `{{img asset-id}}` inserts a responsive image. Options: `sizes="…"`, `class="…"`, `alt="…"` and `eager`.
 - `{{figure asset-id caption="…"}}` inserts an image with its caption and credit.
 - `{{credit asset-id}}` inserts only the photo credit.
-- `{{quiz}}` inserts the Curious Minds quiz.
 - `{{latest-articles 3}}` inserts cards for the newest articles.
 - `{{offer-cards commission gifting}}` inserts cards for offers from `content/offers.json`.
 - `{{enquiry commission}}` inserts that offer's enquiry form.

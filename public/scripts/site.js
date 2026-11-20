@@ -1,4 +1,4 @@
-// Shared behaviour for every page: theme picker, mobile menu and the Curious Minds quiz.
+// Shared behaviour for every page: theme picker, mobile menu and enquiry forms.
 (function () {
   var THEMES = ['marigold', 'haldi', 'indigo', 'gulmohar', 'evening'];
   var STORAGE_KEY = 'tch-theme';
@@ -49,78 +49,6 @@
     header.querySelectorAll('.primary-nav a').forEach(function (a) {
       a.addEventListener('click', function () { setOpen(false); });
     });
-  }
-
-  document.querySelectorAll('[data-quiz]').forEach(initQuiz);
-
-  function initQuiz(el) {
-    var data;
-    try { data = JSON.parse(el.querySelector('script[type="application/json"]').textContent); } catch (e) { return; }
-    var index = 0;
-    var score = 0;
-    var progress = el.querySelector('.quiz__progress');
-    var question = el.querySelector('.quiz__question');
-    var options = el.querySelector('.quiz__options');
-    var feedback = el.querySelector('.quiz__feedback');
-    var next = el.querySelector('.quiz__next');
-
-    function render() {
-      var q = data[index];
-      progress.textContent = 'Question ' + (index + 1) + ' of ' + data.length;
-      question.textContent = q.q;
-      options.innerHTML = '';
-      feedback.textContent = '';
-      next.hidden = true;
-      q.options.forEach(function (label, i) {
-        var li = document.createElement('li');
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'quiz__option';
-        btn.textContent = label;
-        btn.addEventListener('click', function () { answer(i); });
-        li.appendChild(btn);
-        options.appendChild(li);
-      });
-    }
-
-    function answer(choice) {
-      var q = data[index];
-      var buttons = options.querySelectorAll('button');
-      buttons.forEach(function (b, i) {
-        b.disabled = true;
-        if (i === q.answer) b.dataset.state = 'correct';
-        else if (i === choice) b.dataset.state = 'wrong';
-      });
-      var right = choice === q.answer;
-      if (right) score++;
-      feedback.innerHTML = '';
-      var strong = document.createElement('strong');
-      strong.textContent = right ? 'Correct. ' : 'Not quite. ';
-      feedback.appendChild(strong);
-      feedback.appendChild(document.createTextNode(q.explain));
-      next.textContent = index < data.length - 1 ? 'Next question' : 'See your score';
-      next.hidden = false;
-      next.focus();
-    }
-
-    var finished = false;
-    next.addEventListener('click', function () {
-      if (finished) {
-        finished = false; index = 0; score = 0;
-        render();
-        options.querySelector('button').focus();
-        return;
-      }
-      if (index < data.length - 1) { index++; render(); options.querySelector('button').focus(); return; }
-      finished = true;
-      progress.textContent = 'Your score';
-      question.textContent = score + ' of ' + data.length + (score === data.length ? ' — a truly curious human.' : ' — every wrong answer is a new thing learned.');
-      options.innerHTML = '';
-      feedback.textContent = '';
-      next.textContent = 'Play again';
-    });
-
-    render();
   }
 
   document.querySelectorAll('form[data-enquiry]').forEach(initEnquiry);

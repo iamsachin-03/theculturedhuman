@@ -226,12 +226,20 @@ test('makers, hosts and storytellers can list themselves from Join, and the fee 
   assert.doesNotMatch(joinPage + read('plans.html') + read('about.html'), /\{\{/);
 });
 
-test('the footer stays short, and every page it dropped is still reachable', () => {
+test('the footer stays short', () => {
   const footer = read('index.html').match(/<footer[\s\S]*<\/footer>/)[0];
   assert.ok((footer.match(/<li>/g) || []).length <= 14, 'at most 14 footer links');
-  const themes = read('journal/index.html').match(/<nav class="theme-links"[\s\S]*?<\/nav>/)[0];
-  for (const href of ['/culture.html', '/proverbs.html', '/experiences.html', '/conscious-living.html', '/fitness.html', '/music.html']) assert.ok(themes.includes(`href="${href}"`), href);
   assert.match(read('index.html'), /href="\/credits\.html"/);
+});
+
+test('the retired lifestyle pages and the quiz are gone, and their old addresses lead somewhere useful', () => {
+  const vercel = JSON.parse(readFileSync(join(ROOT, 'vercel.json'), 'utf8'));
+  const redirects = Object.fromEntries(vercel.redirects.map((r) => [r.source, r.destination]));
+  for (const page of ['culture', 'proverbs', 'experiences', 'conscious-living', 'fitness', 'music']) {
+    assert.ok(!existsSync(join(PUBLIC, `${page}.html`)), `${page}.html is gone`);
+    assert.ok(redirects[`/${page}.html`], `/${page}.html redirects`);
+  }
+  for (const page of pages) assert.doesNotMatch(read(page), /data-quiz|Curious Minds|The Better Self/, page);
 });
 
 test('privacy, terms and community guidelines are on every page, and the contribute form points to them', () => {
