@@ -21,6 +21,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync, statSync, rmSync } from 'node:fs';
 import { join, relative, dirname, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { parseFrontMatter, renderMarkdown, wordCount, inline, escapeHtml } from './lib/markdown.mjs';
 import * as t from './lib/templates.mjs';
 
@@ -296,6 +297,13 @@ outputs.set(
     const hero = p.image && asset(p.image, p.where);
     return { slug: p.slug, name: p.name, path: p.path, aliases: p.aliases, ...(hero ? { image: hero.files[1600], imageAlt: hero.alt } : {}) };
   })) + '\n',
+);
+
+// The weekly questions live in app-core.js for the browser; the Python weekly sender reads this copy.
+const core = createRequire(import.meta.url)('../public/scripts/app-core.js');
+outputs.set(
+  join(ROOT, 'backend/weekly/questions.json'),
+  JSON.stringify(core.QUESTIONS.map(([kind, text]) => ({ kind, text })), null, 1) + '\n',
 );
 
 // The page shows the first prompt; community-live.js swaps in this week's from this file.

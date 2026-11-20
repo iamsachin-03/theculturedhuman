@@ -1,0 +1,3 @@
+# Python functions in api/ use the standard library only. tzdata gives zoneinfo its time zones
+# on servers that ship without them (the weekly sender counts days in WEEKLY_TIMEZONE).
+tzdata==2026.6

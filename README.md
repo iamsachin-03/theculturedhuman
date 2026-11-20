@@ -128,7 +128,7 @@ Shared contributions live at `/s/<id>`, served by `api/shared.mjs` so WhatsApp, 
 
 ## Weekly question sender
 
-`api/weekly-send.mjs` can send each person's weekly question on WhatsApp for their family member, once a day from a Vercel cron job. It is off until a WhatsApp Business number, an approved template and a few environment variables are in place; [`backend/weekly/README.md`](backend/weekly/README.md) has the steps.
+`api/weekly-send.py` can send each person's weekly question on WhatsApp for their family member, once a day from a Vercel cron job. It is off until a WhatsApp Business number, an approved template and a few environment variables are in place; [`backend/weekly/README.md`](backend/weekly/README.md) has the steps.
 
 ## Visit counts
 

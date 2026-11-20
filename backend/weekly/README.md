@@ -12,10 +12,11 @@ The message asks the person to send their answer to the family member, not to th
 
 | File | What it is |
 | --- | --- |
-| `backend/weekly/sender.mjs` | Chooses who is due, sends the template, marks them asked |
-| `api/weekly-send.mjs` | The Vercel function the daily cron job calls |
+| `backend/weekly/sender.py` | Chooses who is due, sends the template, marks them asked |
+| `backend/weekly/questions.json` | The questions, copied from `public/scripts/app-core.js` by `npm run build` |
+| `api/weekly-send.py` | The Vercel function (Python) the daily cron job calls |
 | `vercel.json` → `crons` | Runs it at 04:30 UTC (10:00 in India) every day |
-| `test/weekly-sender.test.mjs` | Checks the choosing, the message, dry runs, failures and the secret |
+| `test/test_weekly_sender.py` | Checks the choosing, the message, dry runs, failures and the secret |
 
 Until the steps below are done, the function refuses to run (no `CRON_SECRET`) or only reports what it would send (no WhatsApp details). Nothing is sent by accident.
 
