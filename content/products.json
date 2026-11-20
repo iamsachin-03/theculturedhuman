@@ -95,6 +95,19 @@
       "image": "ask-a-question"
     },
     {
+      "id": "family-book",
+      "group": "keep",
+      "name": "The family book",
+      "line": "Your archive laid out as a book, with photographs and what was said in each recording. Print it at home, or have it bound.",
+      "who": "Families who want something to hold, to give at a birthday, a wedding or the next gathering.",
+      "price": "Free to print at home. Bound copies quoted per book, before you agree.",
+      "steps": ["Open your archive as a book.", "Choose the chapters and print, or save a PDF.", "Send the PDF if you want it bound."],
+      "trust": "Only what you choose goes in, and you see a proof before anything is printed.",
+      "href": "/family-book.html",
+      "cta": { "label": "Have it bound", "href": "/family-book.html#enquire" },
+      "image": "book-of-stories"
+    },
+    {
       "id": "storytellers",
       "group": "keep",
       "name": "Storytellers",

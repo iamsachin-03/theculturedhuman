@@ -177,7 +177,7 @@
 
   var routes = [
     [/^$/, home], [/^archive$/, archive], [/^entry\/new$/, editor], [/^entry\/([\w-]+)\/edit$/, editor],
-    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^interview$/, interview], [/^people$/, people], [/^shared$/, shared],
+    [/^entry\/([\w-]+)$/, entryView], [/^roots$/, roots], [/^weekly$/, weekly], [/^interview$/, interview], [/^book$/, book], [/^people$/, people], [/^shared$/, shared],
     [/^shared\/([\w-]+)$/, sharedArchive], [/^settings$/, settings], [/^contribute$/, contribute], [/^moderate$/, moderate],
     [/^offer$/, offer], [/^request$/, requestForm], [/^requests$/, requests], [/^echo$/, echo], [/^report$/, reportForm],
   ];
@@ -386,8 +386,8 @@
         ? 'Long enough for a family book. Print it at home, or have it bound to give at the next family gathering.'
         : n ? plural(goal - n, 'more entry', 'more entries') + ' and it is long enough to print as a family book.' : 'Every story, saying and photograph you keep becomes a page of your family book.'),
       ready
-        ? h('div', { class: 'btn-row' }, link('#/archive', 'Open and print it', 'text-link'), link('/plans.html', 'Have it bound', 'text-link'))
-        : link('#/archive', 'Open your archive', 'text-link'),
+        ? h('div', { class: 'btn-row' }, link('#/book', 'See it as a book', 'text-link'), link('/family-book.html', 'Have it bound', 'text-link'))
+        : link(n ? '#/book' : '#/archive', n ? 'See it as a book so far' : 'Open your archive', 'text-link'),
     );
   }
 
@@ -457,7 +457,7 @@
         var n = k.id ? entries.filter(function (e) { return e.kind === k.id; }).length : entries.length;
         filters.appendChild(h('a', { href: '#/archive' + (k.id ? '?kind=' + k.id : ''), 'aria-current': kind === k.id ? 'true' : null }, k.heading + ' (' + n + ')'));
       });
-      add(view, h('div', { class: 'app-toolbar' }, link('#/entry/new' + (kind ? '?kind=' + kind : ''), 'Add to the archive', 'btn'), entries.length ? button('Print as a book', function () { window.print(); }, 'btn btn--ghost') : null));
+      add(view, h('div', { class: 'app-toolbar' }, link('#/entry/new' + (kind ? '?kind=' + kind : ''), 'Add to the archive', 'btn'), entries.length ? link('#/book', 'See it as a book', 'btn btn--ghost') : null));
       add(view, filters);
       var people = tellers(entries.filter(function (e) { return e.owner === state.user.id; }));
       if (people.length) {
@@ -661,6 +661,115 @@
       if (mineArchive && about) add(actions, link('#/archive?teller=' + encodeURIComponent(about), 'Everything about ' + about, 'text-link'));
       add(view, actions);
       if (mineArchive && about) add(view, askFamily(about, false));
+      return h1;
+    });
+  }
+
+  // ---------- the family book ----------
+  // The owner's archive laid out as a book: a cover, contents and a chapter for each kind of entry,
+  // with photographs and what is said in each recording. Printed from the browser (or saved as a PDF).
+  function bookTitle(name) {
+    var parts = String(name || '').trim().split(/\s+/);
+    return parts.length > 1 ? 'The ' + parts[parts.length - 1] + ' family' : 'Our family book';
+  }
+  function book() {
+    var h1 = page('Your family book', 'Your archive, laid out as a book to print at home, save as a PDF, or have bound for the family.');
+    return Promise.all([store.entries(), loadPeople()]).then(function (r) {
+      var mine = r[0].filter(function (e) { return e.owner === state.user.id; })
+        .sort(function (a, b) { return String(a.createdAt).localeCompare(String(b.createdAt)); });
+      if (!mine.length) {
+        add(view, emptyArchive());
+        return h1;
+      }
+      var urls = {};
+      var title = h('input', { name: 'title', maxlength: '80', value: bookTitle(state.user.name) });
+      var sub = h('input', { name: 'subtitle', maxlength: '120', value: 'Kept by ' + firstName(state.user.name) + ', ' + new Date().getFullYear() });
+      var kinds = core.KINDS.map(function (k) {
+        var n = mine.filter(function (e) { return e.kind === k.id; }).length;
+        return { kind: k, n: n, box: h('input', { type: 'checkbox', checked: n > 0, disabled: !n, onchange: draw }) };
+      });
+      var privateBox = h('input', { type: 'checkbox', checked: true, onchange: draw });
+      var laterBox = h('input', { type: 'checkbox', checked: false, onchange: draw });
+      var englishBox = h('input', { type: 'checkbox', checked: true, onchange: draw });
+      title.addEventListener('input', draw);
+      sub.addEventListener('input', draw);
+      add(view, h('form', { class: 'app-card app-book-options', onsubmit: function (ev) { ev.preventDefault(); } },
+        h('div', { class: 'app-book-options__row' }, field('Title', title), field('Under the title', sub)),
+        h('fieldset', { class: 'app-book-options__kinds' }, h('legend', null, 'Chapters'),
+          kinds.map(function (k) { return h('label', { class: 'app-check' }, k.box, ' ' + k.kind.heading + ' (' + k.n + ')'); })),
+        h('fieldset', { class: 'app-book-options__kinds' }, h('legend', null, 'Also'),
+          h('label', { class: 'app-check' }, privateBox, ' Entries kept as Only me'),
+          h('label', { class: 'app-check' }, laterBox, ' Letters and entries left for later'),
+          h('label', { class: 'app-check' }, englishBox, ' English translations of recordings')),
+        h('div', { class: 'btn-row' },
+          button('Print or save as PDF', function () { window.print(); }),
+          link('/family-book.html', 'Have it printed and bound', 'btn btn--ghost')),
+        h('p', { class: 'field__hint' }, 'Recordings appear as what is said in them. Type or transcribe a recording on its entry to have it in the book.'),
+      ));
+      var out = h('div', { class: 'fbook' });
+      add(view, out);
+
+      function photo(m) {
+        var fig = h('figure', { class: 'fbook__photo' }, h('figcaption', null, m.name));
+        function show(url) { fig.insertBefore(h('img', { src: url, alt: m.name }), fig.firstChild); }
+        if (urls[m.id]) show(urls[m.id]);
+        else store.mediaUrl(m).then(function (url) { urls[m.id] = url; show(url); }).catch(function () { fig.remove(); });
+        return fig;
+      }
+      function recording(m) {
+        var said = [h('p', { class: 'fbook__rec-name' }, (m.kind === 'audio' ? 'A voice note: ' : 'A video: ') + m.name)];
+        if (m.transcript) said.push(h('blockquote', { class: 'fbook__said' }, m.transcript));
+        if (m.translation && englishBox.checked) said.push(h('p', { class: 'fbook__english' }, h('span', null, 'In English: '), m.translation));
+        if (!m.transcript && !m.translation) said.push(h('p', { class: 'fbook__note' }, 'Listen to it in the family archive.'));
+        return h('div', { class: 'fbook__rec' }, said);
+      }
+      function entryPage(e) {
+        var media = e.media || [];
+        return h('article', { class: 'fbook__entry', id: 'fbook-' + e.id },
+          h('h3', null, e.title),
+          h('p', { class: 'fbook__meta' }, [e.teller ? 'Told by ' + e.teller : null, e.place ? 'In ' + e.place : null, e.forWhom ? 'For ' + e.forWhom : null, core.formatDate(e.createdAt)].filter(Boolean).join(' · ')),
+          e.prompt && e.prompt !== e.title ? h('p', { class: 'fbook__prompt' }, e.prompt) : null,
+          e.body ? e.body.split(/\n{2,}/).map(function (p) { return h('p', null, p); }) : null,
+          media.filter(function (m) { return m.kind === 'photo'; }).map(photo),
+          media.filter(function (m) { return m.kind === 'audio' || m.kind === 'video'; }).map(recording),
+        );
+      }
+      function draw() {
+        out.textContent = '';
+        var chosen = mine.filter(function (e) {
+          if (!privateBox.checked && e.audience === 'private') return false;
+          if (!laterBox.checked && (e.audience === 'date' || e.audience === 'passed')) return false;
+          return true;
+        });
+        var chapters = kinds.filter(function (k) { return k.box.checked; }).map(function (k) {
+          return { kind: k.kind, entries: chosen.filter(function (e) { return e.kind === k.kind.id; }) };
+        }).filter(function (c) { return c.entries.length; });
+        var cover = null;
+        chosen.some(function (e) { return (e.media || []).some(function (m) { if (m.kind === 'photo') { cover = m; return true; } return false; }); });
+        var tellerNames = tellers(chosen).map(function (t) { return t.name; });
+        add(out, h('section', { class: 'fbook__cover' },
+          cover ? photo(cover) : null,
+          h('h2', null, title.value.trim() || bookTitle(state.user.name)),
+          sub.value.trim() ? h('p', { class: 'fbook__sub' }, sub.value.trim()) : null,
+          tellerNames.length ? h('p', { class: 'fbook__voices' }, 'In the words of ' + listNames(tellerNames.slice(0, 6)) + (tellerNames.length > 6 ? ' and others' : '')) : null,
+        ));
+        if (!chapters.length) {
+          add(out, h('p', { class: 'empty-state' }, 'Choose at least one chapter with entries in it.'));
+          return;
+        }
+        add(out, h('nav', { class: 'fbook__contents', 'aria-label': 'Contents' }, h('h2', null, 'Contents'),
+          h('ol', null, chapters.map(function (c) {
+            return h('li', null, h('strong', null, c.kind.heading), h('ul', null, c.entries.map(function (e) { return h('li', null, h('a', { href: '#fbook-' + e.id, onclick: function (ev) { ev.preventDefault(); document.getElementById('fbook-' + e.id).scrollIntoView(); } }, e.title)); })));
+          }))));
+        chapters.forEach(function (c, i) {
+          add(out, h('section', { class: 'fbook__chapter' },
+            h('p', { class: 'fbook__num' }, 'Chapter ' + (i + 1)),
+            h('h2', null, c.kind.heading),
+            c.entries.map(entryPage)));
+        });
+        add(out, h('p', { class: 'fbook__colophon' }, 'Kept with The Cultured Human. Printed on ' + core.formatDate(new Date().toISOString()) + '. The recordings themselves are in the family archive.'));
+      }
+      draw();
       return h1;
     });
   }
