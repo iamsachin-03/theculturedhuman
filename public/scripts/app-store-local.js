@@ -319,8 +319,9 @@
       var load = fields.id ? get('elders', fields.id) : Promise.resolve(null);
       return load.then(function (existing) {
         var e = existing && existing.owner === owner ? copy(existing) : { id: uid(), owner: owner, idx: 0, answered: 0, askedAt: null, createdAt: now().toISOString() };
-        ['name', 'relation', 'phone', 'day', 'idx', 'answered', 'askedAt', 'signAs', 'autoSend', 'birthday'].forEach(function (k) { if (k in fields) e[k] = fields[k]; });
+        ['name', 'relation', 'phone', 'day', 'idx', 'answered', 'askedAt', 'signAs', 'autoSend', 'birthday', 'lang'].forEach(function (k) { if (k in fields) e[k] = fields[k]; });
         e.day = Number(e.day) || 0;
+        e.lang = e.lang === 'hi' ? 'hi' : 'en';
         if (!String(e.name || '').trim()) throw new Error('Please add their name.');
         return put('elders', e);
       });

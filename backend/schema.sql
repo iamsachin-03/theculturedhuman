@@ -105,6 +105,8 @@ create table weekly_elders (
   auto_send boolean not null default false,
   -- Month and day only (MM-DD): many elders do not know the year they were born.
   birthday text check (birthday is null or birthday = '' or birthday ~ '^[0-1][0-9]-[0-3][0-9]$'),
+  -- The language the question is asked in: English or Hindi (QUESTIONS_HI in app-core.js).
+  lang text not null default 'en' check (lang in ('en', 'hi')),
   created_at timestamptz not null default now()
 );
 

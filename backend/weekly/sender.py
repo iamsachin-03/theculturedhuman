@@ -17,9 +17,11 @@ GRAPH = 'https://graph.facebook.com/v21.0'
 QUESTIONS = json.loads((Path(__file__).parent / 'questions.json').read_text('utf-8'))
 
 
-def question(n):
+def question(n, lang='en'):
     i = n % len(QUESTIONS)
-    return {**QUESTIONS[i], 'week': i + 1}
+    q = QUESTIONS[i]
+    hi = lang == 'hi'
+    return {'kind': q['kind'], 'text': q['hi'] if hi else q['text'], 'en': q['text'], 'week': i + 1, 'lang': 'hi' if hi else 'en'}
 
 
 def weekday_in(time_zone, now):
@@ -47,7 +49,7 @@ def template_params(row, owner_name):
     first = re.split(r'\s+', str(owner_name or ''))[0]
     sender = (row.get('sign_as') or first or 'your family').strip()
     clean = lambda s: re.sub(r'\s+', ' ', str(s)).strip()
-    return [clean(row['name']), clean(sender), clean(question(row['idx'])['text'])]
+    return [clean(row['name']), clean(sender), clean(question(row['idx'], row.get('lang'))['text'])]
 
 
 def config(env):
@@ -58,6 +60,7 @@ def config(env):
         'phone_number_id': env.get('WHATSAPP_PHONE_NUMBER_ID'),
         'template': env.get('WHATSAPP_TEMPLATE') or 'weekly_question',
         'template_lang': env.get('WHATSAPP_TEMPLATE_LANG') or 'en',
+        'template_lang_hi': env.get('WHATSAPP_TEMPLATE_LANG_HI') or 'hi',
         'time_zone': env.get('WEEKLY_TIMEZONE') or 'Asia/Kolkata',
         'default_country': env.get('WEEKLY_DEFAULT_COUNTRY', '91'),
     }
@@ -72,7 +75,7 @@ def run(cfg, http, now=None, dry_run=False):
     db = supabase(cfg['supabase_url'], cfg['service_key'], http)
 
     today = weekday_in(cfg['time_zone'], now)
-    rows = due_today(db(f'weekly_elders?select=id,owner_id,name,phone,day,idx,sign_as,asked_at,auto_send&auto_send=is.true&day=eq.{today}&asked_at=is.null'), today)
+    rows = due_today(db(f'weekly_elders?select=id,owner_id,name,phone,day,idx,sign_as,asked_at,auto_send,lang&auto_send=is.true&day=eq.{today}&asked_at=is.null'), today)
     owners = list(dict.fromkeys(r['owner_id'] for r in rows))
     names = {}
     if owners:
@@ -95,7 +98,7 @@ def run(cfg, http, now=None, dry_run=False):
                        'messaging_product': 'whatsapp',
                        'to': to,
                        'type': 'template',
-                       'template': {'name': cfg['template'], 'language': {'code': cfg['template_lang']}, 'components': [{'type': 'body', 'parameters': [{'type': 'text', 'text': t} for t in params]}]},
+                       'template': {'name': cfg['template'], 'language': {'code': cfg['template_lang_hi'] if row.get('lang') == 'hi' else cfg['template_lang']}, 'components': [{'type': 'body', 'parameters': [{'type': 'text', 'text': t} for t in params]}]},
                    }))
         if not res.ok:
             failed.append({'id': row['id'], 'reason': f'WhatsApp {res.status}: {res.text}'})

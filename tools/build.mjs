@@ -300,7 +300,7 @@ outputs.set(
 const core = createRequire(import.meta.url)('../public/scripts/app-core.js');
 outputs.set(
   join(ROOT, 'backend/weekly/questions.json'),
-  JSON.stringify(core.QUESTIONS.map(([kind, text]) => ({ kind, text })), null, 1) + '\n',
+  JSON.stringify(core.QUESTIONS.map(([kind, text], i) => ({ kind, text, hi: core.QUESTIONS_HI[i] })), null, 1) + '\n',
 );
 
 // The page shows the first prompt; community-live.js swaps in this week's from this file.

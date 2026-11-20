@@ -35,6 +35,16 @@ Until the steps below are done, the function refuses to run (no `CRON_SECRET`) o
    ```
 
    Sample values for the review: `Nani`, `Asha`, `Which story did you love to hear as a child, and who told it?`. Meta reviews it and chooses its category, which sets the price of each message; see Meta's current WhatsApp pricing.
+
+   For people asked in Hindi, add a second language to the same template, Hindi, with this body (the parts are filled in the same way, and the question is sent in Hindi):
+
+   ```
+   {{1}}, {{2}} की ओर से इस हफ़्ते का सवाल:
+
+   {{3}}
+
+   जब मन करे, अपना जवाब {{2}} को वॉइस नोट में भेजिए, जिस भी भाषा में आप सहज हों। यह नंबर सिर्फ़ सवाल भेजता है।
+   ```
 4. **Replies.** Some people will reply to the business number anyway. In WhatsApp Manager, set an away message such as "Thank you! Please send your answer to the person who asked you."
 5. **Vercel environment variables** (Project → Settings → Environment Variables, Production):
 
@@ -47,6 +57,7 @@ Until the steps below are done, the function refuses to run (no `CRON_SECRET`) o
    | `WHATSAPP_PHONE_NUMBER_ID` | The phone number ID |
    | `WHATSAPP_TEMPLATE` | Optional. Defaults to `weekly_question` |
    | `WHATSAPP_TEMPLATE_LANG` | Optional. Defaults to `en` |
+   | `WHATSAPP_TEMPLATE_LANG_HI` | Optional. The template language used for people asked in Hindi. Defaults to `hi` |
    | `WEEKLY_TIMEZONE` | Optional. Defaults to `Asia/Kolkata` |
    | `WEEKLY_DEFAULT_COUNTRY` | Optional. Added to 10-digit numbers. Defaults to `91` |
 

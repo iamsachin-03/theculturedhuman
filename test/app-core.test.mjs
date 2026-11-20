@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 
 const core = createRequire(import.meta.url)('../public/scripts/app-core.js');
-const { canSee, canAdd, canEdit, legacyNext, legacySeen, legacyReport, newLegacy, question, message, whatsappLink, reminder, mediaKind, audienceLabel, QUESTIONS, KINDS } = core;
+const { QUESTIONS_HI, canSee, canAdd, canEdit, legacyNext, legacySeen, legacyReport, newLegacy, question, message, whatsappLink, reminder, mediaKind, audienceLabel, QUESTIONS, KINDS } = core;
 
 const now = new Date('2026-11-18T10:00:00Z');
 const people = {
@@ -74,6 +74,11 @@ test('a year of weekly questions across every kind', () => {
   for (const k of KINDS) assert.ok(QUESTIONS.some((q) => q[0] === k.id), k.id);
   assert.deepEqual(question(52), question(0));
   assert.match(message('Nani', question(0), 'Riya'), /^Nani, this week's question from Riya:\n\nWhich story/);
+  assert.equal(QUESTIONS_HI.length, 52);
+  assert.equal(new Set(QUESTIONS_HI).size, 52);
+  assert.ok(QUESTIONS_HI.every((q) => /[\u0900-\u097F]/.test(q) && !/[a-z]/i.test(q)), 'every Hindi question is in Devanagari');
+  assert.deepEqual([question(3, 'hi').kind, question(3, 'hi').en, question(3, 'hi').lang], [question(3).kind, question(3).text, 'hi']);
+  assert.match(message('नानी', question(0, 'hi'), 'आशा'), /^नानी, आशा की ओर से इस हफ़्ते का सवाल:\n\nबचपन/);
   assert.equal(whatsappLink('+91 98765-43210', 'a & b?'), 'https://wa.me/919876543210?text=a%20%26%20b%3F');
   const ics = reminder({ id: 'x', name: 'Nana, Sr.', day: 3 }, new Date(2026, 10, 18, 11), 'https://example.org/app.html');
   assert.match(ics, /RRULE:FREQ=WEEKLY;BYDAY=WE/);

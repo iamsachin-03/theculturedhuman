@@ -34,9 +34,9 @@ def fake(whatsapp_status=200):
 
 class WeeklySender(unittest.TestCase):
     def test_the_questions_are_the_ones_the_browser_asks(self):
-        script = "const c=require('./public/scripts/app-core.js');console.log(JSON.stringify([0,3,-1,1000].map(n=>c.question(n))))"
+        script = "const c=require('./public/scripts/app-core.js');console.log(JSON.stringify([0,3,-1,1000].flatMap(n=>[c.question(n),c.question(n,'hi')])))"
         browser = json.loads(subprocess.run(['node', '-e', script], cwd=ROOT, capture_output=True, text=True, check=True).stdout)
-        self.assertEqual([question(n) for n in (0, 3, -1, 1000)], browser)
+        self.assertEqual([q for n in (0, 3, -1, 1000) for q in (question(n), question(n, 'hi'))], browser)
 
     def test_the_day_is_counted_in_india_time_and_numbers_need_a_country_code(self):
         self.assertEqual(weekday_in('Asia/Kolkata', NOW), WED)
@@ -61,6 +61,21 @@ class WeeklySender(unittest.TestCase):
         self.assertEqual(template_params(ROWS[1], 'Ravi Kumar'), ['Dada', 'Ravi', question(3)['text']])
         self.assertEqual(template_params({**ROWS[1], 'name': 'Big\n  Dada'}, '')[1], 'your family')
         self.assertEqual(template_params({**ROWS[1], 'name': 'Big\n  Dada'}, '')[0], 'Big Dada')
+
+    def test_someone_asked_in_hindi_gets_the_hindi_question_and_the_hindi_template(self):
+        rows = [{**ROWS[0], 'lang': 'hi'}]
+        self.assertEqual(template_params(rows[0], 'Asha Rao')[2], question(0, 'hi')['text'])
+        self.assertRegex(question(0, 'hi')['text'], '[\u0900-\u097F]')
+        http = fake()
+        ROWS_BEFORE = list(ROWS)
+        ROWS[:] = rows
+        try:
+            run(config(ENV), http, now=NOW)
+        finally:
+            ROWS[:] = ROWS_BEFORE
+        send = [c for c in http.calls if 'graph.facebook.com' in c['url']][0]
+        self.assertEqual(send['body']['template']['language'], {'code': 'hi'})
+        self.assertEqual(send['body']['template']['components'][0]['parameters'][2]['text'], question(0, 'hi')['text'])
 
     def test_a_live_run_sends_the_template_marks_each_person_asked_and_reports_bad_numbers(self):
         http = fake()

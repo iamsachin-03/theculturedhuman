@@ -1,210 +1,262 @@
 [
  {
   "kind": "story",
-  "text": "Which story did you love to hear as a child, and who told it?"
+  "text": "Which story did you love to hear as a child, and who told it?",
+  "hi": "बचपन में आपको कौन-सी कहानी सुनना सबसे अच्छा लगता था, और वह कौन सुनाता था?"
  },
  {
   "kind": "story",
-  "text": "What did the house you grew up in look, sound and smell like?"
+  "text": "What did the house you grew up in look, sound and smell like?",
+  "hi": "जिस घर में आप बड़े हुए, वह कैसा दिखता था, वहाँ कैसी आवाज़ें आती थीं और कैसी महक रहती थी?"
  },
  {
   "kind": "wisdom",
-  "text": "Which saying did your elders repeat most, and what did they mean by it?"
+  "text": "Which saying did your elders repeat most, and what did they mean by it?",
+  "hi": "घर के बड़े कौन-सी कहावत सबसे ज़्यादा दोहराते थे, और उसका मतलब क्या था?"
  },
  {
   "kind": "story",
-  "text": "Which dish takes you straight back home, and who made it best?"
+  "text": "Which dish takes you straight back home, and who made it best?",
+  "hi": "कौन-सा पकवान आपको सीधे घर की याद दिला देता है, और उसे सबसे अच्छा कौन बनाता था?"
  },
  {
   "kind": "memory",
-  "text": "Find an old photograph. Who is in it, and what was happening just outside the frame?"
+  "text": "Find an old photograph. Who is in it, and what was happening just outside the frame?",
+  "hi": "कोई पुरानी तस्वीर निकालिए। उसमें कौन है, और तस्वीर के बाहर उस समय क्या हो रहा था?"
  },
  {
   "kind": "story",
-  "text": "What did a normal day look like when you were ten?"
+  "text": "What did a normal day look like when you were ten?",
+  "hi": "जब आप दस साल के थे, तब आपका एक आम दिन कैसा होता था?"
  },
  {
   "kind": "steady",
-  "text": "What do you do when you feel worried? What has always calmed you?"
+  "text": "What do you do when you feel worried? What has always calmed you?",
+  "hi": "जब आपको चिंता होती है तो आप क्या करते हैं? आपको हमेशा किस चीज़ से सुकून मिला है?"
  },
  {
   "kind": "story",
-  "text": "Who was your closest friend when you were young, and what did you get up to?"
+  "text": "Who was your closest friend when you were young, and what did you get up to?",
+  "hi": "बचपन में आपका सबसे पक्का दोस्त कौन था, और आप दोनों क्या-क्या करते थे?"
  },
  {
   "kind": "wisdom",
-  "text": "What is the best advice anyone ever gave you?"
+  "text": "What is the best advice anyone ever gave you?",
+  "hi": "किसी ने आपको जो सबसे अच्छी सलाह दी, वह क्या थी?"
  },
  {
   "kind": "story",
-  "text": "How did our family celebrate the most important festival of the year?"
+  "text": "How did our family celebrate the most important festival of the year?",
+  "hi": "हमारा परिवार साल का सबसे बड़ा त्योहार कैसे मनाता था?"
  },
  {
   "kind": "memory",
-  "text": "Which photograph of our family do you treasure most, and why?"
+  "text": "Which photograph of our family do you treasure most, and why?",
+  "hi": "परिवार की कौन-सी तस्वीर आपको सबसे प्यारी है, और क्यों?"
  },
  {
   "kind": "story",
-  "text": "What did your parents do for a living, and what were they like at work?"
+  "text": "What did your parents do for a living, and what were they like at work?",
+  "hi": "आपके माता-पिता क्या काम करते थे, और काम पर वे कैसे थे?"
  },
  {
   "kind": "steady",
-  "text": "What helped you through the hardest year of your life?"
+  "text": "What helped you through the hardest year of your life?",
+  "hi": "आपकी ज़िंदगी के सबसे मुश्किल साल में किस चीज़ ने आपको सँभाला?"
  },
  {
   "kind": "story",
-  "text": "What songs were sung at home, at weddings or at festivals?"
+  "text": "What songs were sung at home, at weddings or at festivals?",
+  "hi": "घर में, शादियों में या त्योहारों पर कौन-से गीत गाए जाते थे?"
  },
  {
   "kind": "wisdom",
-  "text": "What took you longest to learn about people?"
+  "text": "What took you longest to learn about people?",
+  "hi": "लोगों के बारे में कौन-सी बात समझने में आपको सबसे ज़्यादा समय लगा?"
  },
  {
   "kind": "story",
-  "text": "What were you told about our family name, or our village?"
+  "text": "What were you told about our family name, or our village?",
+  "hi": "हमारे परिवार के नाम या हमारे गाँव के बारे में आपको क्या बताया गया था?"
  },
  {
   "kind": "letter",
-  "text": "What do you hope your grandchildren never lose?"
+  "text": "What do you hope your grandchildren never lose?",
+  "hi": "आप क्या चाहते हैं कि आपके नाती-पोते कभी न भूलें?"
  },
  {
   "kind": "story",
-  "text": "What was school like for you? Which teacher do you remember?"
+  "text": "What was school like for you? Which teacher do you remember?",
+  "hi": "आपका स्कूल कैसा था? आपको कौन-से गुरुजी या मास्टरजी याद हैं?"
  },
  {
   "kind": "steady",
-  "text": "How did you find courage when you were frightened?"
+  "text": "How did you find courage when you were frightened?",
+  "hi": "जब आपको डर लगता था, तब आपको हिम्मत कहाँ से मिलती थी?"
  },
  {
   "kind": "story",
-  "text": "Why did our family move, and what did they bring with them?"
+  "text": "Why did our family move, and what did they bring with them?",
+  "hi": "हमारा परिवार अपनी जगह छोड़कर क्यों आया, और साथ में क्या लेकर आया?"
  },
  {
   "kind": "wisdom",
-  "text": "Which words or sayings did your elders use that people don't say any more?"
+  "text": "Which words or sayings did your elders use that people don't say any more?",
+  "hi": "घर के बड़े कौन-से शब्द या कहावतें बोलते थे जो अब कोई नहीं बोलता?"
  },
  {
   "kind": "memory",
-  "text": "Tell me about the happiest day you remember with the whole family together."
+  "text": "Tell me about the happiest day you remember with the whole family together.",
+  "hi": "उस सबसे ख़ुशी वाले दिन के बारे में बताइए जब पूरा परिवार एक साथ था।"
  },
  {
   "kind": "story",
-  "text": "How did you meet your husband or wife? Or the person who mattered most to you?"
+  "text": "How did you meet your husband or wife? Or the person who mattered most to you?",
+  "hi": "आप अपने पति या पत्नी से कैसे मिले? या उस इंसान से, जो आपके लिए सबसे ज़्यादा मायने रखता था?"
  },
  {
   "kind": "steady",
-  "text": "What reminds you who you are when you doubt yourself?"
+  "text": "What reminds you who you are when you doubt yourself?",
+  "hi": "जब आपको ख़ुद पर शक होता है, तब कौन-सी बात आपको याद दिलाती है कि आप कौन हैं?"
  },
  {
   "kind": "story",
-  "text": "Was there a ritual our family never skipped? Why did it matter?"
+  "text": "Was there a ritual our family never skipped? Why did it matter?",
+  "hi": "क्या कोई रीति थी जिसे हमारा परिवार कभी नहीं छोड़ता था? वह इतनी ज़रूरी क्यों थी?"
  },
  {
   "kind": "wisdom",
-  "text": "What does it mean to you to live a good life?"
+  "text": "What does it mean to you to live a good life?",
+  "hi": "आपके लिए एक अच्छी ज़िंदगी जीने का मतलब क्या है?"
  },
  {
   "kind": "story",
-  "text": "What games did you play as a child, and what were the rules?"
+  "text": "What games did you play as a child, and what were the rules?",
+  "hi": "बचपन में आप कौन-से खेल खेलते थे, और उनके नियम क्या थे?"
  },
  {
   "kind": "letter",
-  "text": "What would you like to tell a grandchild on the day they leave home?"
+  "text": "What would you like to tell a grandchild on the day they leave home?",
+  "hi": "जिस दिन कोई नाती या पोता घर छोड़कर जाए, उस दिन आप उससे क्या कहना चाहेंगे?"
  },
  {
   "kind": "story",
-  "text": "Which grandparent do you remember best, and what were they like?"
+  "text": "Which grandparent do you remember best, and what were they like?",
+  "hi": "अपने दादा-दादी या नाना-नानी में से आपको कौन सबसे अच्छी तरह याद है, और वे कैसे थे?"
  },
  {
   "kind": "steady",
-  "text": "How do you stay kind when the world feels unkind?"
+  "text": "How do you stay kind when the world feels unkind?",
+  "hi": "जब दुनिया बेरहम लगती है, तब आप दयालु कैसे बने रहते हैं?"
  },
  {
   "kind": "memory",
-  "text": "Describe a journey you made that you will never forget."
+  "text": "Describe a journey you made that you will never forget.",
+  "hi": "कोई ऐसी यात्रा बताइए जो आप कभी नहीं भूलेंगे।"
  },
  {
   "kind": "wisdom",
-  "text": "What is something you were wrong about, and how did you find out?"
+  "text": "What is something you were wrong about, and how did you find out?",
+  "hi": "किस बात के बारे में आप ग़लत थे, और आपको यह कैसे पता चला?"
  },
  {
   "kind": "story",
-  "text": "What did you want to become when you grew up?"
+  "text": "What did you want to become when you grew up?",
+  "hi": "बड़े होकर आप क्या बनना चाहते थे?"
  },
  {
   "kind": "steady",
-  "text": "What do you do on a day when everything feels uncertain?"
+  "text": "What do you do on a day when everything feels uncertain?",
+  "hi": "जिस दिन सब कुछ अनिश्चित लगता है, उस दिन आप क्या करते हैं?"
  },
  {
   "kind": "story",
-  "text": "What changed most in the place you grew up during your lifetime?"
+  "text": "What changed most in the place you grew up during your lifetime?",
+  "hi": "आप जहाँ बड़े हुए, वहाँ आपके जीवन में सबसे ज़्यादा क्या बदला?"
  },
  {
   "kind": "wisdom",
-  "text": "Which proverb do you think everyone should know?"
+  "text": "Which proverb do you think everyone should know?",
+  "hi": "कौन-सी कहावत आपके हिसाब से हर किसी को पता होनी चाहिए?"
  },
  {
   "kind": "memory",
-  "text": "Tell me about a meal you shared that you still think about."
+  "text": "Tell me about a meal you shared that you still think about.",
+  "hi": "किसी ऐसे खाने के बारे में बताइए जो आपने किसी के साथ खाया और जिसे आप आज भी याद करते हैं।"
  },
  {
   "kind": "story",
-  "text": "What was the bravest thing you ever did?"
+  "text": "What was the bravest thing you ever did?",
+  "hi": "आपने अपनी ज़िंदगी में सबसे हिम्मत वाला काम कौन-सा किया?"
  },
  {
   "kind": "letter",
-  "text": "What do you want them to know about you that nobody else will remember?"
+  "text": "What do you want them to know about you that nobody else will remember?",
+  "hi": "आप उन्हें अपने बारे में क्या बताना चाहते हैं जो और किसी को याद नहीं रहेगा?"
  },
  {
   "kind": "steady",
-  "text": "Who did you turn to when you needed help, and what did they say?"
+  "text": "Who did you turn to when you needed help, and what did they say?",
+  "hi": "जब आपको मदद चाहिए होती थी तो आप किसके पास जाते थे, और वे क्या कहते थे?"
  },
  {
   "kind": "story",
-  "text": "What were the stories or legends about our region that you heard as a child?"
+  "text": "What were the stories or legends about our region that you heard as a child?",
+  "hi": "बचपन में आपने हमारे इलाक़े की कौन-सी कहानियाँ या लोककथाएँ सुनी थीं?"
  },
  {
   "kind": "wisdom",
-  "text": "What is the secret to staying close as a family?"
+  "text": "What is the secret to staying close as a family?",
+  "hi": "परिवार को एक-दूसरे के क़रीब रखने का राज़ क्या है?"
  },
  {
   "kind": "memory",
-  "text": "Which object in your home carries the most memories? Tell me its story."
+  "text": "Which object in your home carries the most memories? Tell me its story.",
+  "hi": "आपके घर की किस चीज़ में सबसे ज़्यादा यादें बसी हैं? उसकी कहानी सुनाइए।"
  },
  {
   "kind": "story",
-  "text": "What work are you proudest of in your life?"
+  "text": "What work are you proudest of in your life?",
+  "hi": "अपनी ज़िंदगी के किस काम पर आपको सबसे ज़्यादा गर्व है?"
  },
  {
   "kind": "steady",
-  "text": "How did you keep going when something you hoped for didn't happen?"
+  "text": "How did you keep going when something you hoped for didn't happen?",
+  "hi": "जब कोई उम्मीद पूरी नहीं हुई, तब आप आगे कैसे बढ़ते रहे?"
  },
  {
   "kind": "wisdom",
-  "text": "What should every young person know about money, work and time?"
+  "text": "What should every young person know about money, work and time?",
+  "hi": "पैसे, काम और समय के बारे में हर नौजवान को क्या पता होना चाहिए?"
  },
  {
   "kind": "story",
-  "text": "What did you learn from your mother? And from your father?"
+  "text": "What did you learn from your mother? And from your father?",
+  "hi": "आपने अपनी माँ से क्या सीखा? और अपने पिता से?"
  },
  {
   "kind": "letter",
-  "text": "What would you tell them about being human?"
+  "text": "What would you tell them about being human?",
+  "hi": "इंसान होने के बारे में आप उन्हें क्या बताना चाहेंगे?"
  },
  {
   "kind": "memory",
-  "text": "Which festival or celebration with the family do you remember most clearly?"
+  "text": "Which festival or celebration with the family do you remember most clearly?",
+  "hi": "परिवार के साथ मनाया कौन-सा त्योहार या जश्न आपको सबसे साफ़ याद है?"
  },
  {
   "kind": "wisdom",
-  "text": "If you could live one year of your life again, which would it be and why?"
+  "text": "If you could live one year of your life again, which would it be and why?",
+  "hi": "अगर आप अपनी ज़िंदगी का कोई एक साल फिर से जी सकें, तो वह कौन-सा होगा और क्यों?"
  },
  {
   "kind": "steady",
-  "text": "What gives you peace now?"
+  "text": "What gives you peace now?",
+  "hi": "आज आपको किस चीज़ से शांति मिलती है?"
  },
  {
   "kind": "letter",
-  "text": "Is there anything you have always wanted to say to the family, but never have?"
+  "text": "Is there anything you have always wanted to say to the family, but never have?",
+  "hi": "क्या कोई बात है जो आप हमेशा परिवार से कहना चाहते थे, पर कभी कह नहीं पाए?"
  }
 ]

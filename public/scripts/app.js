@@ -326,7 +326,7 @@
         link('#/entry/new?kind=memory&narrate=1', 'Narrate an old photo', 'btn btn--ghost'),
       ));
       var grid = h('div', { class: 'app-grid' });
-      var q = elders[0] ? core.question(elders[0].idx) : core.question(0);
+      var q = elders[0] ? core.question(elders[0].idx, elders[0].lang) : core.question(0);
       grid.appendChild(h('section', { class: 'app-card app-card--accent' },
         h('p', { class: 'eyebrow' }, elders[0] ? 'This week, for ' + elders[0].name : 'The weekly question'),
         h('h2', null, q.text),
@@ -925,7 +925,7 @@
   }
 
   function questionCard(elder) {
-    var q = core.question(elder.idx);
+    var q = core.question(elder.idx, elder.lang);
     var kind = core.find(core.KINDS, q.kind);
     var from = elder.signAs || firstName(state.user.name);
     var text = core.message(elder.name, q, from);
@@ -941,8 +941,15 @@
     ]);
     add(card, [
       h('p', { class: 'eyebrow' }, 'Week ' + (elder.idx + 1) + ' for ' + elder.name + (kind ? ' · ' + kind.heading : '')),
-      h('h2', null, q.text),
-      h('pre', { class: 'app-message' }, text),
+      h('h2', { lang: q.lang }, q.text),
+      q.lang !== 'en' ? h('p', { class: 'field__hint' }, q.en) : null,
+      h('div', { class: 'app-filters app-lang', role: 'group', 'aria-label': 'Ask in' }, core.LANGUAGES.map(function (l) {
+        return h('a', { href: '#/weekly?elder=' + elder.id, lang: l.id, 'aria-current': q.lang === l.id ? 'true' : null, onclick: function (ev) {
+          ev.preventDefault();
+          if (q.lang !== l.id) store.saveElder({ id: elder.id, lang: l.id }).then(function () { render(); }).catch(fail);
+        } }, l.label);
+      })),
+      h('pre', { class: 'app-message', lang: q.lang }, text),
       elder.askedAt ? h('p', { class: 'field__hint' }, 'Asked on ' + core.formatDate(elder.askedAt) + '.') : null,
       actions,
       autoSendToggle(elder),
@@ -998,6 +1005,7 @@
     var bMonth = options(h('select', { name: 'birthMonth', 'aria-label': 'Month' }), [{ id: '', label: 'Month' }].concat(MONTHS.map(function (m, i) { return { id: ('0' + (i + 1)).slice(-2), label: m }; })), '');
     var bDay = options(h('select', { name: 'birthDay', 'aria-label': 'Day' }), [{ id: '', label: 'Day' }].concat(Array.from({ length: 31 }, function (_, i) { var d = ('0' + (i + 1)).slice(-2); return { id: d, label: String(i + 1) }; })), '');
     var birthday = h('span', { class: 'app-inline' }, bDay, bMonth);
+    var lang = options(h('select', { name: 'lang' }), core.LANGUAGES, 'en');
     add(form, [
       h('h2', null, open ? 'Who would you like to ask?' : 'Ask someone else too'),
       h('div', { class: 'app-form-grid' },
@@ -1005,14 +1013,14 @@
         field('Their WhatsApp number (optional)', phone, cfg.weeklyAuto && store.mode === 'supabase'
           ? 'With the country code. It stays in your archive. It opens WhatsApp on your phone, or, if you switch on sending for you, the question is sent to it.'
           : 'With the country code. It stays in your archive and is only used to open WhatsApp on your phone.'),
-        field('Which day?', day), field('Sign the message as', signAs),
+        field('Which day?', day), field('Ask in', lang, 'They can answer in any language.'), field('Sign the message as', signAs),
         field('Their birthday (optional)', birthday, 'Just the day and month. We remind you a few days before.'),
       ),
       h('div', { class: 'btn-row' }, button('Start the weekly question', null, 'btn', 'submit')),
     ]);
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      store.saveElder({ name: name.value.trim(), relation: relation.value.trim(), phone: phone.value.trim(), day: Number(day.value), signAs: signAs.value.trim(), birthday: bMonth.value && bDay.value ? bMonth.value + '-' + bDay.value : '' })
+      store.saveElder({ name: name.value.trim(), relation: relation.value.trim(), phone: phone.value.trim(), day: Number(day.value), signAs: signAs.value.trim(), lang: lang.value, birthday: bMonth.value && bDay.value ? bMonth.value + '-' + bDay.value : '' })
         .then(function (e) { location.hash = '#/weekly?elder=' + e.id; }).catch(fail);
     });
     return open ? form : h('details', { class: 'app-more' }, h('summary', null, 'Ask someone else too'), form);

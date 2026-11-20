@@ -121,7 +121,7 @@
         media: (e.media || []).map(mediaOut).sort(function (a, b) { return a.createdAt.localeCompare(b.createdAt); }),
       };
     }
-    function elderOut(e) { return { id: e.id, owner: e.owner_id, name: e.name, relation: e.relation || '', phone: e.phone || '', day: e.day, idx: e.idx, answered: e.answered, askedAt: e.asked_at, signAs: e.sign_as || '', autoSend: !!e.auto_send, birthday: e.birthday || '', createdAt: e.created_at }; }
+    function elderOut(e) { return { id: e.id, owner: e.owner_id, name: e.name, relation: e.relation || '', phone: e.phone || '', day: e.day, idx: e.idx, answered: e.answered, askedAt: e.asked_at, signAs: e.sign_as || '', autoSend: !!e.auto_send, birthday: e.birthday || '', lang: e.lang || 'en', createdAt: e.created_at }; }
 
     function removeFiles(paths) {
       if (!paths.length) return Promise.resolve();
@@ -331,7 +331,7 @@
 
       saveElder: function (f) {
         var row = {};
-        var map = { name: 'name', relation: 'relation', phone: 'phone', day: 'day', idx: 'idx', answered: 'answered', askedAt: 'asked_at', signAs: 'sign_as', autoSend: 'auto_send', birthday: 'birthday' };
+        var map = { name: 'name', relation: 'relation', phone: 'phone', day: 'day', idx: 'idx', answered: 'answered', askedAt: 'asked_at', signAs: 'sign_as', autoSend: 'auto_send', birthday: 'birthday', lang: 'lang' };
         Object.keys(map).forEach(function (k) { if (k in f) row[map[k]] = f[k]; });
         if ('name' in row && !String(row.name).trim()) return Promise.reject(new Error('Please add their name.'));
         var req = f.id
