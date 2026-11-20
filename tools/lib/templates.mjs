@@ -101,7 +101,7 @@ export function footerBlock({ site }) {
 <div class="site-footer__brand"><a class="wordmark wordmark--footer" href="/">${logo(96)}<span>${e(site.name)}</span></a><p>${e(site.tagline)} ${e(site.supportingLine)}</p></div>
 ${cols}
 </div>
-<div class="container site-footer__bottom"><span>© ${new Date().getFullYear()} ${e(site.name)}. Rooted in India, curious about everywhere.</span><span class="site-footer__legal"><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/community-guidelines.html">Community guidelines</a><a href="/credits.html">Illustrations</a></span></div>
+<div class="container site-footer__bottom"><span>© ${new Date().getFullYear()} ${e(site.name)}. Rooted in India, curious about everywhere.</span><span class="site-footer__legal"><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/community-guidelines.html">Community guidelines</a><a href="/if-we-close.html">If we close</a><a href="/credits.html">Illustrations</a></span></div>
 </footer>
 <script src="/scripts/site.js" defer></script>`;
 }
