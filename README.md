@@ -12,10 +12,11 @@ The site is plain HTML, CSS and a little JavaScript, built by a small Node scrip
 npm run dev      # build, then serve at http://localhost:4321
 npm run build    # regenerate every page in public/
 npm run check    # fail if public/ is out of date or has broken links, missing alt text or unlicensed images
-npm test         # unit, site and app tests (node --test)
+npm test         # unit, site and app tests (node --test), then the Python function tests
+npm run test:py  # only the Python tests (python3 -m unittest)
 ```
 
-Node 18 or newer is all you need. There is nothing to `npm install`.
+Node 18 or newer and Python 3.10 or newer are all you need: Node builds the site and serves it, and Python runs the server functions in `api/`. There is nothing to `npm install` or `pip install` (Vercel installs `requirements.txt`, which only adds time zone data).
 
 The local server only answers this computer and sends the same security headers as the live site (from `vercel.json`). To try the site on a phone on your Wi-Fi, run `HOST=0.0.0.0 npm run serve`; anyone on that network can then open it. The security settings to check when you connect Supabase are in `backend/README.md`, under "Keeping it locked down".
 
@@ -124,7 +125,7 @@ Moderators can also feature a published contribution from the moderate page ("Fe
 
 When families suggest a place that has no page yet, the moderate page groups the suggestions. `npm run new-place -- --list` shows them; `npm run new-place -- --name "Jorhat" --region "Assam" --lat 26.75 --lng 94.2` writes `content/places/jorhat.json` (marked as started by families, with no photograph yet). With `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` set it also adds the place to the database and moves the waiting suggestions onto it; otherwise build, re-run `backend/places.sql`, and move them from the moderate page. Suggestions that match an existing place can be moved from the moderate page.
 
-Shared contributions live at `/s/<id>`, served by `api/shared.mjs` so WhatsApp, LinkedIn and others show the contribution in their link preview. Empty Commons and home feeds show a few examples from `content/community-examples.json`, always labelled as written by us; keep them factual.
+Shared contributions live at `/s/<id>`, served by `api/shared.py` so WhatsApp, LinkedIn and others show the contribution in their link preview. Empty Commons and home feeds show a few examples from `content/community-examples.json`, always labelled as written by us; keep them factual.
 
 ## Weekly question sender
 
