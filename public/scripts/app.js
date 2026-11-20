@@ -302,6 +302,7 @@
       h('li', null, 'Your archive is private. Nobody sees an entry unless you share it with them, and "Only me" stays private forever.'),
       h('li', null, 'You decide what is passed on, to whom, and when. Nothing is passed on while you are still visiting.'),
       h('li', null, 'You can download everything, or delete your account, at any time.'),
+      h('li', null, 'We will never clone anyone\u2019s voice, or use your recordings to train AI.'),
     )));
     return h1;
   }
