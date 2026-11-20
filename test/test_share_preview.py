@@ -40,7 +40,7 @@ class SharePreview(unittest.TestCase):
         self.assertEqual(fake.calls[0]['headers']['authorization'], 'Bearer eyJanon')
 
     def test_s_id_is_rewritten_to_the_function_which_answers_404_for_anything_unknown(self):
-        self.assertEqual(VERCEL['rewrites'], [{'source': '/s/:id', 'destination': '/api/shared?id=:id'}])
+        self.assertIn({'source': '/s/:id', 'destination': '/api/shared?id=:id'}, VERCEL['rewrites'])
         self.assertRegex(VERCEL['functions']['api/shared.py']['includeFiles'], r'public/shared\.html')
         shared = load_api('shared')
         from backend.web import Request

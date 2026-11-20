@@ -130,6 +130,10 @@
     {
       "source": "/s/:id",
       "destination": "/api/shared?id=:id"
+    },
+    {
+      "source": "/card/:token",
+      "destination": "/api/card?token=:token"
     }
   ]
 }

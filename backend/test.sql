@@ -292,6 +292,31 @@ select as_user('00000000-0000-0000-0000-00000000000a', 'asha@example.com');
 select check_that(fails($$select * from whatsapp_messages$$), 'nobody signed in can read which WhatsApp messages were kept');
 select check_that(fails($$insert into whatsapp_messages (id, elder_id, entry_id) values ('x', gen_random_uuid(), gen_random_uuid())$$), 'or add to them');
 
+-- Private cards: only for the owner's own recordings, and only the owner sees or withdraws them.
+select as_user('00000000-0000-0000-0000-00000000000a', 'asha@example.com');
+insert into entries (kind, title, audience) values ('story', 'Nani sings', 'private');
+insert into media (entry_id, owner_id, kind, name, mime, size, path)
+  select id, owner_id, 'audio', 'song.m4a', 'audio/mp4', 10, owner_id || '/' || id || '/song.m4a' from entries where title = 'Nani sings';
+insert into cards (entry_id, media_id, note) select m.entry_id, m.id, 'For Mamaji' from media m where m.name = 'song.m4a';
+select check_that((select count(*) from cards) = 1 and (select length(token) from cards) = 64, 'an owner makes a card with a long random link');
+select check_that((select expires_at > now() + interval '29 days' and expires_at < now() + interval '31 days' from cards), 'it lasts thirty days unless chosen otherwise');
+select check_that(fails($$insert into cards (entry_id, media_id, expires_at) select m.entry_id, m.id, now() + interval '2 years' from media m where m.name = 'song.m4a'$$), 'but never more than a year');
+select check_that(fails($$update cards set token = 'guessable'$$), 'the link cannot be chosen');
+select check_that(fails($$update cards set views = 0$$), 'nor the count of plays');
+update cards set revoked_at = now();
+select check_that((select revoked_at is not null from cards), 'the owner can withdraw it');
+select as_user('00000000-0000-0000-0000-00000000000b', 'bina@example.com');
+select check_that((select count(*) from cards) = 0, 'nobody else sees the card');
+select check_that(fails($$insert into cards (entry_id, media_id) select m.entry_id, m.id from media m where m.name = 'song.m4a'$$)
+  or (select count(*) from media where name = 'song.m4a') = 0, 'nor makes cards of someone else''s recordings');
+reset role;
+select check_that(not exists (select 1 from cards where owner_id = '00000000-0000-0000-0000-00000000000b'), 'nothing was made for them');
+set role authenticated;
+set role anon;
+select check_that(fails($$select * from cards$$), 'visitors cannot list cards');
+reset role;
+set role authenticated;
+
 -- Leaving takes the whole archive with it.
 select as_user('00000000-0000-0000-0000-000000000012', 'quiet@example.com');
 insert into entries (kind, title, audience) values ('story', 'A quiet story', 'private');

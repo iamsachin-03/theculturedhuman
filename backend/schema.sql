@@ -125,6 +125,24 @@ create table whatsapp_messages (
 );
 create index whatsapp_messages_recent on whatsapp_messages (elder_id, created_at desc);
 
+-- A private card: one recording (or photograph) from an entry, for relatives without an account.
+-- Whoever has the link can play it until it expires or the owner withdraws it; api/card.py serves
+-- it with the service key, so nothing else of the archive is reachable through it.
+create table cards (
+  id uuid primary key default gen_random_uuid(),
+  token text not null unique default replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', ''),
+  owner_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  entry_id uuid not null references entries (id) on delete cascade,
+  media_id uuid not null references media (id) on delete cascade,
+  note text check (length(note) <= 280),
+  expires_at timestamptz not null default now() + interval '30 days',
+  revoked_at timestamptz,
+  views int not null default 0,
+  created_at timestamptz not null default now(),
+  check (expires_at <= created_at + interval '366 days')
+);
+create index cards_entry on cards (entry_id);
+
 create table roots (
   owner_id uuid primary key default auth.uid() references auth.users (id) on delete cascade,
   data jsonb not null default '{}'
@@ -598,6 +616,7 @@ alter table entries enable row level security;
 alter table media enable row level security;
 alter table weekly_elders enable row level security;
 alter table whatsapp_messages enable row level security;
+alter table cards enable row level security;
 alter table roots enable row level security;
 alter table places enable row level security;
 alter table place_contributions enable row level security;
@@ -636,6 +655,12 @@ create policy "authors and owners remove media" on media for delete using (entry
 create policy "authors and owners write transcripts" on media for update using (entry_editable(entry_id)) with check (entry_editable(entry_id));
 
 create policy "owners only" on weekly_elders for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+create policy "owners see their cards" on cards for select using (owner_id = auth.uid());
+create policy "owners make cards of their own recordings" on cards for insert with check (
+  owner_id = auth.uid() and exists (select 1 from media m where m.id = media_id and m.entry_id = cards.entry_id and m.owner_id = auth.uid())
+);
+create policy "owners withdraw their cards" on cards for update using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+create policy "owners delete their cards" on cards for delete using (owner_id = auth.uid());
 create policy "owners only" on roots for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
 
 create policy "anyone reads places" on places for select using (true);
@@ -684,6 +709,9 @@ grant select on places, place_contributions, listings, contribution_echo_counts 
 grant select, insert, update, delete on all tables in schema public to authenticated;
 revoke insert, update, delete on contacts, contribution_echo_counts from authenticated;
 revoke all on whatsapp_messages from authenticated;
+revoke insert, update on cards from authenticated;
+grant insert (entry_id, media_id, note, expires_at) on cards to authenticated;
+grant update (revoked_at) on cards to authenticated;
 revoke update on legacy, people, media from authenticated;
 grant update (transcript, translation, transcript_by) on media to authenticated;
 grant update (quiet_months, wait_days) on legacy to authenticated;

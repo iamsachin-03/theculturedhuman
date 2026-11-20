@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Serves public/ locally the way Vercel does: /journal/ → index.html, unknown paths → 404.html,
-// /s/<id> → api/shared.py, and the Python functions in api/ at /api/<name> (each run through
+// /s/<id> → api/shared.py, /card/<token> → api/card.py, and the Python functions in api/ at /api/<name> (each run through
 // tools/run_function.py, so edits apply on the next request). Every response carries the security
 // headers from vercel.json. Functions read their settings from the environment, as on Vercel.
 //   node tools/serve.mjs [port]
@@ -114,6 +114,7 @@ async function handle(req, res) {
   const path = url.pathname;
   const share = path.match(/^\/s\/([\w-]+)$/);
   if (share && (await callFunction('shared', req, res, url))) return;
+  if (/^\/card\/[\w-]+$/.test(path) && (await callFunction('card', req, res, url))) return;
   const fn = path.match(/^\/api\/([\w-]+)$/);
   if (fn && (await callFunction(fn[1], req, res, url))) return;
   if (req.method !== 'GET' && req.method !== 'HEAD') {

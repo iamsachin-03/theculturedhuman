@@ -63,8 +63,18 @@ function readBody(req) {
   });
 }
 
+// The service-role key (server functions only) may read and write anything, as on Supabase.
+function serviceRole(auth) {
+  const [head, payload, sig] = String(auth || '').replace(/^Bearer /, '').split('.');
+  if (!sig) return false;
+  const good = createHmac('sha256', SECRET).update(`${head}.${payload}`).digest('base64url');
+  if (sig.length !== good.length || !timingSafeEqual(Buffer.from(sig), Buffer.from(good))) return false;
+  try { return JSON.parse(Buffer.from(payload, 'base64url').toString()).role === 'service_role'; } catch { return false; }
+}
+
 // Asks the database, as the signed-in user, whether a storage path may be read or written.
 function allowed(fn, path, auth, apikey) {
+  if (serviceRole(auth)) return Promise.resolve(true);
   return new Promise((resolve) => {
     const body = JSON.stringify({ path });
     const up = request(

@@ -621,6 +621,70 @@
     return box;
   }
 
+  // A private card: one recording or photograph for relatives without an account (api/card.py).
+  var CARD_LASTS = [{ id: '7', label: 'A week' }, { id: '30', label: 'A month' }, { id: '365', label: 'A year' }];
+  function cardsPanel(e) {
+    var sendable = e.media.filter(function (m) { return m.kind === 'audio' || m.kind === 'video' || m.kind === 'photo'; });
+    if (!sendable.length) return null;
+    var panel = h('details', { class: 'app-card app-cards' }, h('summary', null, h('strong', null, 'Send it to family without an account')));
+    var list = h('ul', { class: 'app-cards__list' });
+    var made = h('div', { 'aria-live': 'polite' });
+    var which = options(h('select', { name: 'media' }), sendable.map(function (m) { return { id: m.id, label: m.name }; }), sendable[0].id);
+    var note = h('textarea', { name: 'note', rows: '2', maxlength: '280', placeholder: 'Mamaji, Nani singing the song you asked about.' });
+    var lasts = options(h('select', { name: 'lasts' }), CARD_LASTS, '30');
+    var form = h('form', { class: 'app-cards__form' },
+      sendable.length > 1 ? field('Which one', which) : null,
+      field('A few words with it (optional)', note),
+      field('The link works for', lasts),
+      h('div', { class: 'btn-row' }, button('Make a private card', null, 'btn btn--small', 'submit')));
+    function cardUrl(c) { return location.origin + '/card/' + c.token; }
+    function share(c, m) {
+      var text = (c.note ? c.note + '\n\n' : '') + cardUrl(c);
+      return h('div', { class: 'btn-row' },
+        h('a', { class: 'btn btn--small', href: 'https://wa.me/?text=' + encodeURIComponent(text), target: '_blank', rel: 'noopener' }, 'Send on WhatsApp'),
+        button('Copy the link', function () {
+          (navigator.clipboard ? navigator.clipboard.writeText(cardUrl(c)) : Promise.reject()).then(function () { say('Copied.'); }, function () { say('Select the link and copy it.'); });
+        }, 'btn btn--ghost btn--small'));
+    }
+    function draw(cards) {
+      list.textContent = '';
+      cards.forEach(function (c) {
+        var m = sendable.filter(function (x) { return x.id === c.mediaId; })[0];
+        var live = !c.revokedAt && new Date(c.expiresAt) > new Date();
+        add(list, h('li', null,
+          h('p', null, h('strong', null, m ? m.name : 'A file'), c.note ? ' \u2014 ' + c.note : ''),
+          h('p', { class: 'field__hint' }, [
+            'Made ' + core.formatDate(c.createdAt),
+            plural(c.views, 'opening'),
+            c.revokedAt ? 'withdrawn' : live ? 'works until ' + core.formatDate(c.expiresAt) : 'expired',
+          ].join(' \u00b7 ')),
+          live ? h('p', { class: 'app-cards__url' }, cardUrl(c)) : null,
+          live ? h('div', { class: 'btn-row' }, share(c, m), button('Withdraw', function () {
+            if (!confirm('Withdraw this card? The link stops working straight away.')) return;
+            store.withdrawCard(c.id).then(load).catch(fail);
+          }, 'btn btn--ghost btn--small')) : null));
+      });
+    }
+    function load() { return store.cards(e.id).then(draw).catch(fail); }
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var m = sendable.filter(function (x) { return x.id === which.value; })[0];
+      var expires = new Date(Date.now() + Number(lasts.value) * 86400000).toISOString();
+      store.createCard(m, { note: note.value, expiresAt: expires }).then(function (c) {
+        made.textContent = '';
+        add(made, [h('p', null, 'Your card is ready. Anyone with this link can ' + (m.kind === 'photo' ? 'see this photograph' : 'play this recording') + ' until ' + core.formatDate(c.expiresAt) + ':'), h('p', { class: 'app-cards__url' }, cardUrl(c)), share(c, m)]);
+        note.value = '';
+        return load();
+      }).catch(fail);
+    });
+    add(panel, [
+      h('p', { class: 'field__hint' }, 'A private card plays one recording, or shows one photograph, to anyone you send the link to, with no account. Nothing else in your archive can be reached through it, and you can withdraw it at any time.'),
+      form, made, list,
+    ]);
+    panel.addEventListener('toggle', function () { if (panel.open && !panel.dataset.loaded) { panel.dataset.loaded = '1'; load(); } });
+    return panel;
+  }
+
   function entryView(id) {
     return Promise.all([store.entry(id), loadPeople()]).then(function (r) {
       var e = r[0];
@@ -660,6 +724,7 @@
       var about = String(rememberedName(e) || e.teller || '').trim();
       if (mineArchive && about) add(actions, link('#/archive?teller=' + encodeURIComponent(about), 'Everything about ' + about, 'text-link'));
       add(view, actions);
+      if (mineArchive && store.mode === 'supabase' && !sample) add(view, cardsPanel(e));
       if (mineArchive && about) add(view, askFamily(about, false));
       return h1;
     });

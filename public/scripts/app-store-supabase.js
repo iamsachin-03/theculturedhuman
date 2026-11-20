@@ -434,6 +434,20 @@
           });
       },
 
+      // Private cards (api/card.py serves them). Only the owner makes, sees and withdraws them.
+      cards: function (entryId) {
+        return rest('cards?select=id,token,media_id,note,expires_at,revoked_at,views,created_at&entry_id=eq.' + enc(entryId) + '&order=created_at.desc').then(function (rows) {
+          return rows.map(function (c) { return { id: c.id, token: c.token, mediaId: c.media_id, note: c.note || '', expiresAt: c.expires_at, revokedAt: c.revoked_at, views: c.views, createdAt: c.created_at }; });
+        });
+      },
+      createCard: function (m, f) {
+        return rest('cards', { method: 'POST', json: { entry_id: m.entryId, media_id: m.id, note: String(f.note || '').trim() || null, expires_at: f.expiresAt }, headers: { prefer: 'return=representation' } })
+          .then(function (rows) { return { id: rows[0].id, token: rows[0].token, mediaId: rows[0].media_id, note: rows[0].note || '', expiresAt: rows[0].expires_at, revokedAt: null, views: 0, createdAt: rows[0].created_at }; });
+      },
+      withdrawCard: function (id) {
+        return rest('cards?id=eq.' + enc(id), { method: 'PATCH', json: { revoked_at: new Date().toISOString() }, headers: { prefer: 'return=minimal' } });
+      },
+
       /** For the site's own serverless functions (payments), which check it with Supabase. */
       accessToken: function () { return session && session.access_token ? session.access_token : null; },
 
